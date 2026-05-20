@@ -576,6 +576,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
   <!-- MANUAL MODE -->
   <div id="closeMode-manual" style="display:none">
+    <div style="margin-bottom:12px"><label style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase">📅 تاريخ التقفيل</label><input type="date" id="manClosingDate" class="fi" style="margin-top:4px" onchange="onManClosingDateChange()"></div>
     <div class="calc-half">
       <div class="calc-half-hdr">
         <span class="calc-half-lbl" style="color:var(--yellow)">☀️ ساعات صباحية</span>
@@ -1079,6 +1080,7 @@ window.addEventListener('DOMContentLoaded', function(){
   document.getElementById('invFrom').value = today;
   document.getElementById('invTo').value = today;
   document.getElementById('closingDate').value = today;
+  document.getElementById('manClosingDate').value = today;
   updatePricePreview();
   document.getElementById('setPriceAM').value = D.settings.priceAM;
   document.getElementById('setPricePM').value = D.settings.pricePM;
@@ -1642,7 +1644,13 @@ function calcClosing(){
 }
 
 function saveClosing(mode){
-  let dv=document.getElementById('closingDate').value;
+  let dv;
+  if(mode==='book'){
+    dv=document.getElementById('closingDate').value;
+  } else {
+    dv=document.getElementById('manClosingDate').value||document.getElementById('closingDate').value;
+  }
+  if(!dv){showToast('اختر تاريخ التقفيل ⚠️','#e03131');return;}
   let actCash,actVisa,actExpInput,expList,net,grossRev;
   if(mode==='book'){
     actCash=parseFloat(document.getElementById('closeActualCash').value)||0;
@@ -1906,17 +1914,47 @@ function exportToExcel(inventoryMode){
   if(inventoryMode){
     let from=document.getElementById('invFrom').value, to=document.getElementById('invTo').value;
     if(!from||!to){showToast('اختر الفترة أولاً ⚠️','#e03131');return;}
-    let rows=[['التاريخ','العميل','الهاتف','الملعب','الوقت','المدة (س)','الإجمالي ج','الكاش ج','الفيزا ج','طريقة الدفع','ملاحظات']];
+    let rows=[];
+    let grandCash=0,grandVisa=0,grandExp=0,grandTotal=0,grandHrs=0,grandBookings=0;
     Object.keys(D.bookings).sort().forEach(date=>{
       if(date<from||date>to)return;
-      (D.bookings[date]||[]).forEach(b=>{
-        let p=parseFloat(b.price)||0,sc=parseFloat(b.splitCash)||0,sv=parseFloat(b.splitVisa)||0;
-        let cash=b.pay==='cash'?p:b.pay==='split'?sc:0;
-        let visa=b.pay==='visa'?p:b.pay==='split'?sv:0;
-        rows.push([date,b.cust||'',b.phone||'',b.court,b.time,parseFloat(b.dur)||0,p,cash,visa,b.pay||'',b.notes||'']);
+      let books=D.bookings[date]||[]; if(!books.length)return;
+      let dayCash=0,dayVisa=0,dayTotal=0,dayHrs=0;
+      rows.push([formatDateAr(date),'','','','','']);
+      rows.push(['الوقت','العميل','الهاتف','الملعب / المدة','الدفع','المبلغ ج']);
+      books.sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(b=>{
+        let p=parseFloat(b.price)||0,dur=parseFloat(b.dur)||0;
+        let et=endT(b.time,b.dur);
+        let payTxt=b.pay==='cash'?'كاش':b.pay==='visa'?'فيزا':b.pay==='split'?'مختلط':'معلق';
+        let sc=parseFloat(b.splitCash)||0,sv=parseFloat(b.splitVisa)||0;
+        let bCash=b.pay==='cash'?p:b.pay==='split'?sc:0;
+        let bVisa=b.pay==='visa'?p:b.pay==='split'?sv:0;
+        dayCash+=bCash;dayVisa+=bVisa;dayTotal+=p;dayHrs+=dur;
+        rows.push([fmt12(b.time)+'—'+fmt12(et),b.cust||'—',b.phone||'—','م'+b.court+' · '+durLbl(b.dur),payTxt,p]);
       });
+      rows.push(['إجمالي الحجوزات','',books.length+' حجز',''+dayHrs+'س','',dayTotal]);
+      let dayExpenses=(D.dayExpenses[date]||[]);
+      let bookExpenses=[];
+      books.forEach(b=>{if(b.expenses&&b.expenses.length)bookExpenses=bookExpenses.concat(b.expenses);});
+      let allDayExp=dayExpenses.concat(bookExpenses);
+      let dayExpTotal=allDayExp.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+      if(allDayExp.length){
+        allDayExp.forEach(e=>{rows.push(['📌 '+(e.desc||'مصروف'),'','','','مصروف',-1*(parseFloat(e.amt)||0)]);});
+        rows.push(['إجمالي المصاريف','','','','',-1*dayExpTotal]);
+      }
+      let dayNet=dayTotal-dayExpTotal;
+      rows.push(['💡 صافي اليوم','','','','',dayNet]);
+      rows.push([]);
+      grandCash+=dayCash;grandVisa+=dayVisa;grandExp+=dayExpTotal;grandTotal+=dayTotal;grandHrs+=dayHrs;grandBookings+=books.length;
     });
-    let ws=XLSX.utils.aoa_to_sheet(rows); XLSX.utils.book_append_sheet(wb,ws,'الجرد'); XLSX.writeFile(wb,'padel_جرد_'+from+'_'+to+'.xlsx');
+    rows.push(['=== الإجمالي الكلي ===','','','','','']);
+    rows.push(['💵 كاش','','','','',grandCash]);
+    rows.push(['💳 فيزا','','','','',grandVisa]);
+    rows.push(['🔴 مصاريف','','','','',-1*grandExp]);
+    rows.push(['💡 صافي','','','','',grandCash+grandVisa-grandExp]);
+    let ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:22},{wch:16},{wch:14},{wch:16},{wch:12},{wch:14}];
+    XLSX.utils.book_append_sheet(wb,ws,'الجرد'); XLSX.writeFile(wb,'padel_جرد_'+from+'_'+to+'.xlsx');
   } else {
     let rows=[['التاريخ','العميل','الهاتف','الملعب','الوقت','المدة','السعر ج','الدفع','ملاحظات']];
     Object.keys(D.bookings).sort().forEach(date=>{(D.bookings[date]||[]).forEach(b=>{rows.push([date,b.cust||'',b.phone||'',b.court,b.time,parseFloat(b.dur)||0,parseFloat(b.price)||0,b.pay||'',b.notes||'']);});});
@@ -1931,27 +1969,75 @@ function exportToExcel(inventoryMode){
   }
   showToast('تم تصدير الإكسيل ✓ 📊');
 }
+function onManClosingDateChange(){
+  let dv=document.getElementById('manClosingDate').value;
+  if(dv){
+    expenses.man=[]; renderExpenses('man');
+    let saved=D.dayExpenses[dv]||[];
+    expenses.man=saved.slice(); renderExpenses('man');
+  }
+}
+
 function exportInventoryImage(){
   let from=document.getElementById('invFrom').value, to=document.getElementById('invTo').value;
   if(!from||!to){showToast('اختر الفترة أولاً ⚠️','#e03131');return;}
   calcInventory();
-  let isDark=document.documentElement.getAttribute('data-theme')!=='light';
-  let bg=isDark?'#060c14':'#f0f4f8', textC=isDark?'#dde8f5':'#1a2533', accent='#00a651';
-  let cash=document.getElementById('invCash').textContent, visa=document.getElementById('invVisa').textContent;
-  let hrs=document.getElementById('invHrs').textContent, exp=document.getElementById('invExp').textContent, net=document.getElementById('invNet').textContent;
+  let accent='#00a651', borderC='#d0d8e0', textC='#1a2533';
+  let totalCashNum=0,totalVisaNum=0,totalExpNum=0,totalBookings=0,totalHrsNum=0;
   let label=from===to?formatDateAr(from):formatDateAr(from)+' — '+formatDateAr(to);
-  let html='<div style="background:'+bg+';color:'+textC+';padding:24px;font-family:Arial,sans-serif;direction:rtl;width:600px">'
-    +'<div style="font-size:22px;font-weight:900;color:'+accent+';margin-bottom:4px">🏸 '+(D.settings.clubName||'Padel MGR')+'</div>'
-    +'<div style="font-size:12px;color:#888;margin-bottom:16px;border-bottom:2px solid '+accent+';padding-bottom:10px">جرد: '+label+' · '+new Date().toLocaleString('ar-EG')+'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-    +'<div style="background:rgba(0,166,81,.1);border:1px solid rgba(0,166,81,.3);border-radius:10px;padding:14px"><div style="font-size:11px;color:#888">💵 كاش</div><div style="font-size:22px;font-weight:900;color:'+accent+'">'+cash+'</div></div>'
-    +'<div style="background:rgba(26,127,196,.1);border:1px solid rgba(26,127,196,.3);border-radius:10px;padding:14px"><div style="font-size:11px;color:#888">💳 فيزا</div><div style="font-size:22px;font-weight:900;color:#1a7fc4">'+visa+'</div></div>'
-    +'<div style="background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:10px;padding:14px"><div style="font-size:11px;color:#888">🔴 مصاريف</div><div style="font-size:22px;font-weight:900;color:#e03131">'+exp+'</div></div>'
-    +'<div style="background:rgba(0,166,81,.15);border:2px solid rgba(0,166,81,.4);border-radius:10px;padding:14px"><div style="font-size:11px;color:#888">💡 الصافي</div><div style="font-size:22px;font-weight:900;color:'+accent+'">'+net+'</div></div>'
-    +'</div></div>';
-  let container=document.createElement('div'); container.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-1;width:640px;'; container.innerHTML=html; document.body.appendChild(container);
+  let dayTables='';
+  Object.keys(D.bookings).sort().forEach(date=>{
+    if(date<from||date>to)return;
+    let books=D.bookings[date]||[]; if(!books.length)return;
+    let dayCash=0,dayVisa=0,dayHrs=0,dayTotal=0;
+    books.forEach(b=>{let p=parseFloat(b.price)||0;dayTotal+=p;dayHrs+=parseFloat(b.dur)||0;
+      if(b.pay==='cash')dayCash+=p;else if(b.pay==='visa')dayVisa+=p;else if(b.pay==='split'){dayCash+=(parseFloat(b.splitCash)||0);dayVisa+=(parseFloat(b.splitVisa)||0);}
+    });
+    totalCashNum+=dayCash;totalVisaNum+=dayVisa;totalHrsNum+=dayHrs;totalBookings+=books.length;
+    dayTables+='<tr style="background:'+accent+';color:#fff"><td colspan="6" style="padding:10px 14px;font-weight:900;font-size:15px;border:none">'+formatDateAr(date)+'</td></tr>';
+    dayTables+='<tr style="background:rgba(0,166,81,.08)"><td style="padding:6px 10px;font-size:10px;color:#888;text-align:right" colspan="6">'+books.length+' حجز · '+dayHrs+' ساعة · '+dayTotal.toLocaleString()+' ج</td></tr>';
+    dayTables+='<tr style="background:#e8ede8;font-weight:800;font-size:11px;color:#555"><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">الوقت</td><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">العميل</td><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">الهاتف</td><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">الملعب / المدة</td><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">الدفع</td><td style="padding:8px 10px;border-bottom:2px solid '+accent+'">المبلغ</td></tr>';
+    books.sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(b=>{
+      let p=parseFloat(b.price)||0;
+      let et=endT(b.time,b.dur);
+      let payIcon=b.pay==='cash'?'<span style="color:'+accent+'">🟩 كاش</span>':b.pay==='visa'?'<span style="color:#1a7fc4">🟦 فيزا</span>':b.pay==='split'?'<span style="color:#7c3aed">🔗 مختلط</span>':'<span style="color:#c68000">⚠️ معلق</span>';
+      dayTables+='<tr style="border-bottom:1px solid '+borderC+'"><td style="padding:8px 10px;font-size:12px;font-weight:700">'+fmt12(b.time)+'—'+fmt12(et)+'</td><td style="padding:8px 10px;font-size:13px;font-weight:700">'+(b.cust||'—')+'</td><td style="padding:8px 10px;font-size:12px;color:#888">'+(b.phone||'—')+'</td><td style="padding:8px 10px;font-size:12px">م'+b.court+' · '+durLbl(b.dur)+'</td><td style="padding:8px 10px;font-size:12px">'+payIcon+'</td><td style="padding:8px 10px;font-size:14px;font-weight:900">'+p.toLocaleString()+' ج</td></tr>';
+    });
+    dayTables+='<tr style="background:rgba(0,166,81,.06);border-top:2px solid '+accent+'"><td colspan="4" style="padding:8px 10px;font-weight:900;font-size:12px;color:'+accent+'">إجمالي الحجوزات</td><td style="padding:8px 10px;font-size:11px;color:#888">'+books.length+' حجز · '+dayHrs+'س</td><td style="padding:8px 10px;font-weight:900;font-size:15px;color:'+accent+'">'+dayTotal.toLocaleString()+' ج</td></tr>';
+    let dayExpenses=(D.dayExpenses[date]||[]);
+    let bookExpenses=[];
+    books.forEach(b=>{if(b.expenses&&b.expenses.length)bookExpenses=bookExpenses.concat(b.expenses);});
+    let allDayExp=dayExpenses.concat(bookExpenses);
+    let dayExpTotal=allDayExp.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+    totalExpNum+=dayExpTotal;
+    if(allDayExp.length){
+      allDayExp.forEach(e=>{
+        dayTables+='<tr style="background:rgba(224,49,49,.04)"><td colspan="4" style="padding:6px 10px;font-size:12px;color:#e03131">📌 '+(e.desc||'مصروف')+'</td><td style="padding:6px 10px;font-size:11px;color:#888">مصروف</td><td style="padding:6px 10px;font-size:13px;font-weight:900;color:#e03131">−'+(parseFloat(e.amt)||0).toLocaleString()+' ج</td></tr>';
+      });
+      dayTables+='<tr style="background:rgba(224,49,49,.08);border-top:1px solid #e03131"><td colspan="5" style="padding:6px 10px;font-weight:800;font-size:12px;color:#e03131">إجمالي المصاريف</td><td style="padding:6px 10px;font-weight:900;font-size:13px;color:#e03131">−'+dayExpTotal.toLocaleString()+' ج</td></tr>';
+    }
+    let dayNet=dayTotal-dayExpTotal;
+    dayTables+='<tr style="background:rgba(0,166,81,.12);border-top:2px solid '+accent+';border-bottom:3px solid '+accent+'"><td colspan="5" style="padding:10px 14px;font-weight:900;font-size:14px;color:'+accent+'">💡 صافي اليوم</td><td style="padding:10px 14px;font-weight:900;font-size:18px;color:'+accent+'">'+dayNet.toLocaleString()+' ج</td></tr>';
+    dayTables+='<tr><td colspan="6" style="padding:6px;border:none"></td></tr>';
+  });
+  let totalNet=totalCashNum+totalVisaNum-totalExpNum;
+  let html='<div style="background:#fff;color:'+textC+';padding:28px;font-family:Arial,Tahoma,sans-serif;direction:rtl;width:800px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div><div style="font-size:10px;color:#888">جرد تفصيلي · '+new Date().toLocaleString('ar-EG')+'</div></div><div style="text-align:left"><div style="font-size:26px;font-weight:900;color:'+accent+'">🏸 '+(D.settings.clubName||'Padel MGR')+'</div></div></div>'
+    +'<div style="font-size:14px;font-weight:700;margin-bottom:2px">'+label+'</div>'
+    +'<div style="font-size:11px;color:#888;margin-bottom:16px">'+totalBookings+' حجز · '+totalHrsNum+' ساعة</div>'
+    +'<div style="border-top:3px solid '+accent+';margin-bottom:16px"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px">'
+    +'<div style="background:rgba(0,166,81,.06);border:2px solid rgba(0,166,81,.3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💵 كاش</div><div style="font-size:24px;font-weight:900;color:'+accent+'">'+totalCashNum.toLocaleString()+'</div></div>'
+    +'<div style="background:rgba(26,127,196,.06);border:2px solid rgba(26,127,196,.3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💳 فيزا</div><div style="font-size:24px;font-weight:900;color:#1a7fc4">'+totalVisaNum.toLocaleString()+'</div></div>'
+    +'<div style="background:rgba(224,49,49,.06);border:2px solid rgba(224,49,49,.2);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">🔴 مصاريف</div><div style="font-size:24px;font-weight:900;color:#e03131">'+totalExpNum.toLocaleString()+'</div></div>'
+    +'<div style="background:rgba(0,166,81,.1);border:2px solid rgba(0,166,81,.4);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💡 صافي</div><div style="font-size:24px;font-weight:900;color:'+accent+'">'+totalNet.toLocaleString()+'</div></div>'
+    +'</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px;direction:rtl;text-align:right" cellpadding="0" cellspacing="0">'+dayTables+'</table>'
+    +'<div style="text-align:center;font-size:10px;color:#aaa;margin-top:16px;padding-top:10px;border-top:1px solid #ddd">'+(D.settings.clubName||'Padel MGR')+' · '+label+' — '+formatDateAr(ymd(new Date()))+'</div>'
+    +'</div>';
+  let container=document.createElement('div'); container.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-1;width:860px;'; container.innerHTML=html; document.body.appendChild(container);
   if(window.html2canvas){
-    html2canvas(container.firstChild,{scale:2,backgroundColor:bg,useCORS:true,logging:false}).then(function(canvas){
+    html2canvas(container.firstChild,{scale:2,backgroundColor:'#fff',useCORS:true,logging:false}).then(function(canvas){
       try{document.body.removeChild(container);}catch(e){}
       let link=document.createElement('a'); link.download='padel_جرد_'+from+'_'+to+'.png'; link.href=canvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); document.body.removeChild(link); showToast('تم تحميل الصورة ✓ 🖼️');
     }).catch(function(){try{document.body.removeChild(container);}catch(e){}showToast('تعذر إنشاء الصورة ⚠️','#e03131');});
