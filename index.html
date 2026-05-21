@@ -375,8 +375,23 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
 
+<!-- LICENSE SCREEN -->
+<div id="licenseScreen" style="display:none;position:fixed;inset:0;z-index:999999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
+  <div style="text-align:center;width:340px;max-width:90vw">
+    <div style="font-size:42px;margin-bottom:8px">🔑</div>
+    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em style="font-style:normal;color:var(--muted)">MGR v15</em></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:24px">تفعيل الترخيص</div>
+    <div style="background:var(--accent-dim);border:1px solid rgba(15,255,110,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--accent)">🔐 أدخل مفتاح الترخيص للوصول إلى التطبيق</div>
+    <input type="text" id="licenseKeyInput" class="fi" placeholder="XXXX-XXXX-XXXX-XXXX" style="text-align:center;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:12px;padding:14px;direction:ltr" onkeydown="if(event.key==='Enter')activateLicense()">
+    <input type="text" id="licenseClubName" class="fi" placeholder="اسم النادي / الملعب..." style="text-align:center;font-size:14px;margin-bottom:16px;padding:12px">
+    <button class="btn btn-green" onclick="activateLicense()" style="width:100%;padding:14px;font-size:16px;font-weight:900">✓ تفعيل</button>
+    <div id="licenseError" style="color:var(--red);font-size:12px;margin-top:10px;display:none"></div>
+    <div style="margin-top:20px;font-size:11px;color:var(--muted)">للحصول على مفتاح ترخيص تواصل مع المطوّر</div>
+  </div>
+</div>
+
 <!-- LOGIN SCREEN -->
-<div id="loginScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
+<div id="loginScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
   <div style="text-align:center;width:320px;max-width:90vw">
     <div style="font-size:42px;margin-bottom:8px">🏸</div>
     <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em>MGR v15</em></div>
@@ -1130,6 +1145,11 @@ window.addEventListener('DOMContentLoaded', function(){
   loadData();
   loadTheme();
   loadLang();
+  if(!checkLicense()) return;
+  initApp();
+});
+
+function initApp(){
   checkLogin();
   updateHeader();
   setInterval(updateHeader, 1000);
@@ -1152,7 +1172,7 @@ window.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('click', function(e){
     if(fabMenuOpen && !e.target.closest('.fab-menu') && !e.target.closest('.fab')) closeFabMenu();
   });
-});
+}
 
 function loadData(){
   try {
@@ -2764,6 +2784,74 @@ function printDailyReport(){
   let html='<div class="print-page"><div class="print-logo">🏸 '+(D.settings.clubName||'Padel MGR')+'</div><div class="print-date-hdr">تقرير يومي · '+formatDateAr(dv)+'</div><table class="print-table"><thead><tr><th>الوقت</th><th>العميل</th><th>الملعب</th><th>المدة</th><th>السعر</th><th>الدفع</th></tr></thead><tbody>'+rows+'<tr class="print-total-row"><td colspan="4">الإجمالي</td><td colspan="2" style="color:#00a651;font-size:16px">'+total.toLocaleString()+' ج</td></tr></tbody></table><div class="print-footer">'+(D.settings.clubName||'Padel MGR')+' · '+new Date().toLocaleString('ar-EG')+'</div></div>';
   document.getElementById('printArea').innerHTML=html; window.print(); setTimeout(()=>{document.getElementById('printArea').innerHTML='';},2000);
 }
+
+// ========================= LICENSE SYSTEM =========================
+const LICENSE_KEY_STORAGE = 'PADEL_LICENSE';
+const LICENSE_SECRET = 'PadelMGR2026StormXYZ';
+
+function generateLicenseKey(clubName){
+  // Owner-only function: generates a valid license key for a club
+  let seed = clubName.trim().toLowerCase() + LICENSE_SECRET;
+  let hash = 0;
+  for(let i=0;i<seed.length;i++){hash=((hash<<5)-hash)+seed.charCodeAt(i);hash|=0;}
+  hash=Math.abs(hash);
+  let chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let key='';
+  for(let i=0;i<16;i++){
+    if(i>0&&i%4===0)key+='-';
+    key+=chars[(hash*((i+1)*7)+i*13)%chars.length];
+    hash=Math.abs((hash*31+i*17)|0);
+  }
+  return key;
+}
+
+function validateLicenseKey(key, clubName){
+  if(!key||!clubName)return false;
+  let expected=generateLicenseKey(clubName);
+  return key.toUpperCase().replace(/\s/g,'')===expected.toUpperCase().replace(/\s/g,'');
+}
+
+function checkLicense(){
+  let stored=localStorage.getItem(LICENSE_KEY_STORAGE);
+  if(stored){
+    try{
+      let lic=JSON.parse(stored);
+      if(lic.key && lic.club && validateLicenseKey(lic.key, lic.club)){
+        D.settings.clubName=lic.club;
+        document.getElementById('licenseScreen').style.display='none';
+        return true;
+      }
+    }catch(e){}
+  }
+  // Show license screen
+  document.getElementById('licenseScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='none';
+  setTimeout(()=>document.getElementById('licenseKeyInput').focus(),100);
+  return false;
+}
+
+function activateLicense(){
+  let key=document.getElementById('licenseKeyInput').value.trim();
+  let club=document.getElementById('licenseClubName').value.trim();
+  let errEl=document.getElementById('licenseError');
+  if(!key){errEl.textContent='أدخل مفتاح الترخيص!';errEl.style.display='block';return;}
+  if(!club){errEl.textContent='أدخل اسم النادي!';errEl.style.display='block';return;}
+  if(validateLicenseKey(key,club)){
+    localStorage.setItem(LICENSE_KEY_STORAGE,JSON.stringify({key:key.toUpperCase(),club:club}));
+    D.settings.clubName=club;
+    saveData();
+    document.getElementById('licenseScreen').style.display='none';
+    errEl.style.display='none';
+    showToast('تم تفعيل الترخيص بنجاح ✓ 🔑');
+    initApp();
+  } else {
+    errEl.textContent='مفتاح الترخيص غير صحيح أو لا يتطابق مع اسم النادي ❌';
+    errEl.style.display='block';
+  }
+}
+
+// Owner console command: open browser console and type generateLicenseKey('Club Name') to get key
 
 // ========================= LOGIN / PASSWORD =========================
 function checkLogin(){
