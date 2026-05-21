@@ -14,6 +14,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#060c14;--surf:#0b1520;--card:#101d2e;--card2:#162538;
@@ -373,7 +374,22 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 <body>
 <div id="printArea"></div>
 <div id="toast" class="toast"></div>
-<div id="app">
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
+  <div style="text-align:center;width:320px;max-width:90vw">
+    <div style="font-size:42px;margin-bottom:8px">🏸</div>
+    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em>MGR v15</em></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:28px">إدارة ملاعب البادل</div>
+    <div id="loginSetupMsg" style="display:none;background:var(--accent-dim);border:1px solid rgba(15,255,110,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--accent)">🔐 أول مرة؟ اكتب باسورد جديد لحماية التطبيق</div>
+    <input type="password" id="loginPass" class="fi" placeholder="الباسورد..." style="text-align:center;font-size:16px;margin-bottom:12px;padding:14px" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="loginPassConfirm" class="fi" placeholder="تأكيد الباسورد..." style="text-align:center;font-size:16px;margin-bottom:16px;padding:14px;display:none" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-green" onclick="doLogin()" style="width:100%;padding:14px;font-size:16px;font-weight:900" id="loginBtn">🔓 دخول</button>
+    <div id="loginError" style="color:var(--red);font-size:12px;margin-top:10px;display:none"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
 
 <!-- HEADER -->
 <div class="hdr">
@@ -676,6 +692,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
       <button class="btn btn-blue" onclick="calcInventory()" style="padding:9px">عرض الجرد ↗</button>
       <button class="btn btn-green" onclick="exportToExcel(true)" style="padding:9px;font-size:13px">إكسيل 📊</button>
       <button class="btn btn-purple" onclick="exportInventoryImage()" style="padding:9px;font-size:13px">صورة 🖼️</button>
+      <button class="btn" onclick="exportInventoryPDF()" style="padding:9px;font-size:13px;background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)">PDF 📄</button>
     </div>
     <div class="inv-result" id="invResult">
       <div class="inv-header-row">
@@ -714,6 +731,31 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   <div id="custList"></div>
 </div>
 
+<!-- TAB: DASHBOARD -->
+<div class="tab" id="tab-dashboard">
+  <div class="card" style="border-color:rgba(15,255,110,.15)">
+    <div class="card-title">📊 لوحة الإحصائيات</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="fbtn active" id="dashPeriod-month" onclick="setDashPeriod('month')">هذا الشهر</button>
+      <button class="fbtn" id="dashPeriod-week" onclick="setDashPeriod('week')">هذا الأسبوع</button>
+      <button class="fbtn" id="dashPeriod-all" onclick="setDashPeriod('all')">كل الوقت</button>
+    </div>
+    <div class="inv-kpi-grid" id="dashKPIs"></div>
+  </div>
+  <div class="card" style="border-color:rgba(77,184,255,.15)">
+    <div class="card-title">📈 إيراد الأيام</div>
+    <div id="dashChart" style="display:flex;align-items:flex-end;gap:4px;height:180px;padding:10px 0;overflow-x:auto"></div>
+  </div>
+  <div class="card" style="border-color:rgba(192,132,252,.15)">
+    <div class="card-title">🏆 أفضل العملاء</div>
+    <div id="dashTopCustomers"></div>
+  </div>
+  <div class="card" style="border-color:rgba(255,214,10,.15)">
+    <div class="card-title">⏰ أوقات الذروة</div>
+    <div id="dashPeakHours" style="display:flex;align-items:flex-end;gap:3px;height:120px;padding:10px 0;overflow-x:auto"></div>
+  </div>
+</div>
+
 <!-- TAB: SETTINGS -->
 <div class="tab" id="tab-settings">
   <div class="card">
@@ -742,6 +784,19 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
     <textarea class="fi" id="impCode" rows="3" placeholder="الصق الكود هنا..." style="resize:none;margin-bottom:10px"></textarea>
     <button class="btn btn-blue" onclick="importCode()">استيراد ودمج ✓</button>
   </div>
+  <div class="card" style="border-color:rgba(255,214,10,.15)">
+    <div class="card-title">🔐 حماية التطبيق</div>
+    <div class="btn-row">
+      <button class="btn btn-blue" onclick="changePassword()">تغيير الباسورد 🔑</button>
+      <button class="btn btn-ghost" onclick="removePassword()">إلغاء الباسورد 🔓</button>
+    </div>
+  </div>
+  <div class="card" style="border-color:rgba(45,212,191,.15)">
+    <div class="card-title">💾 النسخ الاحتياطية</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">يتم حفظ نسخة احتياطية تلقائياً كل يوم (آخر 7 أيام)</p>
+    <button class="btn btn-green" onclick="renderBackups()" style="margin-bottom:10px;padding:8px">عرض النسخ الاحتياطية 📂</button>
+    <div id="backupList"></div>
+  </div>
   <div class="card" style="border-color:rgba(255,77,77,.15)">
     <div class="card-title">🗑️ إدارة البيانات</div>
     <button class="btn btn-red" onclick="clearAllData()">حذف جميع البيانات ⚠️</button>
@@ -755,6 +810,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   <button class="nbtn" id="n-closing" onclick="goTab('closing')"><span class="nico">💰</span><span class="nav-lbl">التقفيل</span></button>
   <button class="nbtn" id="n-history" onclick="goTab('history')"><span class="nico">📋</span><span class="nav-lbl">السجل</span></button>
   <button class="nbtn" id="n-customers" onclick="goTab('customers')"><span class="nico">👥</span><span class="nav-lbl">العملاء</span></button>
+  <button class="nbtn" id="n-dashboard" onclick="goTab('dashboard')"><span class="nico">📊</span><span class="nav-lbl">إحصائيات</span></button>
   <button class="nbtn" id="n-settings" onclick="goTab('settings')"><span class="nico">⚙️</span><span class="nav-lbl">الإعدادات</span></button>
 </nav>
 <div id="fabMenu" class="fab-menu" style="display:none"></div>
@@ -1037,8 +1093,10 @@ let D = {
   closings: [],
   dayExpenses: {},
   academy: { trainees: [], sessions: {}, groups: [] },
-  settings: { priceAM: 160, pricePM: 200, courts: 2, clubName: 'Padel Club' }
+  settings: { priceAM: 160, pricePM: 200, courts: 2, clubName: 'Padel Club' },
+  password: null
 };
+let dashPeriod = 'month';
 
 let curDate = ymd(new Date());
 let draft = { court:'1', dur:'1', pay:'cash', ampm:'pm', editId:null };
@@ -1072,6 +1130,7 @@ window.addEventListener('DOMContentLoaded', function(){
   loadData();
   loadTheme();
   loadLang();
+  checkLogin();
   updateHeader();
   setInterval(updateHeader, 1000);
   setInterval(checkUpcoming, 60000);
@@ -1109,6 +1168,7 @@ function loadData(){
       if(!D.academy.sessions) D.academy.sessions={};
       if(!D.academy.groups) D.academy.groups=[];
       D.settings = Object.assign({priceAM:160,pricePM:200,courts:2,clubName:'Padel Club'},p.settings||{});
+      D.password = p.password||null;
     }
   } catch(e){ console.error(e); }
 }
@@ -1138,7 +1198,7 @@ function toggleTheme(){ let cur=document.documentElement.getAttribute('data-them
 function applyTheme(t){ if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('themeBtn').textContent='☀️';}else{document.documentElement.removeAttribute('data-theme');document.getElementById('themeBtn').textContent='🌙';} }
 function loadTheme(){ applyTheme(localStorage.getItem('padel_theme')||'dark'); }
 
-const LABELS={ar:{hours:'ساعات',cash:'كاش ج',visa:'فيزا ج',bookings:'الحجوزات',academy:'الأكاديمية',closing:'التقفيل',history:'السجل',customers:'العملاء',settings:'الإعدادات'},en:{hours:'Hours',cash:'Cash',visa:'Visa',bookings:'Bookings',academy:'Academy',closing:'Closing',history:'Records',customers:'Clients',settings:'Settings'}};
+const LABELS={ar:{hours:'ساعات',cash:'كاش ج',visa:'فيزا ج',bookings:'الحجوزات',academy:'الأكاديمية',closing:'التقفيل',history:'السجل',customers:'العملاء',dashboard:'إحصائيات',settings:'الإعدادات'},en:{hours:'Hours',cash:'Cash',visa:'Visa',bookings:'Bookings',academy:'Academy',closing:'Closing',history:'Records',customers:'Clients',dashboard:'Dashboard',settings:'Settings'}};
 function toggleLang(){ curLang=curLang==='ar'?'en':'ar'; localStorage.setItem('padel_lang',curLang); applyLang(); }
 function applyLang(){
   let L=LABELS[curLang]; let isAr=curLang==='ar';
@@ -1147,7 +1207,7 @@ function applyLang(){
   document.getElementById('lbl-cash').textContent=L.cash;
   document.getElementById('lbl-visa').textContent=L.visa;
   let navLbls=document.querySelectorAll('.nav-lbl');
-  let keys=['bookings','academy','closing','history','customers','settings'];
+  let keys=['bookings','academy','closing','history','customers','dashboard','settings'];
   navLbls.forEach((el,i)=>{ if(keys[i])el.textContent=L[keys[i]]||el.textContent; });
 }
 function loadLang(){ curLang=localStorage.getItem('padel_lang')||'ar'; applyLang(); }
@@ -1177,6 +1237,7 @@ function goTab(t){
   if(t==='closing'){let di=document.getElementById('closingDate');if(!di.value)di.value=curDate;onClosingDateChange();}
   if(t==='history'){initHistoryDates();renderHistory();}
   if(t==='customers'){renderCustomers();}
+  if(t==='dashboard'){renderDashboard();}
 }
 
 // ========================= FAB MENU =========================
@@ -2689,7 +2750,7 @@ function importCode(){
 function clearAllData(){
   if(!confirm('⚠️ هل أنت متأكد من حذف جميع البيانات؟ لا يمكن التراجع!'))return;
   if(!confirm('⚠️⚠️ تأكيد نهائي: سيتم حذف كل الحجوزات والتقفيلات والأكاديمية!'))return;
-  D={bookings:{},closings:[],dayExpenses:{},academy:{trainees:[],sessions:{},groups:[]},settings:D.settings};
+  D={bookings:{},closings:[],dayExpenses:{},academy:{trainees:[],sessions:{},groups:[]},settings:D.settings,password:D.password};
   saveData(); goTab('bookings'); showToast('تم حذف جميع البيانات ✓','#e03131');
 }
 
@@ -2702,6 +2763,320 @@ function printDailyReport(){
   let total=books.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   let html='<div class="print-page"><div class="print-logo">🏸 '+(D.settings.clubName||'Padel MGR')+'</div><div class="print-date-hdr">تقرير يومي · '+formatDateAr(dv)+'</div><table class="print-table"><thead><tr><th>الوقت</th><th>العميل</th><th>الملعب</th><th>المدة</th><th>السعر</th><th>الدفع</th></tr></thead><tbody>'+rows+'<tr class="print-total-row"><td colspan="4">الإجمالي</td><td colspan="2" style="color:#00a651;font-size:16px">'+total.toLocaleString()+' ج</td></tr></tbody></table><div class="print-footer">'+(D.settings.clubName||'Padel MGR')+' · '+new Date().toLocaleString('ar-EG')+'</div></div>';
   document.getElementById('printArea').innerHTML=html; window.print(); setTimeout(()=>{document.getElementById('printArea').innerHTML='';},2000);
+}
+
+// ========================= LOGIN / PASSWORD =========================
+function checkLogin(){
+  let ls=document.getElementById('loginScreen');
+  let app=document.getElementById('app');
+  if(D.password){
+    // Password is set, check if already authenticated this session
+    if(sessionStorage.getItem('PADEL_AUTHED')==='1'){
+      ls.style.display='none'; app.style.display='block';
+    } else {
+      ls.style.display='flex'; app.style.display='none';
+      document.getElementById('loginSetupMsg').style.display='none';
+      document.getElementById('loginPassConfirm').style.display='none';
+      document.getElementById('loginBtn').textContent='🔓 دخول';
+      setTimeout(()=>document.getElementById('loginPass').focus(),100);
+    }
+  } else {
+    // No password set — show setup
+    ls.style.display='flex'; app.style.display='none';
+    document.getElementById('loginSetupMsg').style.display='block';
+    document.getElementById('loginPassConfirm').style.display='block';
+    document.getElementById('loginBtn').textContent='🔐 تعيين وحفظ';
+    setTimeout(()=>document.getElementById('loginPass').focus(),100);
+  }
+}
+function doLogin(){
+  let pass=document.getElementById('loginPass').value;
+  let errEl=document.getElementById('loginError');
+  if(!pass){errEl.textContent='ادخل الباسورد!';errEl.style.display='block';return;}
+  if(D.password){
+    // Verify
+    if(pass===D.password){
+      sessionStorage.setItem('PADEL_AUTHED','1');
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('app').style.display='block';
+      errEl.style.display='none';
+      document.getElementById('loginPass').value='';
+      autoBackup();
+    } else {
+      errEl.textContent='باسورد غلط! ❌';errEl.style.display='block';
+      document.getElementById('loginPass').value='';
+      document.getElementById('loginPass').focus();
+    }
+  } else {
+    // Setup new password
+    let confirm=document.getElementById('loginPassConfirm').value;
+    if(pass.length<4){errEl.textContent='الباسورد لازم يكون 4 حروف على الأقل';errEl.style.display='block';return;}
+    if(pass!==confirm){errEl.textContent='الباسورد مش متطابق!';errEl.style.display='block';return;}
+    D.password=pass;
+    saveData();
+    sessionStorage.setItem('PADEL_AUTHED','1');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    errEl.style.display='none';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPassConfirm').value='';
+    showToast('تم تعيين الباسورد بنجاح ✓ 🔐');
+  }
+}
+function changePassword(){
+  let oldP=prompt('ادخل الباسورد الحالي:');
+  if(!oldP)return;
+  if(oldP!==D.password){showToast('الباسورد الحالي غلط ❌','#e03131');return;}
+  let newP=prompt('ادخل الباسورد الجديد (4 حروف على الأقل):');
+  if(!newP||newP.length<4){showToast('الباسورد لازم يكون 4 حروف على الأقل ⚠️','#e03131');return;}
+  let conf=prompt('تأكيد الباسورد الجديد:');
+  if(newP!==conf){showToast('الباسورد مش متطابق ❌','#e03131');return;}
+  D.password=newP; saveData(); showToast('تم تغيير الباسورد ✓ 🔐');
+}
+function removePassword(){
+  let oldP=prompt('ادخل الباسورد الحالي لإلغاء الحماية:');
+  if(!oldP)return;
+  if(oldP!==D.password){showToast('الباسورد غلط ❌','#e03131');return;}
+  if(!confirm('متأكد تلغي حماية الباسورد؟'))return;
+  D.password=null; saveData(); showToast('تم إلغاء الباسورد ✓');
+}
+
+// ========================= AUTO-BACKUP =========================
+function autoBackup(){
+  try{
+    let backupKey='PADEL_BACKUP_'+ymd(new Date());
+    let existing=localStorage.getItem(backupKey);
+    if(!existing){
+      localStorage.setItem(backupKey,JSON.stringify(D));
+      // Keep only last 7 backups
+      let allKeys=[];
+      for(let i=0;i<localStorage.length;i++){
+        let k=localStorage.key(i);
+        if(k&&k.startsWith('PADEL_BACKUP_'))allKeys.push(k);
+      }
+      allKeys.sort();
+      while(allKeys.length>7){
+        localStorage.removeItem(allKeys.shift());
+      }
+    }
+  }catch(e){console.warn('Backup failed:',e);}
+}
+function listBackups(){
+  let backups=[];
+  for(let i=0;i<localStorage.length;i++){
+    let k=localStorage.key(i);
+    if(k&&k.startsWith('PADEL_BACKUP_'))backups.push(k.replace('PADEL_BACKUP_',''));
+  }
+  return backups.sort().reverse();
+}
+function restoreBackup(date){
+  let data=localStorage.getItem('PADEL_BACKUP_'+date);
+  if(!data){showToast('النسخة غير موجودة ⚠️','#e03131');return;}
+  if(!confirm('سيتم استعادة بيانات يوم '+formatDateAr(date)+' وحذف البيانات الحالية. متأكد؟'))return;
+  try{
+    let parsed=JSON.parse(data);
+    let pw=D.password;
+    D=parsed;
+    D.password=pw;
+    if(!D.academy)D.academy={trainees:[],sessions:{},groups:[]};
+    if(!D.dayExpenses)D.dayExpenses={};
+    saveData();
+    goTab('bookings');
+    showToast('تم استعادة النسخة الاحتياطية ✓','#25d366');
+  }catch(e){showToast('خطأ في الاستعادة ⚠️','#e03131');}
+}
+function renderBackups(){
+  let el=document.getElementById('backupList');
+  let backups=listBackups();
+  if(!backups.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px">لا توجد نسخ احتياطية بعد</div>';return;}
+  el.innerHTML=backups.map(d=>{
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:13px;font-weight:700">📅 '+formatDateAr(d)+'</span>'
+      +'<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="restoreBackup(\''+d+'\')">استعادة ↩</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ========================= PDF EXPORT =========================
+function exportInventoryPDF(){
+  let from=document.getElementById('invFrom').value, to=document.getElementById('invTo').value;
+  if(!from||!to){showToast('اختر الفترة أولاً ⚠️','#e03131');return;}
+  calcInventory();
+  // Generate image first then convert to PDF
+  exportInventoryImageForPDF(from,to);
+}
+function exportInventoryImageForPDF(from,to){
+  let accent='#00a651', borderC='#d0d8e0', textC='#1a2533';
+  let totalCashNum=0,totalVisaNum=0,totalExpNum=0,totalBookings=0,totalHrsNum=0;
+  let label=from===to?formatDateAr(from):formatDateAr(from)+' — '+formatDateAr(to);
+  let dayTables='';
+  Object.keys(D.bookings).sort().forEach(date=>{
+    if(date<from||date>to)return;
+    let books=D.bookings[date]||[]; if(!books.length)return;
+    let dayCash=0,dayVisa=0,dayHrs=0,dayTotal=0;
+    books.forEach(b=>{let p=parseFloat(b.price)||0;dayTotal+=p;dayHrs+=parseFloat(b.dur)||0;
+      if(b.pay==='cash')dayCash+=p;else if(b.pay==='visa')dayVisa+=p;else if(b.pay==='split'){dayCash+=(parseFloat(b.splitCash)||0);dayVisa+=(parseFloat(b.splitVisa)||0);}
+    });
+    totalCashNum+=dayCash;totalVisaNum+=dayVisa;totalHrsNum+=dayHrs;totalBookings+=books.length;
+    dayTables+='<tr style="background:'+accent+';color:#fff"><td colspan="6" style="padding:8px 12px;font-weight:900;font-size:13px;border:none">'+formatDateAr(date)+'</td></tr>';
+    dayTables+='<tr style="background:#e8ede8;font-weight:800;font-size:10px;color:#555"><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">الوقت</td><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">العميل</td><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">الهاتف</td><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">الملعب/المدة</td><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">الدفع</td><td style="padding:6px 8px;border-bottom:2px solid '+accent+'">المبلغ</td></tr>';
+    books.sort((a,b)=>(a.time||'').localeCompare(b.time||'')).forEach(b=>{
+      let p=parseFloat(b.price)||0,et=endT(b.time,b.dur);
+      let payTxt=b.pay==='cash'?'كاش':b.pay==='visa'?'فيزا':b.pay==='split'?'مختلط':'معلق';
+      dayTables+='<tr style="border-bottom:1px solid '+borderC+'"><td style="padding:6px 8px;font-size:11px;font-weight:700">'+fmt12(b.time)+'—'+fmt12(et)+'</td><td style="padding:6px 8px;font-size:11px;font-weight:700">'+(b.cust||'—')+'</td><td style="padding:6px 8px;font-size:10px;color:#888">'+(b.phone||'—')+'</td><td style="padding:6px 8px;font-size:10px">م'+b.court+' · '+durLbl(b.dur)+'</td><td style="padding:6px 8px;font-size:10px">'+payTxt+'</td><td style="padding:6px 8px;font-size:12px;font-weight:900">'+p.toLocaleString()+' ج</td></tr>';
+    });
+    dayTables+='<tr style="background:rgba(0,166,81,.06);border-top:2px solid '+accent+'"><td colspan="4" style="padding:6px 8px;font-weight:900;font-size:11px;color:'+accent+'">إجمالي</td><td style="padding:6px 8px;font-size:10px;color:#888">'+books.length+' حجز</td><td style="padding:6px 8px;font-weight:900;font-size:13px;color:'+accent+'">'+dayTotal.toLocaleString()+' ج</td></tr>';
+    let dayExpenses=(D.dayExpenses[date]||[]);
+    let bookExpenses=[];
+    books.forEach(b=>{if(b.expenses&&b.expenses.length)bookExpenses=bookExpenses.concat(b.expenses);});
+    let allDayExp=dayExpenses.concat(bookExpenses);
+    let dayExpTotal=allDayExp.reduce((s,e)=>s+(parseFloat(e.amt)||0),0);
+    totalExpNum+=dayExpTotal;
+    if(allDayExp.length){
+      allDayExp.forEach(e=>{
+        dayTables+='<tr style="background:rgba(224,49,49,.04)"><td colspan="4" style="padding:4px 8px;font-size:11px;color:#e03131">📌 '+(e.desc||'مصروف')+'</td><td style="padding:4px 8px;font-size:10px;color:#888">مصروف</td><td style="padding:4px 8px;font-size:11px;font-weight:900;color:#e03131">−'+(parseFloat(e.amt)||0).toLocaleString()+' ج</td></tr>';
+      });
+    }
+    let dayNet=dayTotal-dayExpTotal;
+    dayTables+='<tr style="background:rgba(0,166,81,.12);border-top:2px solid '+accent+'"><td colspan="5" style="padding:8px 10px;font-weight:900;font-size:12px;color:'+accent+'">💡 صافي اليوم</td><td style="padding:8px 10px;font-weight:900;font-size:14px;color:'+accent+'">'+dayNet.toLocaleString()+' ج</td></tr>';
+    dayTables+='<tr><td colspan="6" style="padding:4px;border:none"></td></tr>';
+  });
+  let totalNet=totalCashNum+totalVisaNum-totalExpNum;
+  let html='<div style="background:#fff;color:'+textC+';padding:24px;font-family:Arial,Tahoma,sans-serif;direction:rtl;width:700px">'+
+    '<div style="text-align:left;font-size:22px;font-weight:900;color:'+accent+';margin-bottom:2px">🏸 '+(D.settings.clubName||'Padel MGR')+'</div>'+
+    '<div style="font-size:10px;color:#888;margin-bottom:2px">جرد تفصيلي · '+new Date().toLocaleString('ar-EG')+'</div>'+
+    '<div style="font-size:13px;font-weight:700;margin-bottom:2px">'+label+'</div>'+
+    '<div style="font-size:10px;color:#888;margin-bottom:12px">'+totalBookings+' حجز · '+totalHrsNum+' ساعة</div>'+
+    '<div style="border-top:3px solid '+accent+';margin-bottom:12px"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:16px">'+
+    '<div style="background:rgba(0,166,81,.06);border:2px solid rgba(0,166,81,.3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:#888">💵 كاش</div><div style="font-size:20px;font-weight:900;color:'+accent+'">'+totalCashNum.toLocaleString()+'</div></div>'+
+    '<div style="background:rgba(26,127,196,.06);border:2px solid rgba(26,127,196,.3);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:#888">💳 فيزا</div><div style="font-size:20px;font-weight:900;color:#1a7fc4">'+totalVisaNum.toLocaleString()+'</div></div>'+
+    '<div style="background:rgba(224,49,49,.06);border:2px solid rgba(224,49,49,.2);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:#888">🔴 مصاريف</div><div style="font-size:20px;font-weight:900;color:#e03131">'+totalExpNum.toLocaleString()+'</div></div>'+
+    '<div style="background:rgba(0,166,81,.1);border:2px solid rgba(0,166,81,.4);border-radius:10px;padding:10px;text-align:center"><div style="font-size:9px;color:#888">💡 صافي</div><div style="font-size:20px;font-weight:900;color:'+accent+'">'+totalNet.toLocaleString()+'</div></div>'+
+    '</div>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:11px;direction:rtl;text-align:right" cellpadding="0" cellspacing="0">'+dayTables+'</table>'+
+    '<div style="text-align:center;font-size:9px;color:#aaa;margin-top:12px;padding-top:8px;border-top:1px solid #ddd">'+(D.settings.clubName||'Padel MGR')+' · '+label+'</div>'+
+    '</div>';
+  let container=document.createElement('div'); container.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-1;width:740px;'; container.innerHTML=html; document.body.appendChild(container);
+  if(window.html2canvas&&window.jspdf){
+    html2canvas(container.firstChild,{scale:2,backgroundColor:'#fff',useCORS:true,logging:false}).then(function(canvas){
+      try{document.body.removeChild(container);}catch(e){}
+      let imgData=canvas.toDataURL('image/png');
+      let pdf=new jspdf.jsPDF({orientation:canvas.width>canvas.height?'l':'p',unit:'px',format:[canvas.width,canvas.height]});
+      pdf.addImage(imgData,'PNG',0,0,canvas.width,canvas.height);
+      pdf.save('padel_جرد_'+from+'_'+to+'.pdf');
+      showToast('تم تحميل PDF ✓ 📄');
+    }).catch(function(err){try{document.body.removeChild(container);}catch(e){}showToast('خطأ في إنشاء PDF ⚠️','#e03131');console.error(err);});
+  } else { try{document.body.removeChild(container);}catch(e){} showToast('مكتبة PDF غير متاحة ⚠️','#e03131'); }
+}
+
+// ========================= DASHBOARD =========================
+function setDashPeriod(p){
+  dashPeriod=p;
+  document.querySelectorAll('[id^="dashPeriod-"]').forEach(el=>el.classList.remove('active'));
+  let btn=document.getElementById('dashPeriod-'+p);
+  if(btn)btn.classList.add('active');
+  renderDashboard();
+}
+function getDashDateRange(){
+  let now=new Date();
+  if(dashPeriod==='week'){
+    let d=new Date(now); d.setDate(d.getDate()-d.getDay());
+    return {from:ymd(d),to:ymd(now)};
+  } else if(dashPeriod==='month'){
+    let d=new Date(now.getFullYear(),now.getMonth(),1);
+    return {from:ymd(d),to:ymd(now)};
+  }
+  return {from:'2000-01-01',to:'2099-12-31'};
+}
+function renderDashboard(){
+  let range=getDashDateRange();
+  let totalCash=0,totalVisa=0,totalExp=0,totalHrs=0,bookCount=0,dayRevenues={},custMap={},hourMap={};
+  Object.keys(D.bookings).sort().forEach(date=>{
+    if(date<range.from||date>range.to)return;
+    let books=D.bookings[date]||[];
+    let dayRev=0;
+    books.forEach(b=>{
+      bookCount++;
+      let p=parseFloat(b.price)||0;
+      totalHrs+=parseFloat(b.dur)||0;
+      dayRev+=p;
+      if(b.pay==='cash')totalCash+=p;
+      else if(b.pay==='visa')totalVisa+=p;
+      else if(b.pay==='split'){totalCash+=(parseFloat(b.splitCash)||0);totalVisa+=(parseFloat(b.splitVisa)||0);}
+      // Customer stats
+      let cn=b.cust||'غير محدد';
+      if(!custMap[cn])custMap[cn]={name:cn,visits:0,spent:0};
+      custMap[cn].visits++;custMap[cn].spent+=p;
+      // Hour stats
+      if(b.time){
+        let hr=parseInt(b.time.split(':')[0])||0;
+        if(!hourMap[hr])hourMap[hr]=0;
+        hourMap[hr]++;
+      }
+    });
+    let dexp=D.dayExpenses[date]||[];
+    dexp.forEach(e=>{totalExp+=parseFloat(e.amt)||0;});
+    dayRevenues[date]=dayRev;
+  });
+  let totalRev=totalCash+totalVisa;
+  let net=totalRev-totalExp;
+  // KPIs
+  let kpiEl=document.getElementById('dashKPIs');
+  kpiEl.innerHTML=
+    '<div class="inv-kpi green"><div class="inv-kpi-lbl">💰 إجمالي الإيراد</div><div class="inv-kpi-val" style="color:var(--accent)">'+totalRev.toLocaleString()+' ج</div></div>'+
+    '<div class="inv-kpi"><div class="inv-kpi-lbl">💡 الصافي</div><div class="inv-kpi-val" style="color:var(--yellow)">'+net.toLocaleString()+' ج</div></div>'+
+    '<div class="inv-kpi green"><div class="inv-kpi-lbl">💵 كاش</div><div class="inv-kpi-val" style="color:var(--accent)">'+totalCash.toLocaleString()+'</div></div>'+
+    '<div class="inv-kpi blue"><div class="inv-kpi-lbl">💳 فيزا</div><div class="inv-kpi-val" style="color:var(--blue)">'+totalVisa.toLocaleString()+'</div></div>'+
+    '<div class="inv-kpi red"><div class="inv-kpi-lbl">🔴 مصاريف</div><div class="inv-kpi-val" style="color:var(--red)">'+totalExp.toLocaleString()+'</div></div>'+
+    '<div class="inv-kpi"><div class="inv-kpi-lbl">📋 عدد الحجوزات</div><div class="inv-kpi-val" style="color:var(--text)">'+bookCount+'</div></div>'+
+    '<div class="inv-kpi"><div class="inv-kpi-lbl">⏱ الساعات</div><div class="inv-kpi-val" style="color:var(--text)">'+(totalHrs%1===0?totalHrs:totalHrs.toFixed(1))+'</div></div>'+
+    '<div class="inv-kpi"><div class="inv-kpi-lbl">📊 متوسط الحجز</div><div class="inv-kpi-val" style="color:var(--purple)">'+(bookCount>0?Math.round(totalRev/bookCount):0)+' ج</div></div>';
+  // Revenue chart
+  let chartEl=document.getElementById('dashChart');
+  let dates=Object.keys(dayRevenues).sort().slice(-14);
+  let maxRev=Math.max(...dates.map(d=>dayRevenues[d]||0),1);
+  chartEl.innerHTML=dates.map(d=>{
+    let rev=dayRevenues[d]||0;
+    let pct=Math.round((rev/maxRev)*100);
+    let dayName=new Date(d).toLocaleDateString('ar-EG',{weekday:'short'});
+    let dayNum=d.split('-')[2];
+    return '<div style="flex:1;min-width:28px;display:flex;flex-direction:column;align-items:center;gap:4px">'+
+      '<div style="font-size:9px;font-weight:800;color:var(--accent)">'+rev.toLocaleString()+'</div>'+
+      '<div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:'+Math.max(pct,3)+'%;min-height:4px;transition:height .3s"></div>'+
+      '<div style="font-size:8px;color:var(--muted)">'+dayNum+'</div>'+
+      '<div style="font-size:7px;color:var(--muted)">'+dayName+'</div>'+
+      '</div>';
+  }).join('');
+  if(!dates.length)chartEl.innerHTML='<div style="text-align:center;width:100%;color:var(--muted);font-size:12px;padding:40px 0">لا توجد بيانات</div>';
+  // Top customers
+  let topEl=document.getElementById('dashTopCustomers');
+  let custs=Object.values(custMap).sort((a,b)=>b.spent-a.spent).slice(0,5);
+  if(custs.length){
+    topEl.innerHTML=custs.map((c,i)=>{
+      let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:4px">'+
+        '<div><span style="font-size:14px">'+medal+'</span> <span style="font-weight:700">'+c.name+'</span> <span style="font-size:11px;color:var(--muted)">('+c.visits+' حجز)</span></div>'+
+        '<div style="font-weight:900;color:var(--accent)">'+c.spent.toLocaleString()+' ج</div></div>';
+    }).join('');
+  } else {
+    topEl.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0">لا توجد بيانات</div>';
+  }
+  // Peak hours
+  let peakEl=document.getElementById('dashPeakHours');
+  let maxHourCount=Math.max(...Object.values(hourMap),1);
+  let peakHtml='';
+  for(let h=6;h<=23;h++){
+    let count=hourMap[h]||0;
+    let pct=Math.round((count/maxHourCount)*100);
+    let color=h<16?'var(--yellow)':'var(--blue)';
+    peakHtml+='<div style="flex:1;min-width:20px;display:flex;flex-direction:column;align-items:center;gap:2px">'+
+      '<div style="font-size:8px;font-weight:800;color:var(--text)">'+count+'</div>'+
+      '<div style="width:100%;background:'+color+';border-radius:3px 3px 0 0;height:'+Math.max(pct,3)+'%;min-height:3px;transition:height .3s"></div>'+
+      '<div style="font-size:8px;color:var(--muted)">'+(h>12?h-12:h)+(h>=12?'م':'ص')+'</div>'+
+      '</div>';
+  }
+  peakEl.innerHTML=peakHtml;
 }
 
 </script>
