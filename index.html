@@ -2788,10 +2788,11 @@ function printDailyReport(){
 // ========================= LICENSE SYSTEM =========================
 const LICENSE_KEY_STORAGE = 'PADEL_LICENSE';
 const LICENSE_SECRET = 'PadelMGR2026StormXYZ';
+const BLOCKED_KEYS = [];
 
-function generateLicenseKey(clubName){
-  // Owner-only function: generates a valid license key for a club
-  let seed = clubName.trim().toLowerCase() + LICENSE_SECRET;
+function generateLicenseKey(clubName, expiryDate){
+  let expStr = expiryDate || '9999-12-31';
+  let seed = clubName.trim().toLowerCase() + expStr + LICENSE_SECRET;
   let hash = 0;
   for(let i=0;i<seed.length;i++){hash=((hash<<5)-hash)+seed.charCodeAt(i);hash|=0;}
   hash=Math.abs(hash);
@@ -2805,10 +2806,28 @@ function generateLicenseKey(clubName){
   return key;
 }
 
-function validateLicenseKey(key, clubName){
+function validateLicenseKey(key, clubName, expiryDate){
   if(!key||!clubName)return false;
-  let expected=generateLicenseKey(clubName);
-  return key.toUpperCase().replace(/\s/g,'')===expected.toUpperCase().replace(/\s/g,'');
+  let expected=generateLicenseKey(clubName, expiryDate||'9999-12-31');
+  return key.toUpperCase().replace(/[\s-]/g,'')===expected.toUpperCase().replace(/[\s-]/g,'');
+}
+
+function isKeyBlocked(key){
+  return BLOCKED_KEYS.includes(key.toUpperCase().replace(/\s/g,''));
+}
+
+function isKeyExpired(expiryDate){
+  if(!expiryDate || expiryDate==='9999-12-31')return false;
+  return expiryDate < new Date().toISOString().split('T')[0];
+}
+
+function showLicenseScreen(msg){
+  document.getElementById('licenseScreen').style.display='flex';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='none';
+  let errEl=document.getElementById('licenseError');
+  if(msg){errEl.textContent=msg;errEl.style.display='block';}
+  setTimeout(()=>document.getElementById('licenseKeyInput').focus(),100);
 }
 
 function checkLicense(){
@@ -2816,29 +2835,65 @@ function checkLicense(){
   if(stored){
     try{
       let lic=JSON.parse(stored);
-      if(lic.key && lic.club && validateLicenseKey(lic.key, lic.club)){
-        D.settings.clubName=lic.club;
-        document.getElementById('licenseScreen').style.display='none';
-        return true;
+      if(lic.key && lic.club){
+        // Check if blocked
+        if(isKeyBlocked(lic.key)){
+          localStorage.removeItem(LICENSE_KEY_STORAGE);
+          showLicenseScreen('هذا المفتاح تم إيقافه. تواصل مع المطوّر للحصول على مفتاح جديد 🚫');
+          return false;
+        }
+        // Check expiry
+        if(lic.expiry && isKeyExpired(lic.expiry)){
+          showLicenseScreen('انتهت صلاحية الترخيص في '+lic.expiry+'. تواصل مع المطوّر للتجديد ⏰');
+          return false;
+        }
+        // Validate key
+        if(validateLicenseKey(lic.key, lic.club, lic.expiry)){
+          D.settings.clubName=lic.club;
+          document.getElementById('licenseScreen').style.display='none';
+          return true;
+        }
       }
     }catch(e){}
   }
-  // Show license screen
-  document.getElementById('licenseScreen').style.display='flex';
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('app').style.display='none';
-  setTimeout(()=>document.getElementById('licenseKeyInput').focus(),100);
+  showLicenseScreen();
   return false;
 }
 
 function activateLicense(){
-  let key=document.getElementById('licenseKeyInput').value.trim();
+  let key=document.getElementById('licenseKeyInput').value.trim().toUpperCase();
   let club=document.getElementById('licenseClubName').value.trim();
   let errEl=document.getElementById('licenseError');
   if(!key){errEl.textContent='أدخل مفتاح الترخيص!';errEl.style.display='block';return;}
   if(!club){errEl.textContent='أدخل اسم النادي!';errEl.style.display='block';return;}
-  if(validateLicenseKey(key,club)){
-    localStorage.setItem(LICENSE_KEY_STORAGE,JSON.stringify({key:key.toUpperCase(),club:club}));
+  // Check if blocked
+  if(isKeyBlocked(key)){
+    errEl.textContent='هذا المفتاح تم إيقافه 🚫';errEl.style.display='block';return;
+  }
+  // Try all possible expiry dates (brute-force from today to +3 years)
+  let matched=false;
+  let matchedExpiry=null;
+  // First try permanent (no expiry)
+  if(validateLicenseKey(key,club,'9999-12-31')){
+    matched=true;matchedExpiry=null;
+  } else {
+    // Try each day from today-30 to today+3years
+    let start=new Date();start.setDate(start.getDate()-30);
+    let end=new Date();end.setFullYear(end.getFullYear()+3);
+    for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+      let ds=d.toISOString().split('T')[0];
+      if(validateLicenseKey(key,club,ds)){
+        matched=true;matchedExpiry=ds;
+        break;
+      }
+    }
+  }
+  if(matched){
+    if(matchedExpiry && isKeyExpired(matchedExpiry)){
+      errEl.textContent='هذا المفتاح منتهي الصلاحية ('+matchedExpiry+'). تواصل مع المطوّر للتجديد ⏰';
+      errEl.style.display='block';return;
+    }
+    localStorage.setItem(LICENSE_KEY_STORAGE,JSON.stringify({key:key,club:club,expiry:matchedExpiry}));
     D.settings.clubName=club;
     saveData();
     document.getElementById('licenseScreen').style.display='none';
@@ -2851,7 +2906,7 @@ function activateLicense(){
   }
 }
 
-// Owner console command: open browser console and type generateLicenseKey('Club Name') to get key
+// Owner console: generateLicenseKey('Club Name','2027-05-20') for key with expiry
 
 // ========================= LOGIN / PASSWORD =========================
 function checkLogin(){
