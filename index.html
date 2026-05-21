@@ -832,6 +832,13 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
       <button class="btn btn-ghost" onclick="removePassword()">إلغاء الباسورد 🔓</button>
     </div>
   </div>
+  <div class="card" style="border-color:rgba(224,49,49,.15)">
+    <div class="card-title">🔑 الترخيص</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px" id="licenseInfo"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" onclick="revokeLicense()">حذف الترخيص 🗑️</button>
+    </div>
+  </div>
   <div class="card" style="border-color:rgba(45,212,191,.15)">
     <div class="card-title">💾 النسخ الاحتياطية</div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:10px">يتم حفظ نسخة احتياطية تلقائياً كل يوم (آخر 7 أيام)</p>
@@ -1155,7 +1162,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 <script>
 // ========================= DATA & STATE =========================
-const KEY = 'PADEL_MGR_V15';
+let KEY = 'PADEL_MGR_V15';
 const KEY_MIGRATIONS = ['PADEL_MGR_V14','PADEL_MGR_DATA_V13','padelmgr_v12'];
 
 let D = {
@@ -1207,6 +1214,7 @@ window.addEventListener('DOMContentLoaded', function(){
 });
 
 function initApp(){
+  try{var lic=JSON.parse(localStorage.getItem('PADEL_LICENSE')||'{}');if(lic.club){scopeKey(lic.club);loadData();}}catch(e){}
   checkLogin();
   updateHeader();
   setInterval(updateHeader, 1000);
@@ -1227,14 +1235,26 @@ function initApp(){
   document.getElementById('setClubName').value = D.settings.clubName||'';
   loadWalletSettings();
   buildDaySelectGrid();
+  showLicenseInfo();
   document.addEventListener('click', function(e){
     if(fabMenuOpen && !e.target.closest('.fab-menu') && !e.target.closest('.fab')) closeFabMenu();
   });
 }
 
+function scopeKey(clubName){
+  if(!clubName)return;
+  var h=0,cn=clubName.trim().toLowerCase();
+  for(var i=0;i<cn.length;i++){h=((h<<5)-h)+cn.charCodeAt(i);h|=0;}
+  KEY='PADEL_MGR_V15_'+Math.abs(h).toString(36);
+}
+
 function loadData(){
   try {
     let s = localStorage.getItem(KEY);
+    if(!s && KEY!=='PADEL_MGR_V15'){
+      s=localStorage.getItem('PADEL_MGR_V15');
+      if(s){localStorage.setItem(KEY,s);localStorage.removeItem('PADEL_MGR_V15');}
+    }
     if(!s){ for(let k of KEY_MIGRATIONS){ s=localStorage.getItem(k); if(s)break; } }
     if(s){
       let p = JSON.parse(s);
@@ -3029,6 +3049,23 @@ function removePassword(){
   if(oldP!==D.password){showToast('الباسورد غلط ❌','#e03131');return;}
   if(!confirm('متأكد تلغي حماية الباسورد؟'))return;
   D.password=null; saveData(); showToast('تم إلغاء الباسورد ✓');
+}
+function revokeLicense(){
+  if(!confirm('متأكد تحذف الترخيص؟ هتحتاج تدخل مفتاح جديد عشان التطبيق يشتغل.'))return;
+  localStorage.removeItem('PADEL_LICENSE');
+  sessionStorage.removeItem('PADEL_AUTHED');
+  location.reload();
+}
+function showLicenseInfo(){
+  try{
+    var lic=JSON.parse(localStorage.getItem('PADEL_LICENSE')||'{}');
+    var el=document.getElementById('licenseInfo');
+    if(!el)return;
+    if(lic.club){
+      var exp=lic.expiry?lic.expiry:'دائم';
+      el.textContent='النادي: '+lic.club+' · الصلاحية: '+exp;
+    }else{el.textContent='لا يوجد ترخيص مفعّل';}
+  }catch(e){}
 }
 
 // ========================= AUTO-BACKUP =========================

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Padel MGR - License Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:#060c14;color:#dde8f5;min-height:100vh;padding:20px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:26px;color:#0fff6e;text-align:center;margin-bottom:4px}
+.sub{text-align:center;font-size:12px;color:#536f8f;margin-bottom:24px}
+.card{background:#0b1520;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:16px}
+.card-title{font-size:16px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:140px}
+label{font-size:11px;color:#536f8f;display:block;margin-bottom:4px}
+input,select{width:100%;padding:12px;background:#101d2e;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#dde8f5;font-size:14px;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:#0fff6e}
+.btn{padding:12px 20px;border:none;border-radius:10px;font-size:14px;font-weight:900;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-green{background:#0fff6e;color:#060c14}
+.btn-green:hover{background:#00e65a}
+.btn-red{background:rgba(224,49,49,.15);color:#e03131;border:1px solid rgba(224,49,49,.3)}
+.btn-blue{background:rgba(77,184,255,.15);color:#4db8ff;border:1px solid rgba(77,184,255,.3)}
+.btn-ghost{background:rgba(255,255,255,.06);color:#dde8f5;border:1px solid rgba(255,255,255,.1)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:rgba(15,255,110,.05);border:1px solid rgba(15,255,110,.12);border-radius:10px;padding:12px;text-align:center}
+.kpi-val{font-size:28px;font-weight:900;color:#0fff6e}
+.kpi-lbl{font-size:11px;color:#536f8f}
+.kpi.warn{background:rgba(255,214,10,.05);border-color:rgba(255,214,10,.12)}
+.kpi.warn .kpi-val{color:#ffd60a}
+.kpi.red{background:rgba(224,49,49,.05);border-color:rgba(224,49,49,.12)}
+.kpi.red .kpi-val{color:#e03131}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:rgba(15,255,110,.08);color:#0fff6e;padding:10px 8px;text-align:right;font-weight:700;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.03)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-green{background:rgba(15,255,110,.15);color:#0fff6e}
+.badge-red{background:rgba(224,49,49,.15);color:#e03131}
+.badge-yellow{background:rgba(255,214,10,.15);color:#ffd60a}
+.badge-gray{background:rgba(255,255,255,.08);color:#536f8f}
+.result-box{background:rgba(15,255,110,.06);border:2px solid rgba(15,255,110,.2);border-radius:12px;padding:16px;margin-top:14px;text-align:center;display:none}
+.key-display{font-size:22px;font-weight:900;letter-spacing:3px;color:#0fff6e;direction:ltr;margin:8px 0}
+.warn-box{font-size:11px;color:#e03131;background:rgba(224,49,49,.06);border:1px solid rgba(224,49,49,.15);border-radius:8px;padding:10px;margin-top:16px;text-align:center}
+.empty{text-align:center;padding:30px;color:#536f8f;font-size:13px}
+.search-bar{margin-bottom:12px}
+.search-bar input{background:#101d2e}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="text-align:center;font-size:36px;margin-bottom:6px">🔑</div>
+  <h1>Padel MGR — License Manager</h1>
+  <div class="sub">لوحة إدارة التراخيص — للمطوّر فقط</div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpis"></div>
+
+  <!-- Generate New Key -->
+  <div class="card">
+    <div class="card-title">🔑 توليد مفتاح جديد</div>
+    <div class="row">
+      <div>
+        <label>اسم النادي / الملعب</label>
+        <input type="text" id="newClub" placeholder="مثال: نادي الأهرام للبادل">
+      </div>
+      <div>
+        <label>مدة الترخيص</label>
+        <select id="newDuration">
+          <option value="0">بدون مدة (دائم)</option>
+          <option value="30">شهر (30 يوم)</option>
+          <option value="90">3 شهور (90 يوم)</option>
+          <option value="180">6 شهور (180 يوم)</option>
+          <option value="365" selected>سنة (365 يوم)</option>
+          <option value="custom">مدة مخصصة...</option>
+        </select>
+      </div>
+      <div id="customDaysWrap" style="display:none">
+        <label>عدد الأيام</label>
+        <input type="number" id="customDays" placeholder="مثلاً 60" min="1">
+      </div>
+    </div>
+    <button class="btn btn-green" onclick="generateKey()" style="width:100%">توليد المفتاح 🔑</button>
+    <div class="result-box" id="genResult">
+      <div style="font-size:11px;color:#536f8f">مفتاح الترخيص:</div>
+      <div class="key-display" id="genKeyOutput"></div>
+      <div style="font-size:12px;margin-bottom:6px">
+        النادي: <strong id="genClubOutput"></strong> · 
+        الصلاحية: <strong id="genExpiryOutput"></strong>
+      </div>
+      <button class="btn btn-blue btn-sm" onclick="copyGenKey()">نسخ المفتاح 📋</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyFullMsg()">نسخ رسالة كاملة للعميل 📝</button>
+    </div>
+  </div>
+
+  <!-- Keys List -->
+  <div class="card">
+    <div class="card-title">📋 المفاتيح المصدّرة</div>
+    <div class="search-bar">
+      <input type="text" id="searchKeys" placeholder="🔍 بحث باسم النادي أو المفتاح..." oninput="renderKeys()">
+    </div>
+    <div id="keysTable"></div>
+  </div>
+
+  <!-- Blocked Keys -->
+  <div class="card" style="border-color:rgba(224,49,49,.15)">
+    <div class="card-title">🚫 إيقاف مفتاح</div>
+    <div class="row">
+      <div style="flex:3">
+        <label>اسم النادي أو المفتاح</label>
+        <input type="text" id="blockInput" placeholder="اكتب اسم النادي أو المفتاح...">
+      </div>
+      <div style="flex:1;display:flex;align-items:flex-end">
+        <button class="btn btn-red" onclick="blockKey()" style="width:100%">إيقاف 🚫</button>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#536f8f;margin-top:6px">⚠️ بعد الإيقاف، محتاج ترفع الكود المحدّث على GitHub عشان الإيقاف يشتغل</div>
+  </div>
+
+  <!-- Export Blocklist -->
+  <div class="card">
+    <div class="card-title">📤 تصدير قائمة الحظر</div>
+    <div style="font-size:12px;color:#536f8f;margin-bottom:10px">انسخ الكود ده والصقه في ملف index.html في سطر <code style="color:#0fff6e">BLOCKED_KEYS</code></div>
+    <div id="blocklistCode" style="background:#101d2e;padding:12px;border-radius:8px;font-family:monospace;font-size:12px;direction:ltr;text-align:left;color:#0fff6e;overflow-x:auto;white-space:pre;min-height:40px"></div>
+    <button class="btn btn-ghost btn-sm" onclick="copyBlocklist()" style="margin-top:8px">نسخ الكود 📋</button>
+  </div>
+
+  <div class="warn-box">⚠️ هذا الملف للمطوّر فقط — لا ترفعه على السيرفر أو تشاركه مع أي حد. احفظه على جهازك فقط.</div>
+</div>
+
+<script>
+const _XS = [80,97,100,101,108,77,71,82,50,48,50,54,33,64,35,36,94,38,42,83,116,111,114,109,88,89,90,95,115,101,99,117,114,101,75,101,121,71,101,110,101,114,97,116,111,114,95,50,48,50,54];
+function _gs(){return _XS.map(c=>String.fromCharCode(c)).join('');}
+const KEYS_STORAGE = 'PADEL_MGR_KEYS';
+const BLOCKED_STORAGE = 'PADEL_MGR_BLOCKED';
+
+// Load data
+function loadKeys(){ try{return JSON.parse(localStorage.getItem(KEYS_STORAGE))||[];}catch(e){return [];} }
+function saveKeys(keys){ localStorage.setItem(KEYS_STORAGE, JSON.stringify(keys)); }
+function loadBlocked(){ try{return JSON.parse(localStorage.getItem(BLOCKED_STORAGE))||[];}catch(e){return [];} }
+function saveBlocked(list){ localStorage.setItem(BLOCKED_STORAGE, JSON.stringify(list)); }
+
+// Key generation with expiry
+function generateLicenseKey(clubName, expiryDate){
+  let expStr = expiryDate || '9999-12-31';
+  let seed = clubName.trim().toLowerCase() + expStr + _gs();
+  let hash = 0;
+  for(let i=0;i<seed.length;i++){hash=((hash<<5)-hash)+seed.charCodeAt(i);hash|=0;}
+  hash=Math.abs(hash);
+  let chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let key='';
+  for(let i=0;i<16;i++){
+    if(i>0&&i%4===0)key+='-';
+    key+=chars[(hash*((i+1)*7)+i*13)%chars.length];
+    hash=Math.abs((hash*31+i*17)|0);
+  }
+  return key;
+}
+
+// Duration select handler
+document.getElementById('newDuration').addEventListener('change',function(){
+  document.getElementById('customDaysWrap').style.display=this.value==='custom'?'block':'none';
+});
+
+function getExpiryDate(days){
+  if(!days || days<=0) return null;
+  let d=new Date();
+  d.setDate(d.getDate()+parseInt(days));
+  return d.toISOString().split('T')[0];
+}
+
+function generateKey(){
+  let club=document.getElementById('newClub').value.trim();
+  if(!club){alert('اكتب اسم النادي!');return;}
+  let durSel=document.getElementById('newDuration').value;
+  let days=0;
+  if(durSel==='custom'){
+    days=parseInt(document.getElementById('customDays').value)||0;
+    if(days<=0){alert('اكتب عدد الأيام!');return;}
+  } else {
+    days=parseInt(durSel)||0;
+  }
+  let expiry=days>0?getExpiryDate(days):null;
+  let expiryForKey=expiry||'9999-12-31';
+  let key=generateLicenseKey(club, expiryForKey);
+
+  // Save to list
+  let keys=loadKeys();
+  // Check if club already has a key
+  let existing=keys.findIndex(k=>k.club.trim().toLowerCase()===club.trim().toLowerCase() && k.status==='active');
+  if(existing>=0){
+    if(!confirm('النادي "'+club+'" عنده مفتاح شغال بالفعل. عايز تولّد مفتاح جديد وتلغي القديم؟'))return;
+    keys[existing].status='replaced';
+  }
+  keys.push({
+    club: club,
+    key: key,
+    expiry: expiry,
+    expiryForKey: expiryForKey,
+    days: days,
+    created: new Date().toISOString().split('T')[0],
+    status: 'active'
+  });
+  saveKeys(keys);
+
+  // Show result
+  document.getElementById('genKeyOutput').textContent=key;
+  document.getElementById('genClubOutput').textContent=club;
+  document.getElementById('genExpiryOutput').textContent=expiry?formatDate(expiry):'دائم (بدون مدة)';
+  document.getElementById('genResult').style.display='block';
+
+  renderAll();
+}
+
+function copyGenKey(){
+  let key=document.getElementById('genKeyOutput').textContent;
+  navigator.clipboard.writeText(key).then(()=>alert('تم نسخ المفتاح ✓'));
+}
+
+function copyFullMsg(){
+  let key=document.getElementById('genKeyOutput').textContent;
+  let club=document.getElementById('genClubOutput').textContent;
+  let expiry=document.getElementById('genExpiryOutput').textContent;
+  let msg='مرحباً! 🏸\n\n'
+    +'رابط تطبيق إدارة الملعب:\nhttps://storm-xyz.github.io/padel-mgr/\n\n'
+    +'🔑 مفتاح الترخيص: '+key+'\n'
+    +'🏟️ اسم النادي: '+club+'\n'
+    +'📅 صلاحية الترخيص: '+expiry+'\n\n'
+    +'ادخل المفتاح واسم النادي بالظبط وهيشتغل معاك ✓\n'
+    +'بعد التفعيل هيطلب منك تعيّن باسورد خاص بيك.';
+  navigator.clipboard.writeText(msg).then(()=>alert('تم نسخ الرسالة الكاملة ✓'));
+}
+
+function formatDate(d){
+  if(!d)return 'دائم';
+  let parts=d.split('-');
+  return parts[2]+'/'+parts[1]+'/'+parts[0];
+}
+
+function getStatus(item){
+  if(item.status==='blocked')return {text:'موقوف 🚫',cls:'badge-red'};
+  if(item.status==='replaced')return {text:'مُستبدل',cls:'badge-gray'};
+  if(item.expiry){
+    let today=new Date().toISOString().split('T')[0];
+    if(item.expiry<today)return {text:'منتهي ⏰',cls:'badge-yellow'};
+    // Check days remaining
+    let diff=Math.ceil((new Date(item.expiry)-new Date())/86400000);
+    if(diff<=7)return {text:'ينتهي خلال '+diff+' يوم',cls:'badge-yellow'};
+  }
+  return {text:'نشط ✓',cls:'badge-green'};
+}
+
+function renderKPIs(){
+  let keys=loadKeys();
+  let blocked=loadBlocked();
+  let active=keys.filter(k=>{
+    if(k.status!=='active')return false;
+    if(k.expiry && k.expiry<new Date().toISOString().split('T')[0])return false;
+    return true;
+  }).length;
+  let expired=keys.filter(k=>k.status==='active'&&k.expiry&&k.expiry<new Date().toISOString().split('T')[0]).length;
+  let blockedCount=keys.filter(k=>k.status==='blocked').length;
+  let total=keys.filter(k=>k.status!=='replaced').length;
+
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi"><div class="kpi-val">'+active+'</div><div class="kpi-lbl">🟢 مفتاح نشط</div></div>'
+    +'<div class="kpi warn"><div class="kpi-val">'+expired+'</div><div class="kpi-lbl">⏰ منتهي الصلاحية</div></div>'
+    +'<div class="kpi red"><div class="kpi-val">'+blockedCount+'</div><div class="kpi-lbl">🚫 موقوف</div></div>'
+    +'<div class="kpi"><div class="kpi-val">'+total+'</div><div class="kpi-lbl">📋 إجمالي المفاتيح</div></div>';
+}
+
+function renderKeys(){
+  let keys=loadKeys();
+  let search=document.getElementById('searchKeys').value.trim().toLowerCase();
+  if(search){
+    keys=keys.filter(k=>k.club.toLowerCase().includes(search)||k.key.toLowerCase().includes(search));
+  }
+  if(!keys.length){
+    document.getElementById('keysTable').innerHTML='<div class="empty">لا توجد مفاتيح بعد — ولّد أول مفتاح من فوق</div>';
+    return;
+  }
+  // Sort: active first, then by creation date desc
+  keys.sort((a,b)=>{
+    let sa=a.status==='active'?0:1, sb=b.status==='active'?0:1;
+    if(sa!==sb)return sa-sb;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+  let html='<div style="overflow-x:auto"><table><thead><tr><th>النادي</th><th>المفتاح</th><th>تاريخ الإنشاء</th><th>الصلاحية</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>';
+  keys.forEach((k,i)=>{
+    let st=getStatus(k);
+    html+='<tr>'
+      +'<td style="font-weight:700">'+k.club+'</td>'
+      +'<td style="direction:ltr;font-family:monospace;font-size:11px;letter-spacing:1px;color:#0fff6e">'+k.key+'</td>'
+      +'<td>'+formatDate(k.created)+'</td>'
+      +'<td>'+(k.expiry?formatDate(k.expiry)+(k.days?' ('+k.days+' يوم)':''):'دائم ♾️')+'</td>'
+      +'<td><span class="badge '+st.cls+'">'+st.text+'</span></td>'
+      +'<td>';
+    if(k.status==='active'){
+      html+='<button class="btn btn-red btn-sm" onclick="blockByIndex('+i+')">إيقاف</button> ';
+      html+='<button class="btn btn-ghost btn-sm" onclick="renewByIndex('+i+')">تجديد</button> ';
+      html+='<button class="btn btn-sm" style="background:rgba(224,49,49,.08);color:#e03131;border:1px solid rgba(224,49,49,.2)" onclick="deleteByIndex('+i+')">حذف 🗑️</button>';
+    } else if(k.status==='blocked'){
+      html+='<button class="btn btn-blue btn-sm" onclick="unblockByIndex('+i+')">تفعيل</button> ';
+      html+='<button class="btn btn-sm" style="background:rgba(224,49,49,.08);color:#e03131;border:1px solid rgba(224,49,49,.2)" onclick="deleteByIndex('+i+')">حذف 🗑️</button>';
+    } else if(k.status==='replaced'){
+      html+='<button class="btn btn-sm" style="background:rgba(224,49,49,.08);color:#e03131;border:1px solid rgba(224,49,49,.2)" onclick="deleteByIndex('+i+')">حذف 🗑️</button>';
+    }
+    html+='</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('keysTable').innerHTML=html;
+}
+
+function blockByIndex(idx){
+  let keys=loadKeys();
+  // Find the actual index (since we sorted for display)
+  let search=document.getElementById('searchKeys').value.trim().toLowerCase();
+  let filtered=search?keys.filter(k=>k.club.toLowerCase().includes(search)||k.key.toLowerCase().includes(search)):keys.slice();
+  filtered.sort((a,b)=>{
+    let sa=a.status==='active'?0:1, sb=b.status==='active'?0:1;
+    if(sa!==sb)return sa-sb;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+  let target=filtered[idx];
+  if(!target)return;
+  if(!confirm('إيقاف مفتاح "'+target.club+'"؟'))return;
+  // Find in original array
+  let origIdx=keys.findIndex(k=>k.key===target.key&&k.club===target.club);
+  if(origIdx>=0){
+    keys[origIdx].status='blocked';
+    saveKeys(keys);
+    // Add to blocked list
+    let blocked=loadBlocked();
+    if(!blocked.includes(target.key))blocked.push(target.key);
+    saveBlocked(blocked);
+  }
+  renderAll();
+}
+
+function unblockByIndex(idx){
+  let keys=loadKeys();
+  let search=document.getElementById('searchKeys').value.trim().toLowerCase();
+  let filtered=search?keys.filter(k=>k.club.toLowerCase().includes(search)||k.key.toLowerCase().includes(search)):keys.slice();
+  filtered.sort((a,b)=>{
+    let sa=a.status==='active'?0:1, sb=b.status==='active'?0:1;
+    if(sa!==sb)return sa-sb;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+  let target=filtered[idx];
+  if(!target)return;
+  let origIdx=keys.findIndex(k=>k.key===target.key&&k.club===target.club);
+  if(origIdx>=0){
+    keys[origIdx].status='active';
+    saveKeys(keys);
+    let blocked=loadBlocked();
+    blocked=blocked.filter(b=>b!==target.key);
+    saveBlocked(blocked);
+  }
+  renderAll();
+}
+
+function deleteByIndex(idx){
+  let keys=loadKeys();
+  let search=document.getElementById('searchKeys').value.trim().toLowerCase();
+  let filtered=search?keys.filter(k=>k.club.toLowerCase().includes(search)||k.key.toLowerCase().includes(search)):keys.slice();
+  filtered.sort((a,b)=>{
+    let sa=a.status==='active'?0:1, sb=b.status==='active'?0:1;
+    if(sa!==sb)return sa-sb;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+  let target=filtered[idx];
+  if(!target)return;
+  if(!confirm('حذف مفتاح "'+target.club+'" نهائياً؟ لا يمكن التراجع!'))return;
+  let origIdx=keys.findIndex(k=>k.key===target.key&&k.club===target.club);
+  if(origIdx>=0){
+    keys.splice(origIdx,1);
+    saveKeys(keys);
+    let blocked=loadBlocked();
+    blocked=blocked.filter(b=>b!==target.key);
+    saveBlocked(blocked);
+  }
+  renderAll();
+}
+
+function renewByIndex(idx){
+  let keys=loadKeys();
+  let search=document.getElementById('searchKeys').value.trim().toLowerCase();
+  let filtered=search?keys.filter(k=>k.club.toLowerCase().includes(search)||k.key.toLowerCase().includes(search)):keys.slice();
+  filtered.sort((a,b)=>{
+    let sa=a.status==='active'?0:1, sb=b.status==='active'?0:1;
+    if(sa!==sb)return sa-sb;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+  let target=filtered[idx];
+  if(!target)return;
+  let days=prompt('كام يوم للتجديد؟ (مثلاً 365 لسنة)',target.days||'365');
+  if(!days)return;
+  days=parseInt(days);
+  if(days<=0)return;
+  // Mark old as replaced
+  let origIdx=keys.findIndex(k=>k.key===target.key&&k.club===target.club);
+  if(origIdx>=0)keys[origIdx].status='replaced';
+  // Generate new key
+  let expiry=getExpiryDate(days);
+  let expiryForKey=expiry||'9999-12-31';
+  let newKey=generateLicenseKey(target.club, expiryForKey);
+  keys.push({
+    club:target.club, key:newKey, expiry:expiry, expiryForKey:expiryForKey,
+    days:days, created:new Date().toISOString().split('T')[0], status:'active'
+  });
+  saveKeys(keys);
+  // Show result
+  document.getElementById('genKeyOutput').textContent=newKey;
+  document.getElementById('genClubOutput').textContent=target.club;
+  document.getElementById('genExpiryOutput').textContent=formatDate(expiry);
+  document.getElementById('genResult').style.display='block';
+  document.getElementById('newClub').value=target.club;
+  renderAll();
+}
+
+function blockKey(){
+  let input=document.getElementById('blockInput').value.trim();
+  if(!input){alert('اكتب اسم النادي أو المفتاح!');return;}
+  let keys=loadKeys();
+  let found=keys.filter(k=>k.status==='active'&&(k.club.toLowerCase()===input.toLowerCase()||k.key.toUpperCase()===input.toUpperCase()));
+  if(!found.length){alert('مفيش مفتاح نشط بالاسم أو المفتاح ده');return;}
+  if(!confirm('إيقاف '+found.length+' مفتاح؟'))return;
+  let blocked=loadBlocked();
+  found.forEach(f=>{
+    let idx=keys.findIndex(k=>k.key===f.key&&k.club===f.club);
+    if(idx>=0)keys[idx].status='blocked';
+    if(!blocked.includes(f.key))blocked.push(f.key);
+  });
+  saveKeys(keys);
+  saveBlocked(blocked);
+  document.getElementById('blockInput').value='';
+  renderAll();
+  alert('تم إيقاف '+found.length+' مفتاح ✓');
+}
+
+function renderBlocklist(){
+  let blocked=loadBlocked();
+  let code='const BLOCKED_KEYS = '+JSON.stringify(blocked)+';';
+  document.getElementById('blocklistCode').textContent=code;
+}
+
+function copyBlocklist(){
+  let code=document.getElementById('blocklistCode').textContent;
+  navigator.clipboard.writeText(code).then(()=>alert('تم نسخ الكود ✓'));
+}
+
+function renderAll(){
+  renderKPIs();
+  renderKeys();
+  renderBlocklist();
+}
+
+// Init
+renderAll();
+</script>
+</body>
+</html>
