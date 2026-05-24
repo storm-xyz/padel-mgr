@@ -13,6 +13,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script>
+(function(){var t=localStorage.getItem('padel_theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';}if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -641,10 +644,19 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 <!-- TAB: CLOSING -->
 <div class="tab" id="tab-closing">
+  <div class="sb" id="closingInfoCard" style="padding:12px;margin-bottom:10px;border:1px solid var(--accent);border-radius:12px;position:relative">
+    <button onclick="document.getElementById('closingInfoCard').style.display='none';localStorage.setItem('PADEL_CLOSING_INFO_HIDDEN','1')" style="position:absolute;top:6px;left:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">✕</button>
+    <div style="font-size:13px;font-weight:800;color:var(--accent);margin-bottom:6px">💡 كيف تستخدم التقفيل؟</div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.8">
+      • <strong>"من الحجوزات"</strong>: يحسب تلقائياً من حجوزات اليوم — مثالي لو بتسجّل كل حجز<br>
+      • <strong>"حساب يدوي"</strong>: تدخل ساعات الصباح والمساء يدوياً — لو مش بتسجّل كل حجز
+    </div>
+  </div>
   <div class="mode-switch">
     <button class="mode-btn on" id="cmode-bookings" onclick="setCloseMode('bookings')">📋 من الحجوزات</button>
     <button class="mode-btn" id="cmode-manual" onclick="setCloseMode('manual')">🧮 حساب يدوي</button>
   </div>
+  <div id="closingConflictWarning" style="display:none;padding:10px;margin-bottom:10px;border-radius:10px;background:rgba(255,193,7,.1);border:1px solid var(--yellow);font-size:12px;color:var(--yellow);text-align:center">⚠️ لديك حساب من الحجوزات وحساب يدوي — أيهما تريد حفظه؟</div>
   <div class="cl-date-bar">
     <span style="font-size:20px">📅</span>
     <input type="date" id="closingDate" onchange="onClosingDateChange()">
@@ -979,9 +991,96 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
       <button class="btn btn-ghost" onclick="shareWalletQR()" style="margin-top:8px;padding:8px">مشاركة QR Code 📤</button>
     </div>
   </div>
+  <div class="card">
+    <div class="card-title">🔔 الإشعارات</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px" id="notifPermStatus"></div>
+    <button class="btn btn-blue" onclick="requestNotifPermissionManual()" id="notifPermBtn" style="margin-bottom:12px;padding:8px;font-size:12px">تفعيل الإشعارات 🔔</button>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px">⏰ حجز قادم خلال ساعة</span>
+      <label class="toggle-switch"><input type="checkbox" id="notifUpcoming" onchange="updateNotifSetting('upcomingBooking',this.checked)" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px">💰 مدفوعات معلقة (يومياً 10ص)</span>
+      <label class="toggle-switch"><input type="checkbox" id="notifPending" onchange="updateNotifSetting('pendingPayments',this.checked)" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px">⚠️ اشتراكات تنتهي قريباً</span>
+      <label class="toggle-switch"><input type="checkbox" id="notifExpiry" onchange="updateNotifSetting('subscriptionExpiry',this.checked)" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:12px">📋 تذكير التقفيل</span>
+      <label class="toggle-switch"><input type="checkbox" id="notifClosing" onchange="updateNotifSetting('closingReminder',this.checked)" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="fg" style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <span style="font-size:11px;color:var(--muted)">وقت تذكير التقفيل:</span>
+      <input type="time" class="fi" id="notifClosingTime" value="23:00" onchange="updateNotifSetting('closingReminderTime',this.value)" style="width:auto;flex:0" aria-label="وقت تذكير التقفيل">
+    </div>
+  </div>
   <div class="card" style="border-color:rgba(255,77,77,.15)">
     <div class="card-title">🗑️ إدارة البيانات</div>
     <button class="btn btn-red" onclick="clearAllData()">حذف جميع البيانات ⚠️</button>
+  </div>
+</div>
+
+<!-- TAB: TRAINERS -->
+<div class="tab" id="tab-trainers">
+  <div class="card">
+    <div class="card-title">🧑‍🏫 المدربين</div>
+    <div id="trainersList"></div>
+  </div>
+  <div class="card" id="trainerDetailCard" style="display:none">
+    <div class="card-title" id="trainerDetailTitle">تفاصيل المدرب</div>
+    <div id="trainerDetail"></div>
+  </div>
+</div>
+
+<!-- TRAINER MODAL -->
+<div class="moverlay" id="trainerOverlay" onclick="if(event.target===this)closeTrainerModal()" style="display:none">
+  <div class="msheet">
+    <div class="mheader"><span id="trainerModalTitle">إضافة مدرب</span><button class="mclose" onclick="closeTrainerModal()">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="flbl">اسم المدرب *</label><input class="fi" type="text" id="trName" placeholder="اسم المدرب..." aria-label="اسم المدرب"></div>
+      <div class="fg"><label class="flbl">رقم الهاتف</label><input class="fi" type="tel" id="trPhone" placeholder="01xxxxxxxxx" inputmode="tel" aria-label="رقم هاتف المدرب"></div>
+      <div class="fg"><label class="flbl">التخصص</label>
+        <select class="fi" id="trSpecialty" aria-label="تخصص المدرب">
+          <option value="all">عام</option>
+          <option value="beginners">مبتدئين</option>
+          <option value="advanced">متقدمين</option>
+          <option value="kids">أطفال</option>
+        </select>
+      </div>
+      <div class="fg"><label class="flbl">نوع الأجر</label>
+        <select class="fi" id="trPayType" onchange="toggleTrainerPayFields()" aria-label="نوع أجر المدرب">
+          <option value="percentage">نسبة من الجلسة (%)</option>
+          <option value="salary">راتب شهري ثابت (ج)</option>
+          <option value="per_session">مبلغ لكل جلسة (ج)</option>
+        </select>
+      </div>
+      <div class="fg" id="trPayAmtGroup"><label class="flbl" id="trPayAmtLabel">النسبة / المبلغ</label><input class="fi" type="number" id="trPayAmt" placeholder="0" inputmode="numeric" aria-label="مبلغ أو نسبة الأجر"></div>
+      <input type="hidden" id="trEditId">
+      <button class="btn btn-green" onclick="saveTrainer()" style="width:100%;margin-top:10px">حفظ المدرب ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRAINER PAYMENT MODAL -->
+<div class="moverlay" id="trainerPayOverlay" onclick="if(event.target===this)closeTrainerPayModal()" style="display:none">
+  <div class="msheet">
+    <div class="mheader"><span>تسجيل دفعة للمدرب</span><button class="mclose" onclick="closeTrainerPayModal()">✕</button></div>
+    <div class="mbody">
+      <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:12px" id="trPayName"></div>
+      <div class="fg"><label class="flbl">المبلغ (ج)</label><input class="fi" type="number" id="trPayAmount" placeholder="0" inputmode="numeric" aria-label="مبلغ الدفعة"></div>
+      <div class="fg"><label class="flbl">التاريخ</label><input class="fi" type="date" id="trPayDate" aria-label="تاريخ الدفعة"></div>
+      <div class="fg"><label class="flbl">طريقة الدفع</label>
+        <select class="fi" id="trPayMethod" aria-label="طريقة الدفع">
+          <option value="cash">كاش 💵</option>
+          <option value="transfer">تحويل 💳</option>
+        </select>
+      </div>
+      <div class="fg"><label class="flbl">ملاحظات</label><input class="fi" type="text" id="trPayNotes" placeholder="ملاحظات..." aria-label="ملاحظات الدفعة"></div>
+      <input type="hidden" id="trPayTrainerId">
+      <button class="btn btn-green" onclick="saveTrainerPayment()" style="width:100%;margin-top:10px">تسجيل الدفعة ✓</button>
+    </div>
   </div>
 </div>
 
@@ -992,6 +1091,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   <button class="nbtn" id="n-closing" onclick="goTab('closing')" aria-label="التقفيل"><span class="nico">💰</span><span class="nav-lbl">التقفيل</span></button>
   <button class="nbtn" id="n-history" onclick="goTab('history')" aria-label="السجل"><span class="nico">📋</span><span class="nav-lbl">السجل</span></button>
   <button class="nbtn" id="n-customers" onclick="goTab('customers')" aria-label="العملاء"><span class="nico">👥</span><span class="nav-lbl">العملاء</span></button>
+  <button class="nbtn" id="n-trainers" onclick="goTab('trainers')" aria-label="المدربين"><span class="nico">🧑‍🏫</span><span class="nav-lbl">المدربين</span></button>
   <button class="nbtn" id="n-dashboard" onclick="goTab('dashboard')" aria-label="إحصائيات"><span class="nico">📊</span><span class="nav-lbl">إحصائيات</span></button>
   <button class="nbtn" id="n-settings" onclick="goTab('settings')" aria-label="الإعدادات"><span class="nico">⚙️</span><span class="nav-lbl">الإعدادات</span></button>
 </nav>
@@ -1257,7 +1357,8 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
         <button class="bc" id="stype-open" onclick="selSType('open')">🎾 مفتوح</button>
       </div>
     </div>
-    <div class="fg"><label class="flbl">المدرب</label><input class="fi" type="text" id="sCoach" placeholder="اسم المدرب..."></div>
+    <div class="fg"><label class="flbl">المدرب</label><select class="fi" id="sTrainer" aria-label="اختر المدرب"><option value="">— بدون مدرب —</option></select></div>
+    <div class="fg" style="display:none"><input class="fi" type="text" id="sCoach" placeholder="اسم المدرب..."></div>
     <div class="fg">
       <label class="flbl">حالة الدفع</label>
       <div class="bgr">
@@ -1295,6 +1396,8 @@ let D = {
   closings: [],
   dayExpenses: {},
   academy: { trainees: [], sessions: {}, groups: [] },
+  trainers: [],
+  trainerPayments: [],
   settings: { priceAM: 160, pricePM: 200, courts: 2, clubName: 'Padel Club' },
   password: null
 };
@@ -1332,8 +1435,13 @@ window.addEventListener('DOMContentLoaded', function(){
   loadData();
   loadTheme();
   loadLang();
-  // Register Service Worker for PWA
   if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){});}
+  if(!verifyLicenseDevice()){
+    document.getElementById('licenseScreen').style.display='flex';
+    document.getElementById('licenseError').textContent='🔐 هذا الترخيص مرتبط بجهاز آخر، تواصل مع المطوّر';
+    document.getElementById('licenseError').style.display='block';
+    return;
+  }
   if(!checkLicense()) return;
   initApp();
 });
@@ -1362,9 +1470,11 @@ function initApp(){
   buildDaySelectGrid();
   showLicenseInfo();
   showLastBackupTime();
+  startNotifChecks();
   document.addEventListener('click', function(e){
     if(fabMenuOpen && !e.target.closest('.fab-menu') && !e.target.closest('.fab')) closeFabMenu();
   });
+  if(checkOnboarding()){setTimeout(startOnboarding,500);}
 }
 
 function scopeKey(clubName){
@@ -1391,6 +1501,8 @@ function loadData(){
       if(!D.academy.trainees) D.academy.trainees=[];
       if(!D.academy.sessions) D.academy.sessions={};
       if(!D.academy.groups) D.academy.groups=[];
+      D.trainers = p.trainers||[];
+      D.trainerPayments = p.trainerPayments||[];
       D.settings = Object.assign({priceAM:160,pricePM:200,courts:2,clubName:'Padel Club'},p.settings||{});
       D.password = p.password||null;
     }
@@ -1430,9 +1542,9 @@ function showToast(msg,color){
 // ========================= THEME & LANG =========================
 function toggleTheme(){ let cur=document.documentElement.getAttribute('data-theme'); applyTheme(cur==='light'?'dark':'light'); localStorage.setItem('padel_theme',document.documentElement.getAttribute('data-theme')||'dark'); }
 function applyTheme(t){ if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('themeBtn').textContent='☀️';}else{document.documentElement.removeAttribute('data-theme');document.getElementById('themeBtn').textContent='🌙';} }
-function loadTheme(){ applyTheme(localStorage.getItem('padel_theme')||'dark'); }
+function loadTheme(){ var t=localStorage.getItem('padel_theme'); if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';} applyTheme(t); }
 
-const LABELS={ar:{hours:'ساعات',cash:'كاش ج',visa:'فيزا ج',bookings:'الحجوزات',academy:'الأكاديمية',closing:'التقفيل',history:'السجل',customers:'العملاء',dashboard:'إحصائيات',settings:'الإعدادات'},en:{hours:'Hours',cash:'Cash',visa:'Visa',bookings:'Bookings',academy:'Academy',closing:'Closing',history:'Records',customers:'Clients',dashboard:'Dashboard',settings:'Settings'}};
+const LABELS={ar:{hours:'ساعات',cash:'كاش ج',visa:'فيزا ج',bookings:'الحجوزات',academy:'الأكاديمية',closing:'التقفيل',history:'السجل',customers:'العملاء',trainers:'المدربين',dashboard:'إحصائيات',settings:'الإعدادات'},en:{hours:'Hours',cash:'Cash',visa:'Visa',bookings:'Bookings',academy:'Academy',closing:'Closing',history:'Records',customers:'Clients',trainers:'Trainers',dashboard:'Dashboard',settings:'Settings'}};
 function toggleLang(){ curLang=curLang==='ar'?'en':'ar'; localStorage.setItem('padel_lang',curLang); applyLang(); }
 function applyLang(){
   let L=LABELS[curLang]; let isAr=curLang==='ar';
@@ -1464,15 +1576,20 @@ function goTab(t){
   if(tabEl)tabEl.classList.add('active');
   if(navEl)navEl.classList.add('active');
   let fab=document.getElementById('fab');
-  fab.classList.toggle('fab-hidden', t!=='bookings' && t!=='academy');
+  fab.classList.toggle('fab-hidden', t!=='bookings' && t!=='academy' && t!=='trainers');
   closeFabMenu();
   if(t==='bookings'){renderBooks();}
   if(t==='academy'){renderAcadStats();setAcadView(acadView);}
-  if(t==='closing'){let di=document.getElementById('closingDate');if(!di.value)di.value=curDate;onClosingDateChange();}
+  if(t==='closing'){
+    let di=document.getElementById('closingDate');if(!di.value)di.value=curDate;onClosingDateChange();
+    var infoCard=document.getElementById('closingInfoCard');
+    if(infoCard&&localStorage.getItem('PADEL_CLOSING_INFO_HIDDEN'))infoCard.style.display='none';
+  }
   if(t==='history'){initHistoryDates();renderHistory();}
   if(t==='customers'){renderCustomers();}
   if(t==='dashboard'){renderDashboard();}
-  if(t==='settings'){showLastBackupTime();}
+  if(t==='trainers'){renderTrainers();}
+  if(t==='settings'){showLastBackupTime();loadNotifSettingsUI();}
   addCardAnimations(tabEl);
 }
 function addCardAnimations(container){
@@ -1486,6 +1603,8 @@ function onFabClick(){
   if(currentTab==='academy'){
     if(fabMenuOpen){closeFabMenu();return;}
     openFabMenu();
+  } else if(currentTab==='trainers'){
+    openTrainerModal(null);
   } else {
     openModal(null);
   }
@@ -2022,7 +2141,8 @@ function saveClosing(mode){
   grossRev = actCash + actVisa + actExpInput;
   net = actCash + actVisa - detailedExpT;
   if(expList.length) D.dayExpenses[dv]=expList;
-  D.closings.unshift({id:'cl_'+Date.now(),ts:Date.now(),date:dv,cash:actCash,visa:actVisa,expenses:actExpInput,detailedExpenses:detailedExpT,grossRevenue:grossRev,net,mode,expList});
+  var trainerDues=getTrainersDuesForClosing(dv);
+  D.closings.unshift({id:'cl_'+Date.now(),ts:Date.now(),date:dv,cash:actCash,visa:actVisa,expenses:actExpInput,detailedExpenses:detailedExpT,grossRevenue:grossRev,net:net-trainerDues,trainerDues:trainerDues,mode,expList});
   saveData(); renderHistory(); showToast('تم حفظ التقفيل ✓ 💾');
 }
 
@@ -2712,6 +2832,8 @@ function openAcadSessionModal(editId){
   (D.academy.trainees||[]).filter(t=>t.active!==false).forEach(t=>{
     let opt=document.createElement('option'); opt.value=t.id; opt.textContent=t.name; sel.appendChild(opt);
   });
+  var trSel=document.getElementById('sTrainer');
+  trSel.innerHTML='<option value="">— بدون مدرب —</option>'+getTrainersListForSelect();
   buildAcadCourtBtns();
   if(editId){
     let s=null; Object.values(D.academy.sessions||{}).flat().forEach(x=>{if(x.id===editId)s=x;}); if(!s)return;
@@ -2720,13 +2842,15 @@ function openAcadSessionModal(editId){
     let t12=time24to12(s.time); document.getElementById('sHour').value=t12.h; document.getElementById('sMin').value=t12.m;
     draftSession.ampm=t12.ampm; document.getElementById('sAmPm').textContent=t12.ampm==='am'?'ص':'م'; document.getElementById('sAmPm').className='ampm-btn'+(t12.ampm==='am'?' am':'');
     draftSession.sType=s.sType||'private'; draftSession.paid=s.paid||'sub';
-    document.getElementById('sCoach').value=s.coach||''; document.getElementById('sNotes').value=s.notes||'';
+    document.getElementById('sCoach').value=s.coach||'';
+    trSel.value=s.trainer||'';
+    document.getElementById('sNotes').value=s.notes||'';
   } else {
     draftSession.court='1'; draftSession.dur='1'; draftSession.ampm='pm';
     draftSession.sType='private'; draftSession.paid='sub';
     let nt=getNearestHalfHour(); document.getElementById('sHour').value=nt.h; document.getElementById('sMin').value=nt.m;
     draftSession.ampm=nt.ampm; document.getElementById('sAmPm').textContent=nt.ampm==='am'?'ص':'م'; document.getElementById('sAmPm').className='ampm-btn'+(nt.ampm==='am'?' am':'');
-    document.getElementById('sCoach').value=''; document.getElementById('sNotes').value='';
+    document.getElementById('sCoach').value=''; trSel.value=''; document.getElementById('sNotes').value='';
   }
   updateSDurBtns(); updateSTypeBtns(); updateSPaidBtns(); buildAcadCourtBtns();
   document.getElementById('acadSessionModal').classList.add('open');
@@ -2769,6 +2893,7 @@ function saveAcadSession(){
     id:draftSession.editId||'as_'+Date.now(), traineeId, court:draftSession.court,
     time:t24, dur:draftSession.dur, sType:draftSession.sType,
     paid:draftSession.paid, coach:document.getElementById('sCoach').value.trim(),
+    trainer:document.getElementById('sTrainer').value||'',
     notes:document.getElementById('sNotes').value.trim(), date
   };
   if(!D.academy.sessions)D.academy.sessions={};
@@ -3098,7 +3223,7 @@ function importCode(){
 
 function clearAllData(){
   showDeleteConfirm('حذف جميع البيانات ⚠️','سيتم حذف كل الحجوزات والتقفيلات والأكاديمية نهائياً. لا يمكن التراجع!\n\nاكتب «حذف» للتأكيد:',function(){
-    D={bookings:{},closings:[],dayExpenses:{},academy:{trainees:[],sessions:{},groups:[]},settings:D.settings,password:D.password};
+    D={bookings:{},closings:[],dayExpenses:{},academy:{trainees:[],sessions:{},groups:[]},trainers:[],trainerPayments:[],settings:D.settings,password:D.password};
     saveData(); goTab('bookings'); showToast('تم حذف جميع البيانات ✓','#e03131');
   });
 }
@@ -3116,6 +3241,22 @@ function printDailyReport(){
 
 // ========================= LICENSE SYSTEM =========================
 var a0_0x2e65c8=a0_0x5c32;(function(_0x266df2,_0x52346b){var _0x10bfaf=a0_0x5c32,_0x42cbba=_0x266df2();while(!![]){try{var _0x5d1bd6=-parseInt(_0x10bfaf(0x156))/0x1+parseInt(_0x10bfaf(0x11d))/0x2+parseInt(_0x10bfaf(0x13a))/0x3+parseInt(_0x10bfaf(0x132))/0x4+-parseInt(_0x10bfaf(0x113))/0x5*(parseInt(_0x10bfaf(0x141))/0x6)+-parseInt(_0x10bfaf(0x127))/0x7*(parseInt(_0x10bfaf(0x10c))/0x8)+parseInt(_0x10bfaf(0x157))/0x9*(parseInt(_0x10bfaf(0x154))/0xa);if(_0x5d1bd6===_0x52346b)break;else _0x42cbba['push'](_0x42cbba['shift']());}catch(_0x56037b){_0x42cbba['push'](_0x42cbba['shift']());}}}(a0_0x5f44,0x5041c));const a0_0x5c87c2=a0_0x2e65c8(0x173),a0_0x3c344e=[],a0_0x4b1b2e=[0x50,0x61,0x64,0x65,0x6c,0x4d,0x47,0x52,0x32,0x30,0x32,0x36,0x21,0x40,0x23,0x24,0x5e,0x26,0x2a,0x53,0x74,0x6f,0x72,0x6d,0x58,0x59,0x5a,0x5f,0x73,0x65,0x63,0x75,0x72,0x65,0x4b,0x65,0x79,0x47,0x65,0x6e,0x65,0x72,0x61,0x74,0x6f,0x72,0x5f,0x32,0x30,0x32,0x36];function a0_0x30fc28(){var _0x557721=a0_0x2e65c8,_0x1ce2a3={'\x41\x4e\x6f\x53\x6f':function(_0x2e223a,_0x33cc2b){return _0x2e223a>=_0x33cc2b;},'\x50\x70\x72\x6b\x48':function(_0x24a6e3,_0x433776){return _0x24a6e3===_0x433776;},'\x52\x53\x54\x4d\x68':_0x557721(0x14c),'\x47\x62\x4b\x41\x44':_0x557721(0x105)};return a0_0x4b1b2e[_0x557721(0x135)](function(_0x12874d){var _0xfd763f=_0x557721;return _0x1ce2a3[_0xfd763f(0x168)](_0x1ce2a3[_0xfd763f(0x140)],_0x1ce2a3[_0xfd763f(0x17e)])?_0x1ce2a3[_0xfd763f(0x115)](_0x2d6119[_0xfd763f(0x117)](_0x56c97b[_0xfd763f(0x162)]()[_0xfd763f(0x106)](/\s/g,'')),0x0):String[_0xfd763f(0x15a)](_0x12874d);})[_0x557721(0x12e)]('');}function a0_0x5c32(_0x3889af,_0x2e8d6c){_0x3889af=_0x3889af-0xff;var _0x5f4400=a0_0x5f44();var _0x5c329a=_0x5f4400[_0x3889af];if(a0_0x5c32['\x72\x5a\x6f\x47\x61\x48']===undefined){var _0x11f738=function(_0x1b09ce){var _0x520f73='\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x2b\x2f\x3d';var _0x48f2f1='',_0x2bcd6b='';for(var _0x59c278=0x0,_0x52ff6b,_0x56f13c,_0x23a6f0=0x0;_0x56f13c=_0x1b09ce['\x63\x68\x61\x72\x41\x74'](_0x23a6f0++);~_0x56f13c&&(_0x52ff6b=_0x59c278%0x4?_0x52ff6b*0x40+_0x56f13c:_0x56f13c,_0x59c278++%0x4)?_0x48f2f1+=String['\x66\x72\x6f\x6d\x43\x68\x61\x72\x43\x6f\x64\x65'](0xff&_0x52ff6b>>(-0x2*_0x59c278&0x6)):0x0){_0x56f13c=_0x520f73['\x69\x6e\x64\x65\x78\x4f\x66'](_0x56f13c);}for(var _0x284fd6=0x0,_0x4a49a2=_0x48f2f1['\x6c\x65\x6e\x67\x74\x68'];_0x284fd6<_0x4a49a2;_0x284fd6++){_0x2bcd6b+='\x25'+('\x30\x30'+_0x48f2f1['\x63\x68\x61\x72\x43\x6f\x64\x65\x41\x74'](_0x284fd6)['\x74\x6f\x53\x74\x72\x69\x6e\x67'](0x10))['\x73\x6c\x69\x63\x65'](-0x2);}return decodeURIComponent(_0x2bcd6b);};a0_0x5c32['\x6e\x77\x64\x66\x51\x61']=_0x11f738,a0_0x5c32['\x59\x50\x7a\x75\x6a\x65']={},a0_0x5c32['\x72\x5a\x6f\x47\x61\x48']=!![];}var _0x1a85c9=_0x5f4400[0x0],_0x2b7c6b=_0x3889af+_0x1a85c9,_0x1e39f3=a0_0x5c32['\x59\x50\x7a\x75\x6a\x65'][_0x2b7c6b];return!_0x1e39f3?(_0x5c329a=a0_0x5c32['\x6e\x77\x64\x66\x51\x61'](_0x5c329a),a0_0x5c32['\x59\x50\x7a\x75\x6a\x65'][_0x2b7c6b]=_0x5c329a):_0x5c329a=_0x1e39f3,_0x5c329a;}function a0_0x2a2d2b(_0x3e29f8,_0x988af0){var _0x184d2e=a0_0x2e65c8,_0x3af609={'\x7a\x55\x4d\x6b\x76':'\x38\x7c\x31\x7c\x32\x7c\x35\x7c\x34\x7c\x36\x7c\x37\x7c\x30\x7c\x33','\x45\x74\x61\x4f\x68':function(_0x5d0d89,_0x4a4817){return _0x5d0d89<_0x4a4817;},'\x46\x57\x4b\x4a\x79':function(_0x17d725,_0x13c728){return _0x17d725>_0x13c728;},'\x44\x42\x52\x43\x72':function(_0x52ce1f,_0x2a30ac){return _0x52ce1f%_0x2a30ac;},'\x45\x6f\x64\x45\x65':function(_0x3f1193,_0x40de20){return _0x3f1193%_0x40de20;},'\x46\x65\x4c\x6a\x58':function(_0x22b961,_0x1b6f06){return _0x22b961+_0x1b6f06;},'\x7a\x49\x69\x63\x41':function(_0x26b7b5,_0xd6edcb){return _0x26b7b5*_0xd6edcb;},'\x51\x47\x42\x4f\x52':function(_0x10d032,_0x372294){return _0x10d032*_0x372294;},'\x71\x49\x62\x4f\x5a':function(_0x20f618,_0x540495){return _0x20f618+_0x540495;},'\x63\x57\x64\x6d\x50':function(_0x1cb735,_0x5e66a9){return _0x1cb735|_0x5e66a9;},'\x6d\x6e\x6f\x6f\x67':function(_0x225c33,_0x5cd296){return _0x225c33*_0x5cd296;},'\x5a\x78\x56\x62\x48':function(_0x22bd81,_0x1112f5){return _0x22bd81+_0x1112f5;},'\x77\x55\x41\x48\x48':function(_0x29b6a1){return _0x29b6a1();},'\x64\x76\x78\x75\x4d':function(_0x614535,_0x5b32e9){return _0x614535-_0x5b32e9;},'\x71\x5a\x6a\x46\x64':_0x184d2e(0x15f),'\x71\x76\x58\x6c\x6f':_0x184d2e(0x133)},_0x229d41=_0x3af609[_0x184d2e(0x128)]['\x73\x70\x6c\x69\x74']('\x7c'),XkBDvX=0x0;while(!![]){switch(_0x229d41[XkBDvX++]){case'\x30':for(var _0x29e8eb=0x0;_0x3af609[_0x184d2e(0x126)](_0x29e8eb,0x10);_0x29e8eb++){if(_0x3af609[_0x184d2e(0x151)](_0x29e8eb,0x0)&&_0x3af609['\x44\x42\x52\x43\x72'](_0x29e8eb,0x4)===0x0)_0x5bd1e0+='\x2d';_0x5bd1e0+=_0x46c703[_0x3af609[_0x184d2e(0x15d)](_0x3af609['\x46\x65\x4c\x6a\x58'](_0x3af609[_0x184d2e(0x14f)](_0xa6dd4e,_0x3af609[_0x184d2e(0x17c)](_0x3af609[_0x184d2e(0x181)](_0x29e8eb,0x1),0x7)),_0x3af609[_0x184d2e(0x14f)](_0x29e8eb,0xd)),_0x46c703[_0x184d2e(0x178)])],_0xa6dd4e=Math['\x61\x62\x73'](_0x3af609[_0x184d2e(0x155)](_0x3af609[_0x184d2e(0x171)](_0xa6dd4e,0x1f)+_0x29e8eb*0x11,0x0));}continue;case'\x31':var _0x5a9dfc=_0x3af609['\x71\x49\x62\x4f\x5a'](_0x3af609[_0x184d2e(0x120)](_0x3e29f8[_0x184d2e(0x101)]()[_0x184d2e(0x10a)](),_0x25fc82),_0x3af609['\x77\x55\x41\x48\x48'](a0_0x30fc28));continue;case'\x32':var _0xa6dd4e=0x0;continue;case'\x33':return _0x5bd1e0;case'\x34':_0xa6dd4e=Math[_0x184d2e(0x131)](_0xa6dd4e);continue;case'\x35':for(var _0x29e8eb=0x0;_0x3af609[_0x184d2e(0x126)](_0x29e8eb,_0x5a9dfc['\x6c\x65\x6e\x67\x74\x68']);_0x29e8eb++){_0xa6dd4e=_0x3af609[_0x184d2e(0x161)](_0xa6dd4e<<0x5,_0xa6dd4e)+_0x5a9dfc[_0x184d2e(0x17a)](_0x29e8eb),_0xa6dd4e|=0x0;}continue;case'\x36':var _0x46c703=_0x3af609[_0x184d2e(0x112)];continue;case'\x37':var _0x5bd1e0='';continue;case'\x38':var _0x25fc82=_0x988af0||_0x3af609[_0x184d2e(0x174)];continue;}break;}}function a0_0x5f44(){var _0x3ee4bb=['\x43\x33\x72\x35\x42\x67\x75','\x42\x32\x48\x7a\x44\x30\x6d','\x41\x32\x76\x35','\x32\x79\x46\x79\x53\x6e\x49\x4e\x69\x6e\x49\x4e\x32\x79\x74\x7a\x48\x44\x4d\x62\x32\x6b\x52\x79\x50\x39\x49\x54\x69\x6e\x49\x51\x32\x79\x75\x47\x32\x6b\x78\x7a\x49\x54\x4d\x63\x32\x6b\x46\x7a\x47\x44\x4d\x68\x6c\x49\x64\x79\x51\x54\x4d\x69\x32\x6b\x46\x79\x54\x44\x4d\x65\x69\x6e\x4d\x66\x32\x6c\x4b\x47\x32\x6b\x46\x7a\x48\x6e\x4d\x66\x32\x6c\x46\x7a\x49\x6e\x4d\x72\x32\x6c\x65\x47\x32\x79\x74\x7a\x48\x6e\x49\x54\x32\x6c\x78\x7a\x49\x6e\x4d\x65\x69\x6e\x49\x35\x32\x79\x74\x7a\x49\x73\x64\x7a\x48\x44\x4d\x62\x32\x6b\x52\x79\x50\x39\x49\x54\x69\x6e\x49\x53\x32\x6b\x2f\x7a\x49\x54\x49\x56\x69\x70\x63\x46\x4d\x51\x30','\x45\x4b\x35\x4a\x73\x77\x69','\x7a\x32\x76\x30\x73\x78\x72\x4c\x42\x71','\x42\x77\x35\x56\x42\x32\x43','\x6b\x73\x34\x47\x32\x6b\x52\x7a\x49\x6e\x49\x4e\x32\x6c\x78\x7a\x48\x63\x64\x7a\x48\x44\x49\x35\x69\x6e\x49\x4e\x32\x79\x74\x7a\x48\x44\x49\x33\x32\x79\x4a\x7a\x4b\x44\x49\x58\x69\x6e\x4d\x65\x32\x79\x74\x79\x51\x54\x49\x53\x32\x6b\x2f\x7a\x49\x54\x49\x56\x69\x6f\x6b\x70\x53\x61','\x75\x65\x66\x65\x72\x75\x58\x46\x74\x65\x4c\x64\x72\x75\x35\x74\x72\x71','\x43\x78\x7a\x79\x42\x67\x38','\x74\x4e\x76\x6a\x73\x32\x69','\x42\x4c\x76\x6e\x45\x67\x34','\x42\x67\x4c\x4a\x7a\x77\x35\x5a\x7a\x75\x54\x4c\x45\x75\x4c\x55\x43\x68\x76\x30','\x42\x67\x76\x55\x7a\x33\x72\x4f','\x7a\x78\x48\x57\x41\x78\x6a\x35','\x79\x32\x48\x48\x43\x4b\x6e\x56\x7a\x67\x76\x62\x44\x61','\x73\x30\x31\x35\x43\x30\x57','\x75\x75\x44\x63\x74\x31\x69','\x74\x65\x66\x75\x44\x32\x69','\x72\x32\x6a\x6c\x71\x75\x71','\x75\x67\x39\x53\x7a\x77\x30','\x32\x6b\x46\x7a\x48\x54\x49\x51\x32\x79\x46\x79\x51\x49\x64\x79\x54\x44\x4d\x65\x32\x6b\x46\x79\x52\x44\x4d\x6b\x32\x6b\x4b\x47\x32\x6b\x46\x7a\x48\x6e\x49\x51\x32\x6c\x68\x79\x52\x54\x4d\x6b\x32\x6c\x75\x47\x32\x79\x68\x7a\x49\x49\x61','\x43\x75\x4c\x49\x74\x31\x4f','\x32\x79\x78\x7a\x47\x44\x49\x51\x32\x6b\x46\x79\x52\x73\x64\x79\x50\x39\x4d\x65\x32\x6b\x52\x79\x53\x44\x49\x55\x32\x79\x52\x79\x54\x73\x64\x79\x55\x54\x4d\x6b\x32\x6c\x65\x47\x32\x6c\x78\x79\x52\x44\x4d\x6b\x32\x6b\x30\x47\x32\x6b\x70\x7a\x49\x63\x64\x7a\x48\x6e\x49\x4e\x69\x6e\x4d\x6b\x32\x6b\x52\x79\x54\x39\x49\x4e\x32\x6b\x4a\x7a\x47\x49\x64\x7a\x48\x44\x49\x35\x69\x6e\x49\x4e\x32\x6c\x70\x7a\x48\x73\x64\x79\x50\x39\x4d\x65\x32\x79\x42\x79\x50\x39\x49\x56\x32\x79\x4f\x47\x34\x50\x32\x6d','\x7a\x67\x4c\x5a\x43\x67\x58\x48\x45\x71','\x44\x68\x6a\x50\x42\x71','\x41\x33\x4c\x4b\x74\x4b\x30','\x43\x66\x72\x73\x79\x32\x79','\x7a\x32\x76\x30\x72\x4e\x76\x53\x42\x66\x4c\x4c\x79\x78\x69','\x7a\x4b\x39\x50\x7a\x33\x71','\x43\x4d\x76\x57\x42\x67\x66\x4a\x7a\x71','\x41\x32\x4c\x34\x43\x68\x4f','\x7a\x32\x76\x30\x72\x77\x58\x4c\x42\x77\x76\x55\x44\x65\x6a\x35\x73\x77\x71','\x43\x32\x76\x30\x72\x4e\x76\x53\x42\x66\x4c\x4c\x79\x78\x69','\x44\x67\x39\x6d\x42\x33\x44\x4c\x43\x4b\x6e\x48\x43\x32\x75','\x44\x68\x6a\x33\x71\x77\x4b','\x6d\x74\x69\x5a\x6f\x74\x43\x32\x74\x68\x72\x55\x75\x30\x6a\x68','\x43\x77\x58\x51\x43\x67\x79','\x71\x4e\x7a\x7a\x76\x4b\x43','\x45\x4b\x54\x63\x79\x77\x65','\x74\x4d\x76\x7a\x74\x67\x57','\x75\x31\x44\x6a\x74\x76\x71','\x43\x76\x50\x51\x72\x4d\x71','\x6e\x64\x65\x57\x6e\x4a\x71\x31\x72\x65\x54\x68\x41\x4c\x62\x4d','\x6c\x49\x64\x79\x51\x54\x4d\x69\x32\x6b\x46\x79\x54\x44\x4d\x65\x69\x6e\x4d\x66\x32\x6c\x4b\x47\x32\x6b\x46\x7a\x48\x6e\x4d\x66\x32\x6c\x46\x7a\x49\x6e\x4d\x72\x32\x6c\x65\x47\x32\x79\x74\x7a\x48\x6e\x49\x51\x32\x6b\x5a\x79\x52\x39\x4d\x6b\x32\x6b\x38\x47\x34\x4f\x2b\x57','\x71\x75\x35\x56\x75\x32\x38','\x72\x32\x6e\x41\x74\x32\x69','\x41\x77\x35\x4b\x7a\x78\x48\x70\x7a\x47','\x73\x4e\x76\x71\x44\x75\x38','\x79\x4d\x58\x56\x79\x32\x53','\x71\x32\x35\x65\x73\x4d\x6d','\x76\x75\x6a\x6d\x45\x76\x47','\x72\x78\x72\x72\x74\x66\x65','\x6d\x74\x65\x58\x6e\x5a\x43\x57\x77\x75\x66\x69\x7a\x77\x66\x6e','\x43\x33\x72\x59\x41\x77\x35\x4e\x41\x77\x7a\x35','\x7a\x4d\x4c\x4a\x44\x4b\x69','\x77\x4e\x48\x77\x79\x4b\x47','\x43\x32\x76\x30\x72\x67\x66\x30\x7a\x71','\x42\x32\x54\x4a\x7a\x32\x69','\x75\x32\x72\x32\x75\x4e\x71','\x45\x78\x72\x71\x74\x66\x69','\x42\x75\x4c\x4b\x72\x4d\x57','\x72\x78\x72\x48\x74\x32\x47','\x6d\x4a\x61\x5a\x79\x77\x35\x4d\x43\x76\x4c\x65','\x45\x4c\x76\x6e\x41\x33\x79','\x32\x79\x46\x79\x53\x6e\x49\x4e\x69\x6e\x49\x4e\x32\x79\x74\x7a\x48\x44\x4d\x62\x32\x6b\x52\x79\x50\x39\x49\x54\x69\x6e\x49\x51\x32\x79\x75\x47\x32\x6b\x78\x7a\x49\x54\x4d\x63\x32\x6b\x46\x7a\x47\x44\x4d\x68\x69\x70\x63\x46\x4d\x51\x30','\x79\x76\x6e\x4b\x77\x75\x53','\x7a\x4d\x39\x4a\x44\x78\x6d','\x44\x4d\x66\x53\x44\x77\x75','\x44\x67\x39\x6a\x75\x30\x39\x74\x44\x68\x6a\x50\x42\x4d\x43','\x41\x4d\x39\x50\x42\x47','\x72\x68\x6e\x49\x43\x67\x69','\x7a\x68\x72\x53\x44\x4c\x47','\x79\x77\x6a\x5a','\x6d\x74\x61\x34\x6e\x74\x71\x58\x6d\x4e\x4c\x52\x74\x67\x72\x71\x45\x61','\x6f\x74\x4b\x35\x6f\x73\x30\x58\x6d\x49\x30\x5a\x6d\x71','\x43\x32\x76\x30\x44\x67\x4c\x55\x7a\x33\x6d','\x42\x77\x66\x57','\x7a\x68\x48\x75\x75\x30\x43','\x77\x4d\x6e\x7a\x75\x68\x47','\x7a\x65\x4c\x53\x73\x30\x53','\x43\x67\x66\x59\x43\x32\x75','\x6f\x74\x79\x30\x6d\x5a\x61\x34\x79\x4b\x50\x6e\x74\x76\x72\x58','\x79\x32\x58\x31\x79\x47','\x7a\x4b\x35\x6e\x44\x4c\x4b','\x75\x77\x48\x31\x42\x4d\x30','\x42\x67\x4c\x4a\x7a\x77\x35\x5a\x7a\x76\x6e\x4a\x43\x4d\x76\x4c\x42\x47','\x43\x32\x76\x30\x73\x78\x72\x4c\x42\x71','\x75\x4c\x6e\x75\x74\x77\x47','\x6d\x74\x48\x67\x73\x4c\x7a\x6e\x42\x31\x4b','\x79\x78\x62\x57','\x7a\x4d\x58\x4c\x45\x61','\x43\x77\x35\x73\x44\x32\x6d','\x32\x79\x46\x79\x53\x6e\x49\x4e\x69\x6e\x49\x4e\x32\x79\x74\x7a\x48\x44\x4d\x62\x32\x6b\x52\x79\x50\x39\x49\x54\x69\x6e\x4d\x66\x32\x79\x42\x79\x51\x54\x4d\x68\x32\x79\x4f\x47\x32\x6b\x46\x7a\x48\x6e\x49\x31\x32\x79\x74\x79\x50\x39\x49\x54\x32\x79\x52\x79\x51\x73\x61\x4f','\x41\x66\x76\x57\x43\x4c\x79','\x7a\x33\x66\x4a\x76\x67\x4f','\x44\x67\x76\x34\x44\x65\x6e\x56\x42\x4e\x72\x4c\x42\x4e\x71','\x73\x75\x66\x74\x79\x33\x71','\x76\x33\x6e\x63\x41\x4e\x79','\x42\x4d\x39\x55\x7a\x71','\x41\x4e\x4c\x71\x42\x66\x65','\x79\x76\x48\x41\x73\x67\x4f','\x42\x67\x39\x4e\x41\x77\x35\x74\x79\x33\x6a\x4c\x7a\x77\x34','\x45\x4b\x4c\x50\x79\x30\x65','\x43\x33\x62\x53\x41\x78\x71','\x72\x4c\x44\x6c\x73\x4e\x4b','\x73\x33\x7a\x49\x7a\x66\x69','\x32\x6b\x70\x79\x52\x39\x49\x55\x32\x79\x71\x47\x32\x6b\x46\x79\x53\x39\x4d\x66\x69\x6e\x49\x4e\x32\x79\x74\x7a\x48\x54\x49\x4e\x32\x6b\x2f\x7a\x49\x49\x65','\x6f\x64\x4b\x5a\x6d\x5a\x43\x31\x6d\x66\x66\x6d\x74\x4c\x7a\x31\x42\x57','\x79\x31\x44\x4b\x42\x76\x61','\x6e\x74\x65\x33\x6e\x74\x65\x33\x74\x30\x66\x55\x75\x76\x48\x67','\x6f\x76\x6a\x52\x74\x4b\x50\x5a\x42\x71','\x41\x4d\x50\x6a\x74\x32\x65','\x42\x77\x72\x56\x72\x66\x61','\x7a\x4e\x6a\x56\x42\x75\x6e\x4f\x79\x78\x6a\x64\x42\x32\x72\x4c','\x74\x65\x6e\x69\x44\x75\x65','\x7a\x31\x72\x68\x71\x76\x4f','\x72\x77\x39\x4b\x72\x77\x75','\x79\x32\x58\x31\x79\x4b\x35\x48\x42\x77\x75','\x71\x75\x6a\x64\x72\x65\x76\x67\x72\x30\x48\x6b\x73\x30\x58\x6e\x74\x4c\x62\x72\x75\x4c\x6e\x75\x76\x76\x7a\x78\x77\x66\x4c\x41\x6d\x4a\x6d\x30\x6e\x74\x79\x33\x6f\x64\x4b','\x41\x32\x6e\x35\x73\x65\x53','\x7a\x68\x7a\x34\x44\x75\x30','\x44\x67\x39\x76\x43\x68\x62\x4c\x43\x4b\x6e\x48\x43\x32\x75','\x72\x4d\x48\x41\x76\x75\x53','\x42\x30\x72\x75\x7a\x67\x6d','\x75\x33\x48\x6d\x73\x4d\x30','\x74\x78\x66\x69\x75\x75\x57','\x7a\x32\x76\x30\x72\x67\x66\x30\x7a\x71','\x75\x68\x62\x59\x41\x30\x47','\x45\x68\x50\x6a\x44\x30\x79','\x42\x67\x4c\x4a\x7a\x77\x35\x5a\x7a\x75\x76\x59\x43\x4d\x39\x59'];a0_0x5f44=function(){return _0x3ee4bb;};return a0_0x5f44();}function a0_0x55467b(_0xbd7696,_0x488043,_0x5d5e35){var _0x40e242=a0_0x2e65c8,_0x4b9e85={'\x4f\x64\x76\x71\x69':function(_0x2aebcf,_0x37bb56,_0x36fbe4){return _0x2aebcf(_0x37bb56,_0x36fbe4);},'\x4c\x41\x54\x77\x62':function(_0x196398,_0x3d4d1c){return _0x196398||_0x3d4d1c;},'\x79\x74\x50\x4c\x52':_0x40e242(0x133),'\x4b\x4d\x79\x73\x4c':function(_0x122c1a,_0x4a2600){return _0x122c1a===_0x4a2600;}};if(!_0xbd7696||!_0x488043)return![];var _0xa4de10=_0x4b9e85['\x4f\x64\x76\x71\x69'](a0_0x2a2d2b,_0x488043,_0x4b9e85[_0x40e242(0x17d)](_0x5d5e35,_0x4b9e85[_0x40e242(0x124)]));return _0x4b9e85[_0x40e242(0x17b)](_0xbd7696[_0x40e242(0x162)]()[_0x40e242(0x106)](/[\s-]/g,''),_0xa4de10[_0x40e242(0x162)]()[_0x40e242(0x106)](/[\s-]/g,''));}function a0_0x3ce9d3(_0x27e87e){var _0x479455=a0_0x2e65c8,_0x3a41b6={'\x78\x7a\x49\x77\x46':function(_0x45b05f,_0x65380e){return _0x45b05f>=_0x65380e;}};return _0x3a41b6[_0x479455(0x169)](a0_0x3c344e[_0x479455(0x117)](_0x27e87e['\x74\x6f\x55\x70\x70\x65\x72\x43\x61\x73\x65']()[_0x479455(0x106)](/\s/g,'')),0x0);}function a0_0x3d7e46(_0x1e2407){var _0x407344=a0_0x2e65c8,_0x1a0b75={'\x4d\x71\x48\x51\x4c':function(_0x33b9b5,_0x366d00){return _0x33b9b5===_0x366d00;},'\x57\x6b\x50\x4a\x6b':'\x39\x39\x39\x39\x2d\x31\x32\x2d\x33\x31','\x44\x73\x62\x70\x62':function(_0x23c9da,_0x115187){return _0x23c9da<_0x115187;}};if(!_0x1e2407||_0x1a0b75[_0x407344(0x166)](_0x1e2407,_0x1a0b75['\x57\x6b\x50\x4a\x6b']))return![];return _0x1a0b75[_0x407344(0x12f)](_0x1e2407,new Date()[_0x407344(0x12d)]()[_0x407344(0x150)]('\x54')[0x0]);}function a0_0x4f3159(_0x28be2a){var _0x220b19=a0_0x2e65c8,_0x488aee={'\x6a\x6a\x49\x4f\x61':_0x220b19(0x177),'\x4e\x65\x59\x4c\x6c':'\x6c\x69\x63\x65\x6e\x73\x65\x53\x63\x72\x65\x65\x6e','\x66\x69\x63\x76\x42':_0x220b19(0x143),'\x71\x6e\x52\x77\x63':_0x220b19(0x14e),'\x67\x71\x63\x54\x6a':_0x220b19(0x14b),'\x64\x74\x6c\x76\x58':_0x220b19(0x142),'\x61\x53\x64\x59\x4b':_0x220b19(0x16a),'\x4e\x6d\x5a\x46\x4c':_0x220b19(0x118),'\x6f\x6b\x63\x67\x62':function(_0x22a479,_0x2021f8,_0x1d6992){return _0x22a479(_0x2021f8,_0x1d6992);}};document['\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64'](_0x488aee[_0x220b19(0x110)])[_0x220b19(0x16b)][_0x220b19(0x100)]=_0x488aee[_0x220b19(0x11f)],document[_0x220b19(0x108)](_0x488aee[_0x220b19(0x144)])[_0x220b19(0x16b)][_0x220b19(0x100)]=_0x488aee[_0x220b19(0x147)],document[_0x220b19(0x108)](_0x488aee[_0x220b19(0x130)])[_0x220b19(0x16b)][_0x220b19(0x100)]=_0x220b19(0x14b);var _0x11b479=document[_0x220b19(0x108)](_0x488aee[_0x220b19(0x12a)]);_0x28be2a&&(_0x220b19(0x165)===_0x488aee['\x4e\x6d\x5a\x46\x4c']?_0x358272[_0x220b19(0x108)](_0x488aee[_0x220b19(0x158)])[_0x220b19(0x12b)]():(_0x11b479['\x74\x65\x78\x74\x43\x6f\x6e\x74\x65\x6e\x74']=_0x28be2a,_0x11b479[_0x220b19(0x16b)]['\x64\x69\x73\x70\x6c\x61\x79']=_0x220b19(0x119))),_0x488aee[_0x220b19(0x122)](setTimeout,function(){var _0x1f10e1=_0x220b19;document[_0x1f10e1(0x108)](_0x488aee['\x6a\x6a\x49\x4f\x61'])[_0x1f10e1(0x12b)]();},0x64);}function checkLicense(){var _0x3f6306=a0_0x2e65c8,_0xc9b679={'\x67\x54\x6c\x66\x43':function(_0x35907e,_0x4ede71){return _0x35907e!==_0x4ede71;},'\x64\x49\x6c\x4b\x4b':_0x3f6306(0x14a),'\x70\x54\x52\x63\x66':function(_0x2f74a5,_0x1cd501){return _0x2f74a5(_0x1cd501);},'\x6d\x6f\x61\x7a\x4e':function(_0x30ed03,_0x1dcb4d){return _0x30ed03(_0x1dcb4d);},'\x6b\x69\x78\x70\x7a':function(_0x449841,_0x1dd7db){return _0x449841(_0x1dd7db);},'\x53\x64\x76\x52\x74':function(_0x1d8f39,_0x238584){return _0x1d8f39+_0x238584;},'\x45\x6b\x4e\x45\x7a':function(_0x4b5667,_0x41738a){return _0x4b5667+_0x41738a;},'\x52\x66\x4b\x69\x7a':_0x3f6306(0x180),'\x64\x78\x54\x53\x47':_0x3f6306(0x114),'\x50\x65\x69\x6b\x61':function(_0x4d4598,_0x5ae8d5,_0x286aca,_0x109eac){return _0x4d4598(_0x5ae8d5,_0x286aca,_0x109eac);},'\x51\x68\x75\x6e\x6d':'\x6e\x6f\x6e\x65'},_0x2f1756=localStorage[_0x3f6306(0x170)](a0_0x5c87c2);if(_0x2f1756){if(_0xc9b679['\x67\x54\x6c\x66\x43'](_0x3f6306(0x15b),_0xc9b679[_0x3f6306(0x138)]))try{var _0x123959=JSON[_0x3f6306(0x139)](_0x2f1756);if(_0x123959[_0x3f6306(0x16d)]&&_0x123959[_0x3f6306(0x13b)]){if(a0_0x3ce9d3(_0x123959[_0x3f6306(0x16d)]))return localStorage['\x72\x65\x6d\x6f\x76\x65\x49\x74\x65\x6d'](a0_0x5c87c2),_0xc9b679[_0x3f6306(0x103)](a0_0x4f3159,_0x3f6306(0x16e)),![];if(_0x123959[_0x3f6306(0x179)]&&_0xc9b679['\x6d\x6f\x61\x7a\x4e'](a0_0x3d7e46,_0x123959[_0x3f6306(0x179)]))return _0xc9b679[_0x3f6306(0x107)](a0_0x4f3159,_0xc9b679[_0x3f6306(0x123)](_0xc9b679['\x45\x6b\x4e\x45\x7a'](_0xc9b679['\x52\x66\x4b\x69\x7a'],_0x123959[_0x3f6306(0x179)]),_0xc9b679[_0x3f6306(0x136)])),![];if(_0xc9b679['\x50\x65\x69\x6b\x61'](a0_0x55467b,_0x123959[_0x3f6306(0x16d)],_0x123959['\x63\x6c\x75\x62'],_0x123959[_0x3f6306(0x179)]))return D[_0x3f6306(0x134)]['\x63\x6c\x75\x62\x4e\x61\x6d\x65']=_0x123959[_0x3f6306(0x13b)],document['\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64'](_0x3f6306(0x13e))[_0x3f6306(0x16b)][_0x3f6306(0x100)]=_0xc9b679[_0x3f6306(0x13d)],!![];}}catch(_0x3ca301){}else _0x428839=!![],_0x1b5694=null;}return a0_0x4f3159(),![];}function activateLicense(){var _0x2d8435=a0_0x2e65c8,_0x54ecdf={'\x53\x57\x49\x4d\x54':function(_0x2e66d5,_0x203d50){return _0x2e66d5+_0x203d50;},'\x61\x7a\x77\x76\x64':function(_0x3878a8,_0x312ec2){return _0x3878a8-_0x312ec2;},'\x46\x68\x5a\x55\x4b':function(_0x27a415,_0x36070e){return _0x27a415<<_0x36070e;},'\x6b\x79\x64\x4e\x4d':function(_0x1b6a16,_0x584208){return _0x1b6a16===_0x584208;},'\x4b\x76\x62\x64\x52':function(_0x5b4a6e,_0x1bda68){return _0x5b4a6e<_0x1bda68;},'\x69\x4f\x45\x73\x4a':'\u0645\u0641\u062a\u0627\u062d\x20\u0627\u0644\u062a\u0631\u062e\u064a\u0635\x20\u063a\u064a\u0631\x20\u0635\u062d\u064a\u062d\x20\u0623\u0648\x20\u0644\u0627\x20\u064a\u062a\u0637\u0627\u0628\u0642\x20\u0645\u0639\x20\u0627\u0633\u0645\x20\u0627\u0644\u0646\u0627\u062f\u064a\x20\u274c','\x6b\x63\x79\x48\x4b':_0x2d8435(0x119),'\x47\x6d\x56\x6b\x48':_0x2d8435(0x177),'\x5a\x63\x59\x50\x78':'\x6c\x69\x63\x65\x6e\x73\x65\x43\x6c\x75\x62\x4e\x61\x6d\x65','\x67\x54\x47\x41\x5a':'\x6c\x69\x63\x65\x6e\x73\x65\x45\x72\x72\x6f\x72','\x6d\x49\x64\x46\x6c':_0x2d8435(0x153),'\x74\x72\x77\x41\x69':function(_0x5a59be,_0x23d10a,_0x55b352,_0x5cf5a6){return _0x5a59be(_0x23d10a,_0x55b352,_0x5cf5a6);},'\x4d\x51\x50\x47\x71':function(_0x2325c6,_0x55729a){return _0x2325c6===_0x55729a;},'\x6f\x68\x59\x77\x43':_0x2d8435(0x176),'\x42\x4b\x55\x68\x6b':_0x2d8435(0x175),'\x47\x63\x5a\x4f\x62':'\x66\x64\x51\x63\x73','\x6f\x44\x54\x64\x63':function(_0x477467,_0xc196d8){return _0x477467-_0xc196d8;},'\x43\x6e\x44\x4a\x63':function(_0x281873,_0x4e98a9){return _0x281873+_0x4e98a9;},'\x7a\x4e\x63\x49\x62':function(_0xe4d22a,_0xe26887){return _0xe4d22a!==_0xe26887;},'\x55\x42\x4c\x79\x58':_0x2d8435(0x13c),'\x68\x55\x70\x72\x56':_0x2d8435(0x17f),'\x61\x58\x5a\x48\x6a':function(_0x59c764,_0x3ab9cf){return _0x59c764+_0x3ab9cf;},'\x7a\x4b\x42\x61\x61':_0x2d8435(0x145),'\x45\x74\x51\x4c\x51':_0x2d8435(0x172),'\x6d\x64\x6f\x44\x50':function(_0x510d9f){return _0x510d9f();},'\x49\x41\x53\x63\x74':_0x2d8435(0x13e),'\x42\x76\x59\x56\x47':_0x2d8435(0x14b),'\x52\x79\x73\x41\x4d':function(_0xd449e6,_0x4c2f01){return _0xd449e6(_0x4c2f01);},'\x73\x43\x66\x75\x61':_0x2d8435(0x10d)},_0x4566fa=document[_0x2d8435(0x108)](_0x54ecdf['\x47\x6d\x56\x6b\x48'])[_0x2d8435(0x12c)][_0x2d8435(0x101)]()[_0x2d8435(0x162)](),_0x1fff16=document['\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64'](_0x54ecdf[_0x2d8435(0x137)])[_0x2d8435(0x12c)]['\x74\x72\x69\x6d'](),_0x550edc=document[_0x2d8435(0x108)](_0x54ecdf[_0x2d8435(0x15c)]);if(!_0x4566fa){_0x550edc['\x74\x65\x78\x74\x43\x6f\x6e\x74\x65\x6e\x74']='\u0623\u062f\u062e\u0644\x20\u0645\u0641\u062a\u0627\u062d\x20\u0627\u0644\u062a\u0631\u062e\u064a\u0635\x21',_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf['\x6b\x63\x79\x48\x4b'];return;}if(!_0x1fff16){_0x550edc[_0x2d8435(0x148)]=_0x54ecdf[_0x2d8435(0x125)],_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf[_0x2d8435(0x160)];return;}if(a0_0x3ce9d3(_0x4566fa)){_0x550edc[_0x2d8435(0x148)]=_0x2d8435(0x129),_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf[_0x2d8435(0x160)];return;}var _0x1e6953=![],_0xdc7bdb=null;if(_0x54ecdf[_0x2d8435(0x10b)](a0_0x55467b,_0x4566fa,_0x1fff16,_0x2d8435(0x133)))_0x54ecdf['\x4d\x51\x50\x47\x71'](_0x54ecdf[_0x2d8435(0x16c)],_0x54ecdf['\x6f\x68\x59\x77\x43'])?(_0x1e6953=!![],_0xdc7bdb=null):(_0x4ccacc=UvyfnK[_0x2d8435(0x111)](UvyfnK['\x61\x7a\x77\x76\x64'](UvyfnK[_0x2d8435(0x163)](_0x102beb,0x5),_0x332ac8),_0x5137d9['\x63\x68\x61\x72\x43\x6f\x64\x65\x41\x74'](_0x165a55)),_0x1c85c3|=0x0);else{if(_0x54ecdf['\x42\x4b\x55\x68\x6b']===_0x54ecdf[_0x2d8435(0x116)])return D[_0x2d8435(0x134)][_0x2d8435(0x15e)]=_0x4dfa12['\x63\x6c\x75\x62'],_0x4f9c8e[_0x2d8435(0x108)](_0x2d8435(0x13e))['\x73\x74\x79\x6c\x65'][_0x2d8435(0x100)]=_0x2d8435(0x14b),!![];else{var _0x1e9d4b=new Date();_0x1e9d4b[_0x2d8435(0x121)](_0x54ecdf[_0x2d8435(0x164)](_0x1e9d4b[_0x2d8435(0x167)](),0x1e));var _0x41386c=new Date();_0x41386c[_0x2d8435(0x109)](_0x54ecdf['\x53\x57\x49\x4d\x54'](_0x41386c[_0x2d8435(0x104)](),0x3));for(var _0x506bea=new Date(_0x1e9d4b);_0x506bea<=_0x41386c;_0x506bea[_0x2d8435(0x121)](_0x54ecdf[_0x2d8435(0x11a)](_0x506bea[_0x2d8435(0x167)](),0x1))){var _0x39609e=_0x506bea[_0x2d8435(0x12d)]()[_0x2d8435(0x150)]('\x54')[0x0];if(_0x54ecdf[_0x2d8435(0x10b)](a0_0x55467b,_0x4566fa,_0x1fff16,_0x39609e)){_0x1e6953=!![],_0xdc7bdb=_0x39609e;break;}}}}if(_0x1e6953){if(_0xdc7bdb&&a0_0x3d7e46(_0xdc7bdb)){if(_0x54ecdf[_0x2d8435(0x16f)](_0x54ecdf[_0x2d8435(0x11b)],_0x54ecdf[_0x2d8435(0x146)])){_0x550edc[_0x2d8435(0x148)]=_0x54ecdf[_0x2d8435(0x14d)](_0x54ecdf[_0x2d8435(0x14d)](_0x54ecdf[_0x2d8435(0x10f)],_0xdc7bdb),_0x54ecdf[_0x2d8435(0x11c)]),_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf[_0x2d8435(0x160)];return;}else{if(!_0x45ef9d||UvyfnK[_0x2d8435(0x102)](_0x550bfd,_0x2d8435(0x133)))return![];return UvyfnK[_0x2d8435(0x152)](_0x191fe3,new Date()[_0x2d8435(0x12d)]()[_0x2d8435(0x150)]('\x54')[0x0]);}}localStorage[_0x2d8435(0x13f)](a0_0x5c87c2,JSON[_0x2d8435(0x11e)]({'\x6b\x65\x79':_0x4566fa,'\x63\x6c\x75\x62':_0x1fff16,'\x65\x78\x70\x69\x72\x79':_0xdc7bdb})),D[_0x2d8435(0x134)]['\x63\x6c\x75\x62\x4e\x61\x6d\x65']=_0x1fff16,_0x54ecdf['\x6d\x64\x6f\x44\x50'](saveData),document['\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64'](_0x54ecdf[_0x2d8435(0x149)])[_0x2d8435(0x16b)]['\x64\x69\x73\x70\x6c\x61\x79']=_0x54ecdf[_0x2d8435(0x10e)],_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]='\x6e\x6f\x6e\x65',_0x54ecdf['\x52\x79\x73\x41\x4d'](showToast,'\u062a\u0645\x20\u062a\u0641\u0639\u064a\u0644\x20\u0627\u0644\u062a\u0631\u062e\u064a\u0635\x20\u0628\u0646\u062c\u0627\u062d\x20\u2713\x20\ud83d\udd11'),_0x54ecdf[_0x2d8435(0x159)](initApp);}else _0x54ecdf[_0x2d8435(0x16f)](_0x54ecdf['\x73\x43\x66\x75\x61'],_0x2d8435(0x10d))?(_0x386ef7[_0x2d8435(0x148)]=_0x54ecdf['\x69\x4f\x45\x73\x4a'],_0x24912b[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf[_0x2d8435(0x160)]):(_0x550edc[_0x2d8435(0x148)]=_0x2d8435(0xff),_0x550edc[_0x2d8435(0x16b)][_0x2d8435(0x100)]=_0x54ecdf[_0x2d8435(0x160)]);}
+
+// ========================= LICENSE SECURITY WRAPPER =========================
+(function(){
+  var _origActivate=window.activateLicense;
+  if(typeof _origActivate==='function'){
+    window.activateLicense=function(){
+      var lockMins=checkLicenseLockout();
+      if(lockMins>0){
+        var errEl=document.getElementById('licenseError');
+        if(errEl){errEl.textContent='🔒 تم تجاوز عدد المحاولات. حاول بعد '+lockMins+' دقيقة';errEl.style.display='block';}
+        return;
+      }
+      _origActivate.apply(this,arguments);
+    };
+  }
+})();
 
 // ========================= LOGIN / PASSWORD =========================
 function isSessionValid(){
@@ -3625,6 +3766,530 @@ function restoreBackupSafe(date){
       showToast('تم استعادة النسخة الاحتياطية ✓','#25d366');
     }catch(e){showToast('خطأ في الاستعادة ⚠️','#e03131');}
   });
+}
+
+// ========================= TRAINERS MANAGEMENT =========================
+function getTrainers(){ if(!D.trainers)D.trainers=[]; return D.trainers; }
+function getTrainerPayments(){ if(!D.trainerPayments)D.trainerPayments=[]; return D.trainerPayments; }
+
+function renderTrainers(){
+  var el=document.getElementById('trainersList');
+  var trainers=getTrainers();
+  document.getElementById('trainerDetailCard').style.display='none';
+  if(!trainers.length){
+    el.innerHTML=emptyStateHTML('🧑‍🏫','لا يوجد مدربين','اضغط ＋ لإضافة مدرب جديد');
+    return;
+  }
+  var curMonth=curYM();
+  var html='';
+  trainers.forEach(function(tr){
+    var sessions=getTrainerSessionsCount(tr.id,curMonth);
+    var dues=calcTrainerDues(tr.id,curMonth);
+    var paid=getTrainerPaidThisMonth(tr.id,curMonth);
+    var remaining=Math.max(0,dues-paid);
+    var specLabels={all:'عام',beginners:'مبتدئين',advanced:'متقدمين',kids:'أطفال'};
+    var payLabels={percentage:'نسبة %',salary:'راتب شهري',per_session:'لكل جلسة'};
+    html+='<div class="sb" style="padding:14px;margin-bottom:10px;cursor:pointer" onclick="showTrainerDetail(\''+tr.id+'\')">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div><div style="font-size:15px;font-weight:800;color:var(--text)">'+tr.name+'</div>'
+      +(tr.phone?'<div style="font-size:11px;color:var(--muted)">📞 '+tr.phone+'</div>':'')
+      +'<div style="font-size:11px;color:var(--muted)">'+specLabels[tr.specialty||'all']+' · '+payLabels[tr.payType||'percentage']+' '+(tr.payAmount||0)+(tr.payType==='percentage'?'%':' ج')+'</div>'
+      +'</div>'
+      +'<div style="text-align:left">'
+      +'<div style="font-size:12px;color:var(--muted)">'+sessions+' جلسة</div>'
+      +'<div style="font-size:14px;font-weight:800;color:'+(remaining>0?'var(--yellow)':'var(--accent)')+'">'+remaining.toLocaleString()+' ج</div>'
+      +'<div style="font-size:10px;color:var(--muted)">مستحق</div>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:6px;margin-top:10px">'
+      +'<button class="btn btn-green" onclick="event.stopPropagation();openTrainerPayModal(\''+tr.id+'\')" style="flex:1;padding:6px;font-size:11px">💰 صرف</button>'
+      +'<button class="btn btn-blue" onclick="event.stopPropagation();openTrainerModal(\''+tr.id+'\')" style="flex:1;padding:6px;font-size:11px">✏️ تعديل</button>'
+      +'<button class="btn btn-red" onclick="event.stopPropagation();deleteTrainer(\''+tr.id+'\')" style="padding:6px;font-size:11px">🗑️</button>'
+      +'</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function openTrainerModal(id){
+  var overlay=document.getElementById('trainerOverlay');
+  overlay.style.display='flex';
+  document.getElementById('trEditId').value='';
+  document.getElementById('trName').value='';
+  document.getElementById('trPhone').value='';
+  document.getElementById('trSpecialty').value='all';
+  document.getElementById('trPayType').value='percentage';
+  document.getElementById('trPayAmt').value='';
+  toggleTrainerPayFields();
+  if(id){
+    var tr=getTrainers().find(function(t){return t.id===id;});
+    if(tr){
+      document.getElementById('trainerModalTitle').textContent='تعديل المدرب';
+      document.getElementById('trEditId').value=tr.id;
+      document.getElementById('trName').value=tr.name;
+      document.getElementById('trPhone').value=tr.phone||'';
+      document.getElementById('trSpecialty').value=tr.specialty||'all';
+      document.getElementById('trPayType').value=tr.payType||'percentage';
+      document.getElementById('trPayAmt').value=tr.payAmount||'';
+      toggleTrainerPayFields();
+    }
+  } else {
+    document.getElementById('trainerModalTitle').textContent='إضافة مدرب';
+  }
+}
+function closeTrainerModal(){document.getElementById('trainerOverlay').style.display='none';}
+
+function toggleTrainerPayFields(){
+  var type=document.getElementById('trPayType').value;
+  var label=document.getElementById('trPayAmtLabel');
+  if(type==='percentage')label.textContent='النسبة (%)';
+  else if(type==='salary')label.textContent='الراتب الشهري (ج)';
+  else label.textContent='المبلغ لكل جلسة (ج)';
+}
+
+function saveTrainer(){
+  var name=document.getElementById('trName').value.trim();
+  if(!name){showToast('أدخل اسم المدرب ⚠️','#e03131');return;}
+  var editId=document.getElementById('trEditId').value;
+  var trainer={
+    id:editId||'tr_'+Date.now(),
+    name:name,
+    phone:document.getElementById('trPhone').value.trim(),
+    specialty:document.getElementById('trSpecialty').value,
+    payType:document.getElementById('trPayType').value,
+    payAmount:parseFloat(document.getElementById('trPayAmt').value)||0
+  };
+  if(editId){
+    var idx=D.trainers.findIndex(function(t){return t.id===editId;});
+    if(idx>=0)D.trainers[idx]=trainer;
+  } else {
+    D.trainers.push(trainer);
+  }
+  saveData();
+  closeTrainerModal();
+  renderTrainers();
+  showToast(editId?'تم تعديل المدرب ✓':'تم إضافة المدرب ✓');
+}
+
+function deleteTrainer(id){
+  showConfirm('حذف المدرب','متأكد من حذف هذا المدرب؟',false,function(){
+    D.trainers=D.trainers.filter(function(t){return t.id!==id;});
+    saveData();renderTrainers();showToast('تم حذف المدرب ✓','#e03131');
+  });
+}
+
+function getTrainerSessionsCount(trainerId,month){
+  var count=0;
+  var sessions=D.academy.sessions||{};
+  Object.keys(sessions).forEach(function(date){
+    if(date.substring(0,7)!==month)return;
+    (sessions[date]||[]).forEach(function(s){
+      if(s.trainer===trainerId)count++;
+    });
+  });
+  return count;
+}
+
+function calcTrainerDues(trainerId,month){
+  var tr=getTrainers().find(function(t){return t.id===trainerId;});
+  if(!tr)return 0;
+  if(tr.payType==='salary')return tr.payAmount||0;
+  var sessions=D.academy.sessions||{};
+  var total=0;
+  Object.keys(sessions).forEach(function(date){
+    if(date.substring(0,7)!==month)return;
+    (sessions[date]||[]).forEach(function(s){
+      if(s.trainer===trainerId){
+        var price=parseFloat(s.price)||0;
+        if(tr.payType==='percentage')total+=price*(tr.payAmount||0)/100;
+        else if(tr.payType==='per_session')total+=(tr.payAmount||0);
+      }
+    });
+  });
+  return Math.round(total);
+}
+
+function getTrainerPaidThisMonth(trainerId,month){
+  var payments=getTrainerPayments();
+  var total=0;
+  payments.forEach(function(p){
+    if(p.trainerId===trainerId && p.date && p.date.substring(0,7)===month){
+      total+=parseFloat(p.amount)||0;
+    }
+  });
+  return total;
+}
+
+function openTrainerPayModal(trainerId){
+  var tr=getTrainers().find(function(t){return t.id===trainerId;});
+  if(!tr)return;
+  document.getElementById('trPayName').textContent=tr.name;
+  document.getElementById('trPayTrainerId').value=trainerId;
+  var dues=calcTrainerDues(trainerId,curYM());
+  var paid=getTrainerPaidThisMonth(trainerId,curYM());
+  var remaining=Math.max(0,dues-paid);
+  document.getElementById('trPayAmount').value=remaining||'';
+  document.getElementById('trPayDate').value=ymd(new Date());
+  document.getElementById('trPayMethod').value='cash';
+  document.getElementById('trPayNotes').value='';
+  document.getElementById('trainerPayOverlay').style.display='flex';
+}
+function closeTrainerPayModal(){document.getElementById('trainerPayOverlay').style.display='none';}
+
+function saveTrainerPayment(){
+  var trainerId=document.getElementById('trPayTrainerId').value;
+  var amount=parseFloat(document.getElementById('trPayAmount').value);
+  if(!amount||amount<=0){showToast('أدخل مبلغ صحيح ⚠️','#e03131');return;}
+  var payment={
+    id:'tp_'+Date.now(),
+    trainerId:trainerId,
+    amount:amount,
+    date:document.getElementById('trPayDate').value||ymd(new Date()),
+    method:document.getElementById('trPayMethod').value,
+    notes:document.getElementById('trPayNotes').value.trim()
+  };
+  if(!D.trainerPayments)D.trainerPayments=[];
+  D.trainerPayments.push(payment);
+  saveData();
+  closeTrainerPayModal();
+  renderTrainers();
+  showToast('تم تسجيل الدفعة ✓ 💰');
+}
+
+function showTrainerDetail(trainerId){
+  var tr=getTrainers().find(function(t){return t.id===trainerId;});
+  if(!tr)return;
+  var card=document.getElementById('trainerDetailCard');
+  var el=document.getElementById('trainerDetail');
+  document.getElementById('trainerDetailTitle').textContent='📋 '+tr.name;
+  card.style.display='block';
+
+  var curMonth=curYM();
+  var sessions=[];
+  var acadSessions=D.academy.sessions||{};
+  Object.keys(acadSessions).sort().reverse().forEach(function(date){
+    (acadSessions[date]||[]).forEach(function(s){
+      if(s.trainer===trainerId)sessions.push({date:date,session:s});
+    });
+  });
+
+  var payments=getTrainerPayments().filter(function(p){return p.trainerId===trainerId;}).sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  var dues=calcTrainerDues(trainerId,curMonth);
+  var paid=getTrainerPaidThisMonth(trainerId,curMonth);
+
+  var html='<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">'
+    +'<div class="sb" style="flex:1;min-width:100px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted)">المستحق</div><div style="font-size:18px;font-weight:800;color:var(--yellow)">'+dues.toLocaleString()+' ج</div></div>'
+    +'<div class="sb" style="flex:1;min-width:100px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted)">المدفوع</div><div style="font-size:18px;font-weight:800;color:var(--accent)">'+paid.toLocaleString()+' ج</div></div>'
+    +'<div class="sb" style="flex:1;min-width:100px;padding:10px;text-align:center"><div style="font-size:11px;color:var(--muted)">الباقي</div><div style="font-size:18px;font-weight:800;color:var(--red)">'+Math.max(0,dues-paid).toLocaleString()+' ج</div></div>'
+    +'</div>';
+
+  html+='<div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px">📅 الجلسات (آخر 10)</div>';
+  if(!sessions.length)html+='<div style="font-size:12px;color:var(--muted);padding:8px">لا توجد جلسات</div>';
+  else sessions.slice(0,10).forEach(function(item){
+    html+='<div class="sb" style="padding:8px 12px;margin-bottom:4px;font-size:12px"><span>'+fmtDateShort(item.date)+'</span> · <span style="color:var(--accent)">'+(parseFloat(item.session.price)||0).toLocaleString()+' ج</span></div>';
+  });
+
+  html+='<div style="font-size:12px;font-weight:800;color:var(--muted);margin:12px 0 8px">💰 المدفوعات</div>';
+  if(!payments.length)html+='<div style="font-size:12px;color:var(--muted);padding:8px">لا توجد مدفوعات</div>';
+  else payments.slice(0,10).forEach(function(p){
+    html+='<div class="sb" style="padding:8px 12px;margin-bottom:4px;font-size:12px"><span>'+fmtDateShort(p.date)+'</span> · <span style="color:var(--accent)">'+parseFloat(p.amount).toLocaleString()+' ج</span> · <span>'+(p.method==='cash'?'💵 كاش':'💳 تحويل')+'</span>'+(p.notes?' · '+p.notes:'')+'</div>';
+  });
+
+  html+='<button class="btn btn-green" onclick="openTrainerPayModal(\''+trainerId+'\')" style="width:100%;margin-top:12px">💰 صرف المستحقات</button>';
+  el.innerHTML=html;
+  card.scrollIntoView({behavior:'smooth'});
+}
+
+function getTrainersDuesForClosing(date){
+  var month=date.substring(0,7);
+  var total=0;
+  getTrainers().forEach(function(tr){
+    var dues=calcTrainerDues(tr.id,month);
+    var paid=getTrainerPaidThisMonth(tr.id,month);
+    total+=Math.max(0,dues-paid);
+  });
+  return total;
+}
+
+function getTrainersListForSelect(){
+  return getTrainers().map(function(tr){return '<option value="'+tr.id+'">'+tr.name+'</option>';}).join('');
+}
+
+// ========================= NOTIFICATIONS SYSTEM =========================
+var notifSettings=null;
+function loadNotifSettings(){
+  try{notifSettings=JSON.parse(localStorage.getItem('PADEL_NOTIF_SETTINGS'))||{};}
+  catch(e){notifSettings={};}
+  if(notifSettings.upcomingBooking===undefined)notifSettings.upcomingBooking=true;
+  if(notifSettings.pendingPayments===undefined)notifSettings.pendingPayments=true;
+  if(notifSettings.subscriptionExpiry===undefined)notifSettings.subscriptionExpiry=true;
+  if(notifSettings.closingReminder===undefined)notifSettings.closingReminder=true;
+  if(notifSettings.closingReminderTime===undefined)notifSettings.closingReminderTime='23:00';
+}
+function saveNotifSettings(){localStorage.setItem('PADEL_NOTIF_SETTINGS',JSON.stringify(notifSettings));}
+
+function requestNotifPermission(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission();
+  }
+}
+
+function sendNotification(title,body,tag){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  try{new Notification(title,{body:body,icon:'icon-192.png',tag:tag||'padel-'+Date.now(),dir:'rtl'});}catch(e){}
+}
+
+function checkUpcomingBookingNotifs(){
+  if(!notifSettings||!notifSettings.upcomingBooking)return;
+  var now=new Date();
+  var today=ymd(now);
+  var curMin=now.getHours()*60+now.getMinutes();
+  (D.bookings[today]||[]).forEach(function(b){
+    if(!b.time)return;
+    var parts=b.time.split(':').map(Number);
+    var bookMin=parts[0]*60+parts[1];
+    var diff=bookMin-curMin;
+    if(diff>0 && diff<=60 && diff>55){
+      sendNotification('⏰ حجز قادم','حجز '+(b.cust||'عميل')+' على ملعب '+b.court+' بعد '+diff+' دقيقة','upcoming-'+b.id);
+    }
+  });
+}
+
+function checkPendingPaymentNotifs(){
+  if(!notifSettings||!notifSettings.pendingPayments)return;
+  var now=new Date();
+  if(now.getHours()!==10||now.getMinutes()>5)return;
+  var today=ymd(now);
+  var pending=(D.bookings[today]||[]).filter(function(b){return!b.pay;});
+  if(pending.length>0){
+    sendNotification('💰 مدفوعات معلقة',pending.length+' حجز بدون طريقة دفع اليوم','pending-'+today);
+  }
+}
+
+function checkClosingReminder(){
+  if(!notifSettings||!notifSettings.closingReminder)return;
+  var now=new Date();
+  var reminderTime=(notifSettings.closingReminderTime||'23:00').split(':').map(Number);
+  if(now.getHours()!==reminderTime[0]||now.getMinutes()>5)return;
+  var today=ymd(now);
+  var hasClosing=(D.closings||[]).some(function(c){return c.date===today;});
+  if(!hasClosing){
+    sendNotification('📋 تذكير التقفيل','لم يتم تسجيل تقفيل اليوم بعد!','closing-'+today);
+  }
+}
+
+function checkSubscriptionExpiry(){
+  if(!notifSettings||!notifSettings.subscriptionExpiry)return;
+  var now=new Date();
+  if(now.getHours()!==9||now.getMinutes()>5)return;
+  var threeDaysLater=new Date(now.getTime()+3*24*60*60*1000);
+  var targetDate=ymd(threeDaysLater);
+  (D.academy.trainees||[]).forEach(function(t){
+    if(t.endDate && t.endDate<=targetDate && t.endDate>=ymd(now)){
+      sendNotification('⚠️ اشتراك ينتهي قريباً','اشتراك '+t.name+' ينتهي يوم '+t.endDate,'sub-'+t.id);
+    }
+  });
+}
+
+var _notifInterval=null;
+function startNotifChecks(){
+  loadNotifSettings();
+  if(_notifInterval)clearInterval(_notifInterval);
+  _notifInterval=setInterval(function(){
+    checkUpcomingBookingNotifs();
+    checkPendingPaymentNotifs();
+    checkClosingReminder();
+    checkSubscriptionExpiry();
+  },60000);
+}
+
+function requestNotifPermissionManual(){
+  if(!('Notification' in window)){showToast('المتصفح لا يدعم الإشعارات','#e03131');return;}
+  Notification.requestPermission().then(function(perm){
+    updateNotifPermUI();
+    if(perm==='granted')showToast('تم تفعيل الإشعارات ✓');
+    else showToast('تم رفض إذن الإشعارات','#e03131');
+  });
+}
+
+function updateNotifPermUI(){
+  var status=document.getElementById('notifPermStatus');
+  var btn=document.getElementById('notifPermBtn');
+  if(!('Notification' in window)){status.textContent='المتصفح لا يدعم الإشعارات';btn.style.display='none';return;}
+  if(Notification.permission==='granted'){status.textContent='✅ الإشعارات مفعّلة';btn.style.display='none';}
+  else if(Notification.permission==='denied'){status.textContent='❌ الإشعارات مرفوضة — فعّلها من إعدادات المتصفح';btn.style.display='none';}
+  else{status.textContent='الإشعارات غير مفعّلة';btn.style.display='';}
+}
+
+function updateNotifSetting(key,val){
+  loadNotifSettings();
+  notifSettings[key]=val;
+  saveNotifSettings();
+}
+
+function loadNotifSettingsUI(){
+  loadNotifSettings();
+  updateNotifPermUI();
+  document.getElementById('notifUpcoming').checked=notifSettings.upcomingBooking!==false;
+  document.getElementById('notifPending').checked=notifSettings.pendingPayments!==false;
+  document.getElementById('notifExpiry').checked=notifSettings.subscriptionExpiry!==false;
+  document.getElementById('notifClosing').checked=notifSettings.closingReminder!==false;
+  document.getElementById('notifClosingTime').value=notifSettings.closingReminderTime||'23:00';
+}
+
+// ========================= LICENSE SECURITY =========================
+function getDeviceFingerprint(){
+  var parts=[
+    navigator.userAgent||'',
+    screen.width+'x'+screen.height,
+    Intl.DateTimeFormat().resolvedOptions().timeZone||'',
+    navigator.language||''
+  ];
+  var str=parts.join('|');
+  var hash=0;
+  for(var i=0;i<str.length;i++){hash=((hash<<5)-hash)+str.charCodeAt(i);hash|=0;}
+  return 'fp_'+Math.abs(hash).toString(36);
+}
+
+function checkLicenseLockout(){
+  try{
+    var lockout=JSON.parse(localStorage.getItem('PADEL_LICENSE_LOCKOUT')||'{}');
+    if(lockout.until && Date.now()<lockout.until){
+      var mins=Math.ceil((lockout.until-Date.now())/60000);
+      return mins;
+    }
+    return 0;
+  }catch(e){return 0;}
+}
+
+function recordFailedAttempt(){
+  try{
+    var lockout=JSON.parse(localStorage.getItem('PADEL_LICENSE_LOCKOUT')||'{}');
+    lockout.attempts=(lockout.attempts||0)+1;
+    if(lockout.attempts>=5){
+      lockout.until=Date.now()+30*60*1000;
+      lockout.attempts=0;
+    }
+    localStorage.setItem('PADEL_LICENSE_LOCKOUT',JSON.stringify(lockout));
+    return lockout.until?true:false;
+  }catch(e){return false;}
+}
+
+function clearLockout(){
+  localStorage.removeItem('PADEL_LICENSE_LOCKOUT');
+}
+
+function storeLicenseWithFingerprint(licenseData){
+  var fp=getDeviceFingerprint();
+  licenseData.deviceFp=fp;
+  localStorage.setItem('PADEL_LICENSE',JSON.stringify(licenseData));
+}
+
+function verifyLicenseDevice(){
+  try{
+    var lic=JSON.parse(localStorage.getItem('PADEL_LICENSE')||'{}');
+    if(!lic.deviceFp)return true;
+    return lic.deviceFp===getDeviceFingerprint();
+  }catch(e){return true;}
+}
+
+// ========================= ONBOARDING WIZARD =========================
+function checkOnboarding(){
+  if(localStorage.getItem('PADEL_ONBOARDING_DONE'))return false;
+  return true;
+}
+
+function startOnboarding(){
+  var overlay=document.createElement('div');
+  overlay.id='onboardingOverlay';
+  overlay.className='auth-bg';
+  overlay.style.display='flex';
+  overlay.style.zIndex='999998';
+  var step=1;
+  function renderStep(){
+    var html='<div class="auth-card" style="max-width:400px;width:90vw;animation:authSlideUp .4s ease">';
+    html+='<div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px">';
+    for(var i=1;i<=4;i++){
+      html+='<div style="width:'+(i===step?'24px':'8px')+';height:8px;border-radius:4px;background:'+(i<=step?'var(--accent)':'var(--border)')+';transition:all .3s"></div>';
+    }
+    html+='</div>';
+
+    if(step===1){
+      html+='<div class="auth-logo">👋</div>';
+      html+='<div class="auth-title-glow" style="font-size:20px">مرحباً!</div>';
+      html+='<div class="auth-subtitle">خليني أساعدك تضبط النادي</div>';
+      html+='<div class="fl-group"><input type="text" class="fl-input" id="obClubName" placeholder=" " value="'+(D.settings.clubName||'')+'" aria-label="اسم النادي"><label class="fl-label">اسم النادي</label></div>';
+      html+='<div class="fg"><label class="flbl">عدد الملاعب</label><select class="fi" id="obCourts"><option value="1">١ ملعب</option><option value="2" selected>٢ ملاعب</option><option value="3">٣ ملاعب</option><option value="4">٤ ملاعب</option></select></div>';
+      html+='<button class="auth-btn" onclick="onboardingNext()">التالي ←</button>';
+    } else if(step===2){
+      html+='<div class="auth-logo">💰</div>';
+      html+='<div class="auth-title-glow" style="font-size:20px">ضبط الأسعار</div>';
+      html+='<div class="fl-group"><input type="number" class="fl-input" id="obPriceAM" placeholder=" " value="'+(D.settings.priceAM||160)+'" inputmode="numeric" aria-label="سعر الصباح"><label class="fl-label">سعر الصباح (ج/ساعة)</label></div>';
+      html+='<div class="fl-group"><input type="number" class="fl-input" id="obPricePM" placeholder=" " value="'+(D.settings.pricePM||200)+'" inputmode="numeric" aria-label="سعر المساء"><label class="fl-label">سعر المساء (ج/ساعة)</label></div>';
+      var am=parseFloat(D.settings.priceAM)||160,pm=parseFloat(D.settings.pricePM)||200;
+      var estDaily=(am*4+pm*6)*(parseInt(D.settings.courts)||2);
+      html+='<div class="sb" style="padding:10px;margin:10px 0;text-align:center;font-size:12px"><span style="color:var(--muted)">الإيراد اليومي المتوقع: </span><span style="color:var(--accent);font-weight:800">'+estDaily.toLocaleString()+' ج</span></div>';
+      html+='<div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="onboardingPrev()" style="flex:1">→ رجوع</button><button class="auth-btn" onclick="onboardingNext()" style="flex:2">التالي ←</button></div>';
+    } else if(step===3){
+      html+='<div class="auth-logo">🧑‍🏫</div>';
+      html+='<div class="auth-title-glow" style="font-size:20px">هل لديك مدربين؟</div>';
+      html+='<div class="fl-group"><input type="text" class="fl-input" id="obTrainerName" placeholder=" " aria-label="اسم المدرب"><label class="fl-label">اسم المدرب (اختياري)</label></div>';
+      html+='<div class="fl-group"><input type="tel" class="fl-input" id="obTrainerPhone" placeholder=" " aria-label="هاتف المدرب"><label class="fl-label">هاتف المدرب</label></div>';
+      html+='<div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="onboardingPrev()" style="flex:1">→ رجوع</button><button class="btn btn-ghost" onclick="onboardingSkipTrainer()" style="flex:1">تخطي</button><button class="auth-btn" onclick="onboardingNext()" style="flex:2">التالي ←</button></div>';
+    } else if(step===4){
+      html+='<div class="auth-logo" style="font-size:50px">✅</div>';
+      html+='<div class="auth-title-glow" style="font-size:22px">جاهز!</div>';
+      html+='<div class="auth-subtitle">تم ضبط كل الإعدادات بنجاح</div>';
+      html+='<div class="sb" style="padding:12px;margin:12px 0;font-size:13px">';
+      html+='<div style="margin-bottom:6px">🏟️ النادي: <strong>'+(D.settings.clubName||'Padel Club')+'</strong></div>';
+      html+='<div style="margin-bottom:6px">🎾 الملاعب: <strong>'+(D.settings.courts||2)+'</strong></div>';
+      html+='<div style="margin-bottom:6px">☀️ سعر الصباح: <strong>'+(D.settings.priceAM||160)+' ج</strong></div>';
+      html+='<div>🌙 سعر المساء: <strong>'+(D.settings.pricePM||200)+' ج</strong></div>';
+      if(D.trainers&&D.trainers.length)html+='<div style="margin-top:6px">🧑‍🏫 المدربين: <strong>'+D.trainers.length+'</strong></div>';
+      html+='</div>';
+      html+='<button class="auth-btn" onclick="finishOnboarding()">ابدأ الاستخدام 🚀</button>';
+    }
+    html+='</div>';
+    overlay.innerHTML='<div class="auth-glow-2"></div>'+html;
+  }
+
+  window.onboardingNext=function(){
+    if(step===1){
+      var name=document.getElementById('obClubName').value.trim();
+      var courts=document.getElementById('obCourts').value;
+      if(name)D.settings.clubName=name;
+      D.settings.courts=parseInt(courts)||2;
+      saveData();
+    } else if(step===2){
+      D.settings.priceAM=parseFloat(document.getElementById('obPriceAM').value)||160;
+      D.settings.pricePM=parseFloat(document.getElementById('obPricePM').value)||200;
+      saveData();
+    } else if(step===3){
+      var trName=document.getElementById('obTrainerName').value.trim();
+      if(trName){
+        if(!D.trainers)D.trainers=[];
+        D.trainers.push({id:'tr_'+Date.now(),name:trName,phone:document.getElementById('obTrainerPhone').value.trim()||'',specialty:'all',payType:'percentage',payAmount:30});
+        saveData();
+      }
+    }
+    step++;
+    if(step>4)return;
+    renderStep();
+  };
+  window.onboardingPrev=function(){
+    if(step>1){step--;renderStep();}
+  };
+  window.onboardingSkipTrainer=function(){
+    step=4;renderStep();
+  };
+  window.finishOnboarding=function(){
+    localStorage.setItem('PADEL_ONBOARDING_DONE','1');
+    overlay.parentNode.removeChild(overlay);
+    initApp();
+    showToast('مرحباً بك في Padel MGR! 🎾');
+  };
+
+  document.body.appendChild(overlay);
+  renderStep();
 }
 
 </script>
