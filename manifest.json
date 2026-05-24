@@ -1,12 +1,13 @@
 {
-  "name": "Padel MGR v15",
+  "name": "Padel MGR",
   "short_name": "Padel MGR",
   "description": "إدارة ملاعب البادل - Padel Court Management",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#060c14",
-  "theme_color": "#0fff6e",
+  "background_color": "#111111",
+  "theme_color": "#1A73E8",
   "dir": "rtl",
   "lang": "ar",
   "icons": [

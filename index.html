@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Padel MGR v16</title>
-<meta name="theme-color" content="#1fc8a0">
+<title>Padel MGR v17</title>
+<meta name="theme-color" content="#1A73E8">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -22,53 +22,100 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  /* خلفيات — أزرق داكن دافئ */
-  --bg:#0d1b2a;--surf:#142233;--card:#1a2d40;--card2:#1f3347;
-  /* اللون الرئيسي — تيل/نعناعي هادئ */
-  --accent:#1fc8a0;--accent-dim:rgba(31,200,160,.09);--accent-glow:rgba(31,200,160,.22);--accent-solid:#1fc8a0;
-  /* ألوان مساعدة محسّنة */
-  --blue:#5ba8f5;--blue-dim:rgba(91,168,245,.09);
-  --red:#f07070;--red-dim:rgba(240,112,112,.1);
-  --yellow:#f5c842;--yellow-dim:rgba(245,200,66,.09);
-  --purple:#b07ef8;--purple-dim:rgba(176,126,248,.09);
-  --orange:#f5874a;--orange-dim:rgba(245,135,74,.1);
-  --teal:#2ec4b6;--teal-dim:rgba(46,196,182,.09);
-  /* نصوص وحدود */
-  --text:#ddeaf7;--muted:#5e7d99;
-  --border:rgba(91,168,245,.07);--shadow:rgba(0,0,0,.4);--nav-h:68px;
-  /* تأثيرات */
-  --grid-dot:rgba(31,200,160,.022);--hdr-bg:rgba(13,27,42,.93);--toast-color:#0d1b2a;
+  /* === Clean palette — Dark Mode (Material-style, no neon, no gradients) === */
+  --bg:#111111;
+  --surface:#1E1E1E;
+  --primary:#4A9EFF;
+  --text:#F0F0F0;
+  --text2:#9E9E9E;
+  --border:#2C2C2C;
+  --success:#4CAF50;
+  --danger:#F44336;
+  /* derived helpers */
+  --primary-dim:rgba(74,158,255,.10);
+  --primary-glow:rgba(74,158,255,.20);
+  --success-dim:rgba(76,175,80,.10);
+  --danger-dim:rgba(244,67,54,.10);
+  --shadow:rgba(0,0,0,.40);
+  --nav-h:68px;
+  --grid-dot:rgba(255,255,255,.02);
+  --hdr-bg:#111111;
+  --toast-color:#FFFFFF;
+  /* secondary accents (kept calm) */
+  --yellow:#FFCA28;--yellow-dim:rgba(255,202,40,.10);
+  --purple:#B388FF;--purple-dim:rgba(179,136,255,.10);
+  --orange:#FF9800;--orange-dim:rgba(255,152,0,.10);
+  /* === Legacy aliases — map old var names to the new clean palette so the rest of the CSS keeps working === */
+  --surf:var(--surface);
+  --card:var(--surface);
+  --card2:#262626;
+  --accent:var(--primary);
+  --accent-solid:var(--primary);
+  --accent-dim:var(--primary-dim);
+  --accent-glow:var(--primary-glow);
+  --muted:var(--text2);
+  --blue:var(--primary);
+  --blue-dim:var(--primary-dim);
+  --red:var(--danger);
+  --red-dim:var(--danger-dim);
+  --teal:var(--success);
+  --teal-dim:var(--success-dim);
 }
 [data-theme="light"]{
-  --bg:#eef3f8;--surf:#ffffff;--card:#ffffff;--card2:#f4f8fb;
-  --accent:#0a8f6e;--accent-dim:rgba(10,143,110,.08);--accent-glow:rgba(10,143,110,.18);--accent-solid:#0a8f6e;
-  --blue:#1a6fbf;--blue-dim:rgba(26,111,191,.08);
-  --red:#d63031;--red-dim:rgba(214,48,49,.07);
-  --yellow:#c57a00;--yellow-dim:rgba(197,122,0,.07);
-  --purple:#6c2bd9;--purple-dim:rgba(108,43,217,.07);
-  --orange:#c04f0a;--orange-dim:rgba(192,79,10,.08);
-  --teal:#0a7a72;--teal-dim:rgba(10,122,114,.08);
-  --text:#1a2a3a;--muted:#527088;
-  --border:rgba(0,0,0,.07);--shadow:rgba(0,0,0,.07);
-  --grid-dot:rgba(10,143,110,.03);--hdr-bg:rgba(238,243,248,.95);
-  --toast-color:#ffffff;
+  /* === Clean palette — Light Mode === */
+  --bg:#F5F5F5;
+  --surface:#FFFFFF;
+  --primary:#1A73E8;
+  --text:#1C1C1E;
+  --text2:#6E6E73;
+  --border:#E0E0E0;
+  --success:#34A853;
+  --danger:#EA4335;
+  /* derived helpers */
+  --primary-dim:rgba(26,115,232,.08);
+  --primary-glow:rgba(26,115,232,.18);
+  --success-dim:rgba(52,168,83,.08);
+  --danger-dim:rgba(234,67,53,.08);
+  --shadow:rgba(0,0,0,.08);
+  --grid-dot:rgba(0,0,0,.02);
+  --hdr-bg:#FFFFFF;
+  --toast-color:#FFFFFF;
+  /* secondary accents (less saturated for light bg) */
+  --yellow:#F9AB00;--yellow-dim:rgba(249,171,0,.10);
+  --purple:#6A4DDB;--purple-dim:rgba(106,77,219,.10);
+  --orange:#E65100;--orange-dim:rgba(230,81,0,.10);
+  /* aliases */
+  --surf:var(--surface);
+  --card:var(--surface);
+  --card2:#F5F5F5;
+  --accent:var(--primary);
+  --accent-solid:var(--primary);
+  --accent-dim:var(--primary-dim);
+  --accent-glow:var(--primary-glow);
+  --muted:var(--text2);
+  --blue:var(--primary);
+  --blue-dim:var(--primary-dim);
+  --red:var(--danger);
+  --red-dim:var(--danger-dim);
+  --teal:var(--success);
+  --teal-dim:var(--success-dim);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{font-family:'Tajawal','Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);transition:background .3s,color .3s;}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 1px 1px,var(--grid-dot) 1px,transparent 0);background-size:28px 28px;pointer-events:none;z-index:0;}
 #app{position:relative;z-index:1}
-.hdr{position:sticky;top:0;z-index:100;background:var(--hdr-bg);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;}
-.hdr-logo{font-size:22px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--accent),#00c4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr{position:sticky;top:0;z-index:100;background:var(--hdr-bg);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;}
+.hdr-logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--primary);}
 .hdr-logo em{font-style:normal;-webkit-text-fill-color:rgba(128,128,128,.5);font-weight:400}
 .hdr-right{display:flex;align-items:center;gap:7px;}
 .hdr-meta{font-size:11px;color:var(--muted);text-align:left;line-height:1.5}
 .theme-btn,.lang-btn{background:var(--card);border:1px solid var(--border);border-radius:50%;width:33px;height:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:900;font-family:'Tajawal','Cairo',sans-serif;transition:all .2s;flex-shrink:0;color:var(--text);}
 .theme-btn:active,.lang-btn:active{transform:scale(.9)}
-.scanner{display:none;margin:10px 14px;padding:10px 14px;background:var(--accent-dim);border:1px solid rgba(15,255,110,.35);border-radius:12px;font-size:12px;color:var(--accent);text-align:center;animation:scanPulse 2s infinite;}
+.scanner{display:none;margin:10px 14px;padding:10px 14px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:12px;font-size:12px;color:var(--primary);text-align:center;animation:scanPulse 2s infinite;}
 [data-theme="light"] .scanner{border-color:rgba(0,166,81,.35);}
 @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.65}}
-.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surf);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 20px var(--shadow);transition:background .3s;}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -1px 3px var(--shadow);transition:background .3s;}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'Tajawal','Cairo',sans-serif;font-size:10px;font-weight:700;transition:color .2s;padding-bottom:4px;position:relative;}
 .nbtn .nico{font-size:22px;line-height:1;transition:transform .2s}
 .nbtn.active{color:var(--accent)}.nbtn.active .nico{transform:scale(1.15)}
@@ -97,8 +144,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .fbtn{flex-shrink:0;padding:8px 16px;border-radius:50px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Tajawal','Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .fbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
 .bitem{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease;border-right-width:3px;box-shadow:0 2px 8px var(--shadow);}
-.bitem.c1{border-right-color:rgba(15,255,110,.7)}.bitem.c2{border-right-color:rgba(77,184,255,.7)}.bitem.c3{border-right-color:rgba(255,214,10,.7)}.bitem.c4{border-right-color:rgba(255,77,77,.7)}
-[data-theme="light"] .bitem.c1{border-right-color:rgba(0,166,81,.8)}
+.bitem.c1{border-right-color:var(--primary)}.bitem.c2{border-right-color:var(--success)}.bitem.c3{border-right-color:var(--yellow)}.bitem.c4{border-right-color:var(--danger)}
 .bitem.overdue{border-color:rgba(224,49,49,.5);background:rgba(224,49,49,.04)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .btcol{min-width:56px;text-align:center;flex-shrink:0}.bts{font-size:16px;font-weight:800;color:var(--accent);line-height:1.2}.bte{font-size:11px;color:var(--muted);line-height:1.2}
@@ -136,8 +182,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .ampm-btn{flex-shrink:0;min-width:52px;padding:11px 8px;border-radius:12px;border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);font-family:'Tajawal','Cairo',sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:all .2s;}
 .ampm-btn.am{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
 .court-st{font-size:11px;padding:7px 12px;background:var(--card);border-radius:9px;margin-top:8px;display:none}
-.price-disp{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border:1px dashed rgba(0,166,81,.3);border-radius:12px;padding:11px 14px;margin-bottom:12px;}
+.price-disp{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border:1px dashed var(--primary-glow);border-radius:12px;padding:11px 14px;margin-bottom:12px;position:sticky;bottom:0;backdrop-filter:none;z-index:5;box-shadow:0 -1px 3px var(--shadow);}
 .pdi{text-align:center;flex:1}.pdi .lbl{font-size:9px;color:var(--muted);display:block;margin-bottom:3px;letter-spacing:.5px}.pdi .val{font-size:15px;font-weight:900}
+/* Step 2 toggle (v17) */
+.book-step2-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'Tajawal','Cairo',sans-serif;font-size:13px;font-weight:800;color:var(--text);cursor:pointer;margin-bottom:12px;min-height:44px;}
+.book-step2-toggle:active{background:var(--card2);}
+.book-step2-chev{font-size:14px;color:var(--muted);transition:transform .25s;}
+.book-step2-toggle[aria-expanded="true"] .book-step2-chev{transform:rotate(180deg);}
 .conf-warn{font-size:12px;padding:9px 12px;background:var(--red-dim);border:1px solid rgba(224,49,49,.3);border-radius:10px;color:var(--red);font-weight:700;text-align:center;margin-bottom:10px;display:none;}
 .btn{display:block;width:100%;padding:13px;border-radius:12px;font-family:'Tajawal','Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:transform .15s,opacity .15s;text-align:center;}
 .btn:active{transform:scale(.98);opacity:.9}.btn-green{background:var(--accent);color:var(--toast-color)}.btn-blue{background:var(--blue);color:#fff}
@@ -153,7 +204,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .mode-switch{display:flex;background:var(--card2);border-radius:12px;padding:3px;margin-bottom:14px;gap:3px;border:1px solid var(--border);}
 .mode-btn{flex:1;padding:9px 4px;border-radius:9px;border:none;font-family:'Tajawal','Cairo',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;background:none;transition:all .25s;}
 .mode-btn.on{background:var(--card);color:var(--text);box-shadow:0 1px 8px var(--shadow);}
-.smart-note-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid rgba(15,255,110,.25);border-radius:14px;padding:9px 12px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);}
+.smart-note-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--primary-glow);border-radius:14px;padding:9px 12px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);}
 [data-theme="light"] .smart-note-bar{border-color:rgba(0,166,81,.3);}
 .smart-note-input{flex:1;background:none;border:none;color:var(--text);font-family:'Tajawal','Cairo',sans-serif;font-size:13px;outline:none;}
 .smart-note-input::placeholder{color:var(--muted)}
@@ -194,7 +245,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .verdict.ok{background:var(--accent-dim);border:2px solid rgba(0,166,81,.28);}
 .verdict.over{background:var(--yellow-dim);border:2px solid rgba(198,128,0,.28);}
 .verdict.under{background:var(--red-dim);border:2px solid rgba(224,49,49,.28);}
-.verdict.deficit-resolved{background:linear-gradient(135deg,var(--red-dim),var(--accent-dim));border:2px solid rgba(0,166,81,.4);}
+.verdict.deficit-resolved{background:var(--success-dim);border:2px solid var(--success);}
 .verdict-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .verdict-icon{font-size:30px;line-height:1;flex-shrink:0}
 .verdict-title{font-size:16px;font-weight:900;line-height:1.2;}
@@ -262,7 +313,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .inv-kpi.green{background:var(--accent-dim);border:1px solid rgba(0,166,81,.16);}
 .inv-kpi.blue{background:var(--blue-dim);border:1px solid rgba(26,127,196,.16);}
 .inv-kpi.red{background:var(--red-dim);border:1px solid rgba(224,49,49,.1);}
-.inv-kpi.net{background:linear-gradient(135deg,var(--accent-dim),var(--blue-dim));border:1px solid rgba(0,166,81,.2);grid-column:1/-1;}
+.inv-kpi.net{background:var(--primary-dim);border:1px solid var(--primary);grid-column:1/-1;}
 .inv-kpi.fullw{grid-column:1/-1;background:var(--card2);border:1px solid var(--border);}
 .inv-kpi-lbl{font-size:10px;font-weight:700;opacity:.6;margin-bottom:4px}
 .inv-kpi-val{font-size:18px;font-weight:900;}
@@ -368,7 +419,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 /* NAV PILL INDICATOR */
 .nbtn.active::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:32px;height:4px;background:var(--accent);border-radius:4px;box-shadow:0 0 8px var(--accent-glow);}
 /* CONFIRM MODAL */
-.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99998;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px);}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
 .confirm-overlay.open{opacity:1;pointer-events:all;}
 .confirm-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 24px;max-width:340px;width:90vw;text-align:center;transform:scale(.85);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 8px 40px rgba(0,0,0,.5);}
 .confirm-overlay.open .confirm-box{transform:scale(1);}
@@ -379,31 +430,31 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 .confirm-btns{display:flex;gap:10px;}
 .confirm-btns .btn{flex:1;}
 /* AUTH SCREENS — GLASS MORPHISM */
-.auth-bg{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;overflow:hidden;background:linear-gradient(135deg,#040d15 0%,#0a1628 30%,#071a12 60%,#060c14 100%);}
-.auth-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(15,255,110,.04) 1px,transparent 0);background-size:32px 32px;animation:authGridDrift 20s linear infinite;}
-.auth-bg::after{content:'';position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(15,255,110,.12) 0%,transparent 70%);border-radius:50%;top:-80px;right:-80px;animation:authGlow 6s ease-in-out infinite alternate;}
+.auth-bg{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;overflow:hidden;background:var(--bg);}
+.auth-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,var(--grid-dot) 1px,transparent 0);background-size:32px 32px;}
+.auth-bg::after{display:none;}
 @keyframes authGridDrift{0%{transform:translate(0,0)}100%{transform:translate(32px,32px)}}
 @keyframes authGlow{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.3);opacity:.8}}
 .auth-glow-2{position:absolute;width:250px;height:250px;background:radial-gradient(circle,rgba(0,196,255,.08) 0%,transparent 70%);border-radius:50%;bottom:-60px;left:-60px;animation:authGlow2 8s ease-in-out infinite alternate;}
 @keyframes authGlow2{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.4);opacity:.7}}
-.auth-card{position:relative;z-index:2;width:380px;max-width:92vw;background:rgba(16,29,46,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 28px;box-shadow:0 8px 48px rgba(0,0,0,.4);animation:authCardIn .6s cubic-bezier(.4,0,.2,1) both;}
+.auth-card{position:relative;z-index:2;width:380px;max-width:92vw;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 28px;box-shadow:0 1px 3px var(--shadow);animation:authCardIn .6s cubic-bezier(.4,0,.2,1) both;}
 @keyframes authCardIn{0%{opacity:0;transform:translateY(30px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
 .auth-logo{font-size:56px;text-align:center;margin-bottom:8px;animation:authLogoBounce 2s ease-in-out infinite;}
 @keyframes authLogoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.auth-title{text-align:center;font-size:28px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,var(--accent),#00c4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;}
-.auth-title-glow{text-align:center;font-size:28px;font-weight:900;margin-bottom:2px;color:var(--accent);text-shadow:0 0 20px rgba(15,255,110,.4),0 0 40px rgba(15,255,110,.2);}
+.auth-title{text-align:center;font-size:28px;font-weight:900;margin-bottom:2px;color:var(--primary);}
+.auth-title-glow{text-align:center;font-size:28px;font-weight:900;margin-bottom:2px;color:var(--primary);}
 .auth-subtitle{text-align:center;font-size:13px;color:var(--muted);margin-bottom:28px;}
-.auth-info-box{background:rgba(15,255,110,.06);border:1px solid rgba(15,255,110,.15);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--accent);text-align:center;line-height:1.6;}
+.auth-info-box{background:var(--primary-dim);border:1px solid var(--primary-glow);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--primary);text-align:center;line-height:1.6;}
 /* FLOATING LABEL INPUT */
 .fl-group{position:relative;margin-bottom:18px;}
 .fl-input{width:100%;background:rgba(22,37,56,.6);border:1.5px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 16px 8px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:16px;font-weight:500;outline:none;transition:border-color .3s,box-shadow .3s;}
-.fl-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,255,110,.1);}
+.fl-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim);}
 .fl-label{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none;transition:all .25s cubic-bezier(.4,0,.2,1);font-weight:500;}
 .fl-input:focus ~ .fl-label,.fl-input:not(:placeholder-shown) ~ .fl-label{top:10px;transform:translateY(0);font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.5px;}
 .fl-toggle{position:absolute;left:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;transition:color .2s;}
 .fl-toggle:hover{color:var(--text);}
-.auth-btn{display:block;width:100%;padding:14px;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:900;cursor:pointer;border:none;background:linear-gradient(135deg,var(--accent),#00c853);color:#060c14;transition:transform .2s,box-shadow .2s;text-align:center;box-shadow:0 4px 20px rgba(15,255,110,.25);}
-.auth-btn:hover{transform:scale(1.02);box-shadow:0 6px 28px rgba(15,255,110,.35);}
+.auth-btn{display:block;width:100%;padding:14px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:900;cursor:pointer;border:none;background:var(--primary);color:#FFFFFF;transition:background .2s,box-shadow .2s;text-align:center;box-shadow:0 1px 3px var(--shadow);}
+.auth-btn:hover{box-shadow:0 1px 3px var(--shadow);}
 .auth-btn:active{transform:scale(.97);}
 .auth-error{color:var(--red);font-size:12px;margin-top:10px;text-align:center;display:none;animation:authShake .4s ease;}
 @keyframes authShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
@@ -431,7 +482,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 .context-menu-item:active{background:var(--card2);}
 .context-menu-item.danger{color:var(--red);}
 /* INSTALL BANNER */
-.install-banner{background:var(--accent-dim);border:1px solid rgba(15,255,110,.2);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.install-banner{background:var(--primary-dim);border:1px solid var(--primary-glow);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
 .install-banner-text{flex:1;font-size:12px;font-weight:700;color:var(--accent);}
 .install-banner-btn{background:var(--accent);color:var(--toast-color);border:none;padding:8px 16px;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;}
 /* =========================================================
@@ -441,10 +492,10 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 /* Cards hover */
 .bitem{transition:transform .15s ease, box-shadow .15s ease;cursor:default;}
 .bitem:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--shadow);}
-.bitem.c1{border-right-color:#1fc8a0;}
-.bitem.c2{border-right-color:#5ba8f5;}
-.bitem.c3{border-right-color:#f5c842;}
-.bitem.c4{border-right-color:#f07070;}
+.bitem.c1{border-right-color:var(--primary);}
+.bitem.c2{border-right-color:var(--success);}
+.bitem.c3{border-right-color:var(--yellow);}
+.bitem.c4{border-right-color:var(--danger);}
 .stat{border-radius:18px;padding:18px 10px;transition:transform .15s;}
 .stat:hover{transform:translateY(-2px);}
 .cust-card{transition:transform .15s, border-color .2s;}
@@ -456,8 +507,8 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted);}
 
-/* Header logo gradient (v16) */
-.hdr-logo{background:linear-gradient(135deg,var(--accent),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+/* Header logo (v17 — solid primary color) */
+.hdr-logo{color:var(--primary);}
 
 /* Smooth tab transitions */
 .tab.active{animation:fadeIn .25s ease;}
@@ -465,6 +516,65 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 /* FAB text (visible only on desktop) */
 .fab-txt{display:none;}
+
+/* Top install banner (v17) */
+.install-top-banner{position:sticky;top:0;z-index:99;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--primary-dim);border-bottom:1px solid var(--primary-glow);font-size:13px;font-weight:700;color:var(--text);}
+.install-top-text{flex:1;}
+.install-top-btn{background:var(--primary);color:#FFFFFF;border:none;padding:8px 16px;border-radius:8px;font-family:'Tajawal','Cairo',sans-serif;font-size:13px;font-weight:800;cursor:pointer;min-height:36px;}
+.install-top-btn:active{opacity:.85;}
+.install-top-dismiss{background:transparent;color:var(--muted);border:none;font-size:22px;line-height:1;cursor:pointer;width:32px;height:32px;border-radius:50%;}
+.install-top-dismiss:active{background:var(--border);}
+
+/* =========================================================
+   MOBILE UX (v17) — touch targets, no iOS zoom, scrollable
+   ========================================================= */
+
+/* Prevent iOS auto-zoom: every input/textarea/select min 16px font */
+input,textarea,select,.fi{font-size:16px!important;}
+input[type="checkbox"],input[type="radio"]{font-size:inherit!important;}
+.btn{font-size:15px;}
+
+/* Min touch target 44x44 on key buttons */
+.btn{min-height:44px;}
+.dnavbtn{width:44px;height:44px;font-size:24px;}
+.theme-btn,.lang-btn{width:40px;height:40px;font-size:17px;}
+.fab-menu-btn{min-height:44px;}
+.confirm-btn{min-height:44px;}
+
+/* Bottom nav: clearly tappable, fits 7 tabs comfortably */
+.bnav{height:max(var(--nav-h),58px);}
+.nbtn{min-height:56px;padding:6px 2px;}
+.nbtn .nico{font-size:20px;}
+.nbtn{font-size:9.5px;line-height:1.1;}
+
+/* FAB sits comfortably above the nav (spec: bottom:80px on mobile) */
+.fab{bottom:calc(var(--nav-h) + 12px);}
+
+/* Modals: never overflow, always scrollable on small screens */
+.moverlay{align-items:flex-end;overflow:hidden;}
+.msheet{max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:max(24px,env(safe-area-inset-bottom));}
+
+/* Header stats wrap properly when cramped */
+.hdr-meta{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 10px;font-size:11px;line-height:1.4;}
+.hdr-meta > *{white-space:nowrap;}
+
+/* Tab/filter strips: horizontal scroll if they overflow */
+.filter-bar,.tab-bar,.acad-tabs,.inv-tabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none;}
+.filter-bar::-webkit-scrollbar,.tab-bar::-webkit-scrollbar,.acad-tabs::-webkit-scrollbar,.inv-tabs::-webkit-scrollbar{display:none;}
+.fbtn,.tab-btn,.acad-tab,.inv-tab{flex-shrink:0;white-space:nowrap;}
+
+/* Comfortable card / list-item padding on small screens */
+@media(max-width:579px){
+  .tab{padding:14px 16px;}
+  .card{padding:16px;}
+  .bitem{padding:14px 16px;}
+  body{font-size:14px;}
+  /* Bigger date navigation arrows */
+  .dnavbtn{width:48px;height:48px;font-size:26px;}
+  /* Calculator buttons: proper grid */
+  .calc-keys,.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .calc-key{min-height:48px;font-size:18px;font-weight:800;border-radius:8px;}
+}
 
 /* =========================================================
    RESPONSIVE LAYOUT (v16) — tablet, desktop sidebar, wide
@@ -499,7 +609,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
     border-radius:0;transform:none;left:auto;
     box-shadow:-2px 0 20px var(--shadow);
     gap:4px;overflow-y:auto;
-    background:var(--surf);backdrop-filter:blur(24px);
+    background:var(--surface);
   }
   .nbtn{
     flex-direction:row;justify-content:flex-start;
@@ -612,7 +722,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-logo">Padel <em>MGR v16</em></div>
+  <div class="hdr-logo">Padel <em>MGR v17</em></div>
   <div class="hdr-right">
     <div class="hdr-meta" id="hdrMeta"></div>
     <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
@@ -620,6 +730,13 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   </div>
 </div>
 <div id="scannerEl" class="scanner"></div>
+
+<!-- TOP INSTALL BANNER (v17 — fires on beforeinstallprompt) -->
+<div id="installTopBanner" class="install-top-banner" style="display:none">
+  <span class="install-top-text">📲 ثبّت التطبيق على جهازك</span>
+  <button class="install-top-btn" onclick="installApp()" aria-label="تثبيت التطبيق">تثبيت</button>
+  <button class="install-top-dismiss" onclick="dismissInstallBanner()" aria-label="إغلاق">×</button>
+</div>
 
 <!-- TAB: BOOKINGS -->
 <div class="tab active" id="tab-bookings">
@@ -969,7 +1086,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 <!-- TAB: DASHBOARD -->
 <div class="tab" id="tab-dashboard">
-  <div class="card" style="border-color:rgba(15,255,110,.15)">
+  <div class="card" style="border-color:var(--primary-glow)">
     <div class="card-title">📊 لوحة الإحصائيات</div>
     <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
       <button class="fbtn active" id="dashPeriod-month" onclick="setDashPeriod('month')">هذا الشهر</button>
@@ -1210,12 +1327,9 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
     <div class="mtitle" id="modalTitle">حجز جديد 🏸</div>
     <!-- DATE PICKER FOR BOOKING -->
     <div class="fg"><label class="flbl">📅 تاريخ الحجز</label><input class="fi" type="date" id="fBookDate"></div>
-    <div class="ipair" style="margin-bottom:13px">
-      <div><label class="flbl">اسم العميل</label><input class="fi" type="text" id="fCust" placeholder="الاسم..." oninput="autofillPhone()"></div>
-      <div><label class="flbl">رقم الهاتف</label><input class="fi" type="tel" id="fPhone" placeholder="01x..." inputmode="numeric"></div>
-    </div>
+    <!-- ═══ STEP 1 — REQUIRED FIELDS (v17) ═══ -->
+    <div class="fg"><label class="flbl">اسم العميل</label><input class="fi" type="text" id="fCust" placeholder="الاسم..." oninput="autofillPhone()"></div>
     <div id="custSuggestions" style="display:none;margin-top:-10px;margin-bottom:10px;"></div>
-    <div class="fg"><label class="flbl">رقم الملعب</label><div class="bgr" id="courtBtns"></div><div class="court-st" id="courtSt"></div></div>
     <div class="fg">
       <label class="flbl">وقت البداية</label>
       <div class="time-row">
@@ -1235,33 +1349,41 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
       </div>
       <input class="fi" type="number" id="fDurCustom" placeholder="عدد الساعات..." step="0.5" min="0.5" style="margin-top:8px;display:none" oninput="calcBookingTotal()">
     </div>
-    <div class="fg" id="paySection">
-      <label class="flbl">طريقة الدفع</label>
-      <div class="bgr">
-        <button class="bc" id="pPend" onclick="selPay('pending')">⏳ آجل</button>
-        <button class="bc ag" id="pCash" onclick="selPay('cash')">💵 كاش</button>
-        <button class="bc" id="pVisa" onclick="selPay('visa')">💳 فيزا</button>
-        <button class="bc" id="pSplit" onclick="selPay('split')">🔗 نص نص</button>
-      </div>
-      <div id="splitFields" style="display:none;margin-top:8px;">
-        <div class="ipair">
-          <div class="iwrap"><span class="flbl">كاش (ج)</span><input class="fi" type="number" id="fSplitCash" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
-          <div class="iwrap"><span class="flbl">فيزا (ج)</span><input class="fi" type="number" id="fSplitVisa" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
+    <div class="fg"><label class="flbl">رقم الملعب</label><div class="bgr" id="courtBtns"></div><div class="court-st" id="courtSt"></div></div>
+    <!-- ═══ STEP 2 — OPTIONAL (collapsed) ═══ -->
+    <button type="button" class="book-step2-toggle" id="bookStep2Toggle" onclick="toggleBookStep2()" aria-expanded="false">
+      <span>تفاصيل إضافية</span><span class="book-step2-chev" id="bookStep2Chev">▼</span>
+    </button>
+    <div id="bookStep2" style="display:none">
+      <div class="fg"><label class="flbl">رقم الهاتف</label><input class="fi" type="tel" id="fPhone" placeholder="01x..." inputmode="numeric"></div>
+      <div class="fg" id="paySection">
+        <label class="flbl">طريقة الدفع</label>
+        <div class="bgr">
+          <button class="bc" id="pPend" onclick="selPay('pending')">⏳ آجل</button>
+          <button class="bc ag" id="pCash" onclick="selPay('cash')">💵 كاش</button>
+          <button class="bc" id="pVisa" onclick="selPay('visa')">💳 فيزا</button>
+          <button class="bc" id="pSplit" onclick="selPay('split')">🔗 نص نص</button>
+        </div>
+        <div id="splitFields" style="display:none;margin-top:8px;">
+          <div class="ipair">
+            <div class="iwrap"><span class="flbl">كاش (ج)</span><input class="fi" type="number" id="fSplitCash" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
+            <div class="iwrap"><span class="flbl">فيزا (ج)</span><input class="fi" type="number" id="fSplitVisa" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="fg"><label class="flbl">العربون (اختياري)</label><input class="fi" type="number" id="fDeposit" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
-    <div class="fg"><label class="flbl">ملاحظات</label><input class="fi" type="text" id="fNotes" placeholder="أي ملاحظات..."></div>
-    <div class="fg" id="bookExpSection" style="display:none">
-      <label class="flbl" style="color:var(--red)">🔴 مصاريف مرتبطة (اختياري)</label>
-      <div class="exp-input-row">
-        <input class="fi" type="text" id="fExpDesc" placeholder="وصف المصروف...">
-        <input class="fi amt" type="number" id="fExpAmt" placeholder="0" inputmode="numeric">
-        <button class="exp-add-btn" onclick="addBookingExpense()">+</button>
+      <div class="fg"><label class="flbl">العربون (اختياري)</label><input class="fi" type="number" id="fDeposit" placeholder="0" inputmode="numeric" oninput="calcBookingTotal()"></div>
+      <div class="fg"><label class="flbl">ملاحظات</label><input class="fi" type="text" id="fNotes" placeholder="أي ملاحظات..."></div>
+      <div class="fg" id="bookExpSection" style="display:none">
+        <label class="flbl" style="color:var(--red)">🔴 مصاريف مرتبطة (اختياري)</label>
+        <div class="exp-input-row">
+          <input class="fi" type="text" id="fExpDesc" placeholder="وصف المصروف...">
+          <input class="fi amt" type="number" id="fExpAmt" placeholder="0" inputmode="numeric">
+          <button class="exp-add-btn" onclick="addBookingExpense()">+</button>
+        </div>
+        <div class="exp-list" id="fExpList"></div>
       </div>
-      <div class="exp-list" id="fExpList"></div>
+      <button class="btn btn-ghost" id="toggleBookExpBtn" onclick="toggleBookingExpenses()" style="font-size:12px;padding:7px;margin-bottom:10px;border-color:var(--danger);color:var(--danger)">+ إضافة مصاريف للحجز</button>
     </div>
-    <button class="btn btn-ghost" id="toggleBookExpBtn" onclick="toggleBookingExpenses()" style="font-size:12px;padding:7px;margin-bottom:10px;border-color:rgba(224,49,49,.3);color:var(--red)">+ إضافة مصاريف للحجز</button>
     <div class="price-disp">
       <div class="pdi"><span class="lbl">الإجمالي</span><span class="val" id="calcTotal" style="color:var(--accent)">0 ج</span></div>
       <div class="pdi"><span class="lbl">العربون</span><span class="val" id="calcDep" style="color:var(--yellow)">0 ج</span></div>
@@ -1860,10 +1982,24 @@ function openModal(editId){
   document.getElementById('bookExpSection').style.display=draftExpenses.length?'block':'none';
   document.getElementById('toggleBookExpBtn').textContent=draftExpenses.length?'− إخفاء المصاريف':'+ إضافة مصاريف للحجز';
   renderBookingExpenses();
+  // Step 2 visibility: auto-expand for edits or when optional data already present
+  var hasOptional=!!(editId || document.getElementById('fPhone').value || document.getElementById('fNotes').value || (parseFloat(document.getElementById('fDeposit').value)||0) || draftExpenses.length);
+  setBookStep2(hasOptional);
   document.getElementById('moverlay').classList.add('open');
 }
 function setAmpmBtn(ap){ let btn=document.getElementById('ampmBtn'); btn.textContent=ap==='am'?'ص':'م'; btn.className='ampm-btn'+(ap==='am'?' am':''); }
-function closeModal(){ document.getElementById('moverlay').classList.remove('open'); draftExpenses=[]; renderBookingExpenses(); document.getElementById('bookExpSection').style.display='none'; document.getElementById('toggleBookExpBtn').textContent='+ إضافة مصاريف للحجز'; }
+function setBookStep2(open){
+  var box=document.getElementById('bookStep2'); var tog=document.getElementById('bookStep2Toggle'); var chev=document.getElementById('bookStep2Chev');
+  if(!box||!tog)return;
+  box.style.display=open?'block':'none';
+  tog.setAttribute('aria-expanded',open?'true':'false');
+  if(chev)chev.textContent=open?'▲':'▼';
+}
+function toggleBookStep2(){
+  var box=document.getElementById('bookStep2'); if(!box)return;
+  setBookStep2(box.style.display==='none');
+}
+function closeModal(){ document.getElementById('moverlay').classList.remove('open'); draftExpenses=[]; renderBookingExpenses(); document.getElementById('bookExpSection').style.display='none'; document.getElementById('toggleBookExpBtn').textContent='+ إضافة مصاريف للحجز'; setBookStep2(false); }
 function overlayClick(e){ if(e.target===document.getElementById('moverlay'))closeModal(); }
 function toggleBookingExpenses(){ let s=document.getElementById('bookExpSection'); let btn=document.getElementById('toggleBookExpBtn'); let open=s.style.display==='none'; s.style.display=open?'block':'none'; btn.textContent=open?'− إخفاء المصاريف':'+ إضافة مصاريف للحجز'; }
 function addBookingExpense(){ let desc=document.getElementById('fExpDesc').value.trim(); let amt=parseFloat(document.getElementById('fExpAmt').value)||0; if(!desc){showToast('أدخل وصف المصروف ⚠️','#e03131');return;} if(!amt||amt<=0){showToast('أدخل مبلغ صحيح ⚠️','#e03131');return;} draftExpenses.push({id:'exp_'+Date.now(),desc,amt}); document.getElementById('fExpDesc').value=''; document.getElementById('fExpAmt').value=''; renderBookingExpenses(); }
@@ -3766,11 +3902,20 @@ function closeConfirm(ok){
 
 // ========================= PWA INSTALL =========================
 var deferredPrompt=null;
+var INSTALL_DISMISS_KEY='PADEL_INSTALL_DISMISSED';
 window.addEventListener('beforeinstallprompt',function(e){
   e.preventDefault();
   deferredPrompt=e;
-  var banner=document.getElementById('installBannerCard');
-  if(banner)banner.style.display='block';
+  var card=document.getElementById('installBannerCard');
+  if(card)card.style.display='block';
+  var top=document.getElementById('installTopBanner');
+  if(top && localStorage.getItem(INSTALL_DISMISS_KEY)!=='1')top.style.display='flex';
+});
+window.addEventListener('appinstalled',function(){
+  deferredPrompt=null;
+  var card=document.getElementById('installBannerCard'); if(card)card.style.display='none';
+  var top=document.getElementById('installTopBanner'); if(top)top.style.display='none';
+  showToast('تم تثبيت التطبيق بنجاح! 📲');
 });
 function installApp(){
   if(!deferredPrompt){showToast('التطبيق مثبت بالفعل أو المتصفح لا يدعم التثبيت','#e03131');return;}
@@ -3778,9 +3923,14 @@ function installApp(){
   deferredPrompt.userChoice.then(function(choice){
     if(choice.outcome==='accepted')showToast('تم تثبيت التطبيق بنجاح! 📲');
     deferredPrompt=null;
-    var banner=document.getElementById('installBannerCard');
-    if(banner)banner.style.display='none';
+    var card=document.getElementById('installBannerCard'); if(card)card.style.display='none';
+    var top=document.getElementById('installTopBanner'); if(top)top.style.display='none';
   });
+}
+function dismissInstallBanner(){
+  var top=document.getElementById('installTopBanner');
+  if(top)top.style.display='none';
+  try{localStorage.setItem(INSTALL_DISMISS_KEY,'1');}catch(_){}
 }
 
 // ========================= EMPTY STATE =========================
