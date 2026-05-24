@@ -1,11 +1,11 @@
-const CACHE_NAME = 'padel-mgr-v15';
+const CACHE_NAME = 'padel-mgr-v15-r2';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap',
+  'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
