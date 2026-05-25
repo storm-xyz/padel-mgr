@@ -903,6 +903,112 @@ body{transition:background .18s,color .18s;}
 @supports (overscroll-behavior:none){
   body{overscroll-behavior-y:none;}
 }
+
+/* ============ V20 MODERN GRADIENT THEME ============ */
+:root{
+  /* Vibrant modern gradients */
+  --g-primary:linear-gradient(135deg,#7C3AED 0%,#A855F7 35%,#EC4899 100%);
+  --g-success:linear-gradient(135deg,#10B981 0%,#06B6D4 100%);
+  --g-warning:linear-gradient(135deg,#F59E0B 0%,#F97316 100%);
+  --g-danger:linear-gradient(135deg,#EF4444 0%,#EC4899 100%);
+  --g-blue:linear-gradient(135deg,#3B82F6 0%,#06B6D4 100%);
+  --g-purple:linear-gradient(135deg,#8B5CF6 0%,#D946EF 100%);
+  --g-sunset:linear-gradient(135deg,#F97316 0%,#EC4899 100%);
+  --g-ocean:linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
+  --g-emerald:linear-gradient(135deg,#059669 0%,#10B981 100%);
+}
+
+/* Apply modern gradients to existing primary surfaces */
+.fab,.btn-green,.auth-btn,.smart-note-btn,.mode-btn.on,.stab.active,.subtab-pill.active,.badge-range{background:var(--g-primary)!important;color:#fff!important;}
+.fab::after,.btn-green::after,.auth-btn::after{display:none;}
+
+.btn-blue{background:var(--g-blue)!important;color:#fff!important;}
+.btn-purple{background:var(--g-purple)!important;color:#fff!important;}
+
+/* Brand logo / hdr-logo — gradient text */
+.hdr-logo{background:var(--g-primary);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;}
+.hdr-logo em{-webkit-text-fill-color:var(--muted)!important;background:none;}
+
+/* KPI stat cards — soft gradient backgrounds */
+.day-kpi,.inv-kpi,.stat{position:relative;overflow:hidden;}
+.inv-kpi.green::before,.day-kpi.g::before,.stat::before{content:'';position:absolute;inset:0;background:var(--g-emerald);opacity:.08;pointer-events:none;border-radius:inherit;}
+.inv-kpi.blue::before,.day-kpi.b::before{content:'';position:absolute;inset:0;background:var(--g-blue);opacity:.08;pointer-events:none;border-radius:inherit;}
+.inv-kpi.red::before,.day-kpi.r::before{content:'';position:absolute;inset:0;background:var(--g-danger);opacity:.06;pointer-events:none;border-radius:inherit;}
+.inv-kpi.net::before{content:'';position:absolute;inset:0;background:var(--g-primary);opacity:.10;pointer-events:none;border-radius:inherit;}
+
+/* Booking action icons — modern, larger touch targets, no text-emoji */
+.bact{font-size:16px;width:32px;height:32px;border-radius:10px;background:var(--card2);color:var(--text2);transition:all .15s;}
+.bact:hover{background:var(--primary-dim);color:var(--primary);}
+.bact i{font-size:16px;line-height:1;}
+.bact.edit:hover,.bact.edit:active{background:var(--primary-dim);color:var(--primary);}
+.bact.del:hover,.bact.del:active{background:var(--danger-dim);color:var(--danger);}
+.bact.pay:hover,.bact.pay:active{background:var(--success-dim);color:var(--success);}
+
+/* Booking item padding & icon spacing */
+.bitem{gap:11px;padding:11px 13px;}
+.bacts{gap:6px;}
+
+/* === Receipt — Professional layout === */
+.rcpt-modal-pro{background:var(--card);border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 18px 50px rgba(0,0,0,.5);}
+.rcpt-header{background:var(--g-primary);color:#fff;padding:18px 20px;text-align:center;position:relative;}
+.rcpt-header::after{content:'';position:absolute;bottom:-8px;left:0;right:0;height:16px;background-image:radial-gradient(circle,transparent 8px,var(--card) 8px);background-size:16px 16px;background-position:center bottom;}
+.rcpt-header-club{font-size:20px;font-weight:900;letter-spacing:-.3px;}
+.rcpt-header-sub{font-size:11px;opacity:.92;margin-top:3px;font-weight:600;}
+.rcpt-body{padding:20px 18px 12px;}
+.rcpt-body .rcpt-row{padding:8px 0;font-size:13px;}
+.rcpt-body .rcpt-row .lbl{font-weight:600;}
+.rcpt-total-block{margin-top:12px;padding:14px;border-radius:14px;background:var(--primary-dim);border:1.5px dashed var(--primary);}
+.rcpt-total-block .rcpt-row{padding:5px 0;border:none;}
+.rcpt-total-block .rcpt-row.grand .lbl{font-size:14px;font-weight:800;}
+.rcpt-total-block .rcpt-row.grand .val{font-size:22px;font-weight:900;background:var(--g-primary);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+.rcpt-footer-pro{text-align:center;padding:14px 16px;border-top:1px dashed var(--border);font-size:11px;color:var(--text2);}
+.rcpt-footer-pro .rcpt-thanks{font-weight:800;color:var(--primary);font-size:13px;margin-bottom:4px;}
+
+/* === Differentiate Closing vs Inventory === */
+/* Daily closing → emerald accent */
+#tab-closing #subtab-daily .card{border-color:rgba(16,185,129,.35);background:linear-gradient(180deg,rgba(16,185,129,.04) 0%,transparent 40%);}
+
+/* Range closing card (emerald/green) */
+.section-closing{position:relative;background:linear-gradient(180deg,rgba(16,185,129,.05) 0%,transparent 50%);}
+.section-closing .card-title{background:var(--g-emerald);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.section-closing .card-title i{-webkit-text-fill-color:#10B981;}
+
+/* Inventory card (purple/violet) */
+.section-inventory{position:relative;background:linear-gradient(180deg,rgba(139,92,246,.06) 0%,transparent 50%);}
+.section-inventory .card-title{background:var(--g-purple);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.section-inventory .card-title i{-webkit-text-fill-color:#8B5CF6;}
+
+/* Section badge */
+.section-badge{position:absolute;top:-8px;left:14px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:8px;color:#fff;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1;}
+.section-badge-closing{background:var(--g-emerald);}
+.section-badge-inventory{background:var(--g-purple);}
+
+/* === Inventory comparison box === */
+.inv-compare-box{margin-top:14px;padding:14px;border-radius:14px;background:var(--card2);border:1.5px solid rgba(139,92,246,.3);}
+.inv-compare-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;margin-bottom:12px;color:var(--purple);}
+.inv-compare-title i{font-size:18px;}
+.inv-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.inv-compare-result{padding-top:10px;border-top:1px dashed var(--border);}
+.inv-diff-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:12px;}
+.inv-diff-row .lbl{color:var(--text2);font-weight:600;}
+.inv-diff-row .val{font-weight:800;font-size:14px;}
+.inv-diff-row.inv-diff-total{border-top:1px solid var(--border);margin-top:4px;padding-top:10px;font-size:14px;}
+.inv-diff-row.inv-diff-total .lbl{font-weight:800;color:var(--text);}
+.inv-diff-row.inv-diff-total .val{font-size:18px;}
+.inv-diff-status{margin-top:10px;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;text-align:center;}
+.inv-diff-status.ok{background:rgba(16,185,129,.12);color:var(--success);border:1px solid rgba(16,185,129,.3);}
+.inv-diff-status.short{background:rgba(239,68,68,.12);color:var(--danger);border:1px solid rgba(239,68,68,.3);}
+.inv-diff-status.surplus{background:rgba(245,158,11,.12);color:var(--warning);border:1px solid rgba(245,158,11,.3);}
+
+/* === Calendar grid — overnight (next-day) styling === */
+.cgrid-time-next{background:linear-gradient(180deg,rgba(139,92,246,.10) 0%,rgba(139,92,246,.04) 100%) !important;color:var(--purple);font-weight:700;}
+.cgrid-slot-overnight{position:relative;}
+.cgrid-slot-overnight::before{content:'';position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--g-purple);box-shadow:0 0 4px rgba(139,92,246,.7);z-index:3;}
+.cgrid-overnight-banner{margin:8px 0;padding:8px 12px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.3);font-size:11px;color:var(--purple);font-weight:700;display:flex;align-items:center;gap:6px;justify-content:center;}
+
+/* === Auth logo — modern, larger Phosphor icon === */
+.auth-logo{display:flex;align-items:center;justify-content:center;}
+.auth-logo i{font-size:64px;background:var(--g-primary);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 12px rgba(124,58,237,.4));}
 </style>
 </head>
 <body>
@@ -938,7 +1044,7 @@ body{transition:background .18s,color .18s;}
 <div id="loginScreen" class="auth-bg" style="display:none" role="dialog" aria-label="شاشة تسجيل الدخول">
   <div class="auth-glow-2"></div>
   <div class="auth-card">
-    <div class="auth-logo">🏸</div>
+    <div class="auth-logo"><i class="ph ph-tennis-ball"></i></div>
     <div class="auth-title-glow">Padel MGR</div>
     <div class="auth-subtitle">إدارة ملاعب البادل</div>
     <div id="loginSetupMsg" class="auth-info-box" style="display:none">🔐 أول مرة؟ اكتب باسورد جديد لحماية التطبيق</div>
@@ -1294,7 +1400,8 @@ body{transition:background .18s,color .18s;}
     <div id="searchResults" style="display:none;margin-bottom:10px;"></div>
 
     <!-- v19 F2: Multi-day (range) closing -->
-    <div class="card" style="border-color:var(--border-glow)">
+    <div class="card section-closing" id="rangeClosingCard" style="border-color:var(--border-glow)">
+      <div class="section-badge section-badge-closing">تقفيل</div>
       <div class="card-title"><i class="ph ph-calendar-dots" aria-hidden="true"></i> تقفيل متعدد الأيام</div>
       <div class="ipair" style="margin-bottom:10px">
         <div class="iwrap"><span class="flbl">من</span><input class="fi" type="date" id="rcFrom"></div>
@@ -1318,7 +1425,8 @@ body{transition:background .18s,color .18s;}
       </div>
     </div>
 
-    <div class="card" style="border-color:rgba(77,184,255,.15)">
+    <div class="card section-inventory" id="inventoryCard" style="border-color:rgba(139,92,246,.4)">
+      <div class="section-badge section-badge-inventory">جرد</div>
       <div class="card-title"><i class="ph ph-chart-line" aria-hidden="true"></i> جرد الفترة</div>
       <div class="ipair" style="margin-bottom:10px">
         <div class="iwrap"><span class="flbl">من</span><input class="fi" type="date" id="invFrom"></div>
@@ -1342,6 +1450,33 @@ body{transition:background .18s,color .18s;}
           <div class="inv-kpi red"><div class="inv-kpi-lbl">🔴 مصاريف</div><div class="inv-kpi-val" id="invExp" style="color:var(--red)">0</div></div>
           <div class="inv-kpi fullw"><div class="inv-kpi-lbl">📦 إجمالي (كاش + فيزا)</div><div class="inv-kpi-val" id="invTotal" style="color:var(--yellow)">0</div></div>
           <div class="inv-kpi net"><div class="inv-kpi-lbl">💡 الصافي بعد المصاريف</div><div class="inv-kpi-val" id="invNet" style="color:var(--accent);font-size:22px">0</div></div>
+        </div>
+
+        <!-- INVENTORY COMPARISON (v20) — compare expected vs actual on-hand -->
+        <div class="inv-compare-box">
+          <div class="inv-compare-title">
+            <i class="ph ph-scales" aria-hidden="true"></i>
+            <span>المطابقة مع اللي معاك فعلياً</span>
+          </div>
+          <div class="inv-compare-grid">
+            <div class="ibox g"><label style="color:var(--success)">💵 كاش معاك</label><input type="number" id="invActualCash" placeholder="0" inputmode="numeric" oninput="updateInventoryCompare()"></div>
+            <div class="ibox b"><label style="color:var(--blue)">💳 فيزا فعلية</label><input type="number" id="invActualVisa" placeholder="0" inputmode="numeric" oninput="updateInventoryCompare()"></div>
+          </div>
+          <div id="invCompareResult" class="inv-compare-result" style="display:none">
+            <div class="inv-diff-row" id="invDiffCashRow">
+              <span class="lbl">فرق الكاش</span>
+              <span class="val" id="invDiffCash">0 ج</span>
+            </div>
+            <div class="inv-diff-row" id="invDiffVisaRow">
+              <span class="lbl">فرق الفيزا</span>
+              <span class="val" id="invDiffVisa">0 ج</span>
+            </div>
+            <div class="inv-diff-row inv-diff-total" id="invDiffTotalRow">
+              <span class="lbl">إجمالي الفرق</span>
+              <span class="val" id="invDiffTotal">0 ج</span>
+            </div>
+            <div id="invDiffStatus" class="inv-diff-status"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -2171,7 +2306,7 @@ function setBookView(v,btn){
 function renderCourtGrid(){
   let el=document.getElementById('courtGrid'); if(!el)return;
   let cnt=parseInt(D.settings.courts)||2;
-  let startHour=8,endHour=24,slotMins=30;
+  let startHour=8,endHour=30,slotMins=30;
   let totalSlots=(endHour-startHour)*60/slotMins;
   let list=booksFor(curDate);
   let skip={};
@@ -2184,10 +2319,13 @@ function renderCourtGrid(){
   // time labels
   for(let s=0;s<totalSlots;s++){
     let totalMin=startHour*60+s*slotMins;
+    let isNextDay=totalMin>=24*60;
     let h24=Math.floor(totalMin/60)%24,m=totalMin%60;
     let ap=h24>=12?'م':'ص', h12=(h24%12)||12;
     let tlabel=h12+':'+String(m).padStart(2,'0')+' '+ap;
-    cells+='<div class="cgrid-time-cell" style="grid-column:1;grid-row:'+(2+s)+'">'+tlabel+'</div>';
+    let nextDayCls=isNextDay?' cgrid-time-next':'';
+    let nextDayMark=isNextDay?'<span style="font-size:8px;color:var(--purple);font-weight:800;display:block;margin-top:2px">+1 يوم</span>':'';
+    cells+='<div class="cgrid-time-cell'+nextDayCls+'" style="grid-column:1;grid-row:'+(2+s)+'">'+tlabel+nextDayMark+'</div>';
   }
   // booked cells
   list.forEach(b=>{
@@ -2202,7 +2340,8 @@ function renderCourtGrid(){
     let payCls=b.pay?('pay-'+b.pay):'pay-pending';
     let cust=(b.cust||'عميل').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,"\\'");
     let lblTime=fmt12(b.time);
-    cells+='<div class="cgrid-slot cgrid-slot-booked '+payCls+'" data-row="'+row+'" data-col="'+col+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+col+';grid-row:'+row+'/span '+span+'" onclick="openModal(\''+b.id+'\')"><div class="cgrid-slot-inner">'+cust+'<br><span style="font-size:9px;font-weight:500;color:var(--text2)">'+lblTime+'</span></div></div>';
+    let isOvernight=mins>=16*60;let overnightCls=isOvernight?' cgrid-slot-overnight':'';
+    cells+='<div class="cgrid-slot cgrid-slot-booked '+payCls+overnightCls+'" data-row="'+row+'" data-col="'+col+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+col+';grid-row:'+row+'/span '+span+'" onclick="openModal(\''+b.id+'\')"><div class="cgrid-slot-inner">'+cust+'<br><span style="font-size:9px;font-weight:500;color:var(--text2)">'+lblTime+'</span></div></div>';
     for(let i=0;i<span;i++) skip[col+'_'+(2+startIdx+i)]=true;
   });
   // empty slots — drag-to-book via pointer events (v19 F1)
@@ -2559,7 +2698,7 @@ function renderBooks(){
     else if(b.pay==='split'){badge='<span class="badge badge-split">🔗 مختلط</span>';}
     else{badge='<span class="badge badge-'+b.pay+'">'+(b.pay==='cash'?'💵 كاش':'💳 فيزا')+'</span>';}
     let priceColor=b.pay==='visa'?'var(--blue)':b.pay==='split'?'var(--purple)':b.pay==='cash'?'var(--accent)':'var(--muted)';
-    let qpayBtn=io?'<button class="bact pay" onclick="openQpay(\''+b.id+'\')" title="تسديد الآن">💳</button>':'';
+    let qpayBtn=io?'<button class="bact pay" onclick="openQpay(\''+b.id+'\')" title="تسديد الآن" aria-label="تسديد"><i class="ph ph-credit-card" aria-hidden="true"></i></button>':'';
     let expNote=(b.expenses&&b.expenses.length)?'<div class="bnotes" style="color:var(--red)">🔴 مصاريف: '+(b.expenses.reduce(function(s,e){return s+(parseFloat(e.amt)||0);},0)).toLocaleString()+' ج</div>':'';
     return '<div class="bitem c'+b.court+' '+(io?'overdue':'')+'" id="bi_'+b.id+'">'
       +'<div class="btcol"><div class="bts">'+fmt12(b.time)+'</div><div class="bte">'+fmt12(et)+'</div></div>'
@@ -2572,8 +2711,8 @@ function renderBooks(){
       +'<div class="bright"><div class="bprice" style="color:'+priceColor+'">'+price.toLocaleString()+' ج</div>'
       +(dep>0?'<div class="brem">باقي: '+rem+' ج</div>':'')+badge+'</div>'
       +'<div class="bacts">'+qpayBtn
-      +'<button class="bact edit" onclick="openModal(\''+b.id+'\')" title="تعديل">✏️</button>'
-      +'<button class="bact del" onclick="delBook(\''+b.id+'\')" title="حذف">×</button>'
+      +'<button class="bact edit" onclick="openModal(\''+b.id+'\')" title="تعديل" aria-label="تعديل"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button>'
+      +'<button class="bact del" onclick="delBook(\''+b.id+'\')" title="حذف" aria-label="حذف"><i class="ph ph-trash" aria-hidden="true"></i></button>'
       +'</div></div>';
   }).join('');
   checkUpcoming();
@@ -2836,22 +2975,31 @@ function openRcptModal(id){
   let dep=parseFloat(b.deposit)||0,price=parseFloat(b.price)||0,rem=Math.max(0,price-dep),et=endT(b.time,b.dur);
   let payStr=b.pay==='cash'?'💵 كاش':b.pay==='visa'?'💳 فيزا':b.pay==='split'?'🔗 كاش '+(b.splitCash||0)+' + فيزا '+(b.splitVisa||0)+' ج':'⏳ معلق';
   let dateStr=bDate?formatDateAr(bDate):'';
-  let rows=[['👤 العميل',b.cust||'—'],['📞 الهاتف',b.phone||'—'],['🏟️ الملعب','ملعب '+b.court],['⏰ الجلسة',fmt12(b.time)+' ← '+fmt12(et)],['⌛ المدة',durLbl(b.dur)],['💳 طريقة الدفع',payStr]];
+  let receiptNum=(b.id||'').toString().slice(-6).toUpperCase();
+  let rows=[['<i class="ph ph-user"></i> العميل',b.cust||'—'],['<i class="ph ph-phone"></i> الهاتف',b.phone||'—'],['<i class="ph ph-court-basketball"></i> الملعب','ملعب '+b.court],['<i class="ph ph-clock"></i> الجلسة',fmt12(b.time)+' ← '+fmt12(et)],['<i class="ph ph-hourglass"></i> المدة',durLbl(b.dur)],['<i class="ph ph-credit-card"></i> طريقة الدفع',payStr]];
   document.getElementById('rcptContent').innerHTML=
-    '<div style="text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">'
-    +'<div style="font-size:18px;font-weight:900;color:var(--accent)">🏸 '+(D.settings.clubName||'Padel MGR')+'</div>'
-    +'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+dateStr+'</div></div>'
-    +rows.map(r=>'<div class="rcpt-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>').join('')
-    +'<div style="border-top:2px solid var(--border);margin-top:10px;padding-top:10px">'
-    +'<div class="rcpt-row"><span class="lbl" style="font-weight:800">💰 الإجمالي</span><span class="val" style="color:var(--accent);font-size:18px">'+price.toLocaleString()+' ج</span></div>'
-    +(dep>0?'<div class="rcpt-row"><span class="lbl">💵 العربون</span><span class="val" style="color:var(--yellow)">'+dep+' ج</span></div><div class="rcpt-row"><span class="lbl">📌 المتبقي</span><span class="val" style="color:var(--red)">'+rem+' ج</span></div>':'')
+    '<div class="rcpt-modal-pro">'
+    +'<div class="rcpt-header">'
+    +'<div class="rcpt-header-club">'+(D.settings.clubName||'Padel MGR')+'</div>'
+    +'<div class="rcpt-header-sub">وصل حجز رقم #'+receiptNum+' · '+dateStr+'</div>'
     +'</div>'
-    +(b.notes?'<div style="font-size:12px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">💬 '+b.notes+'</div>':'')
-    +'<div class="tafqeet-box"><strong style="color:var(--text);display:block;margin-bottom:4px">📝 التفقيط</strong>'+tafqeet(price)+'</div>';
+    +'<div class="rcpt-body">'
+    +rows.map(r=>'<div class="rcpt-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>').join('')
+    +'<div class="rcpt-total-block">'
+    +(dep>0?'<div class="rcpt-row"><span class="lbl">المبلغ الإجمالي</span><span class="val">'+price.toLocaleString()+' ج</span></div>'
+      +'<div class="rcpt-row"><span class="lbl" style="color:var(--warning)">العربون المدفوع</span><span class="val" style="color:var(--warning)">'+dep+' ج</span></div>'
+      +'<div class="rcpt-row grand"><span class="lbl">المتبقي للدفع</span><span class="val">'+rem.toLocaleString()+' ج</span></div>':
+      '<div class="rcpt-row grand"><span class="lbl">الإجمالي المستحق</span><span class="val">'+price.toLocaleString()+' ج</span></div>')
+    +'</div>'
+    +(b.notes?'<div style="font-size:12px;color:var(--text2);margin-top:12px;padding:10px 12px;background:var(--card2);border-radius:10px;border-right:3px solid var(--primary)"><strong style="color:var(--primary)">ملاحظات:</strong> '+b.notes+'</div>':'')
+    +'<div class="tafqeet-box" style="margin-top:12px"><strong style="color:var(--primary);display:block;margin-bottom:4px;font-size:11px">التفقيط</strong>'+tafqeet(price)+'</div>'
+    +'</div>'
+    +'<div class="rcpt-footer-pro"><div class="rcpt-thanks">شكراً لاختياركم '+(D.settings.clubName||'نادينا')+'</div><div>نتشرف بحضوركم</div></div>'
+    +'</div>';
   let qrEl=document.getElementById('rcptQR'); qrEl.innerHTML='';
   let qrNewEl=document.createElement('div'); qrEl.appendChild(qrNewEl);
   let qrData='عميل: '+(b.cust||'—')+' | ملعب: '+b.court+' | '+fmt12(b.time)+' - '+fmt12(et)+' | '+price+' ج';
-  try{new QRCode(qrNewEl,{text:qrData,width:150,height:150,colorDark:(document.documentElement.getAttribute('data-theme')==='light'?'#00a651':'#00ff6e'),colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+  try{new QRCode(qrNewEl,{text:qrData,width:150,height:150,colorDark:(document.documentElement.getAttribute('data-theme')==='light'?'#7C3AED':'#A855F7'),colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
   catch(e){qrEl.innerHTML='<div style="padding:20px;color:var(--muted);font-size:12px;text-align:center">QR غير متاح</div>';}
   // Payment QR if wallet configured
   var payQRWrap=document.getElementById('rcptPaymentQR');
@@ -2881,11 +3029,35 @@ function printReceipt(){
   let dep=parseFloat(b.deposit)||0,price=parseFloat(b.price)||0,rem=Math.max(0,price-dep),et=endT(b.time,b.dur);
   let payStr=b.pay==='cash'?'كاش':b.pay==='visa'?'فيزا':b.pay==='split'?'كاش '+(b.splitCash||0)+' + فيزا '+(b.splitVisa||0)+' ج':'معلق';
   let dateStr=bDate?formatDateAr(bDate):'';
+  let receiptNum=(b.id||'').toString().slice(-6).toUpperCase();
+  let clubName=D.settings.clubName||'Padel MGR';
   let rows=[['العميل',b.cust||'—'],['رقم الهاتف',b.phone||'—'],['الملعب','ملعب '+b.court],['تاريخ الجلسة',dateStr],['وقت الجلسة',fmt12(b.time)+' — '+fmt12(et)],['المدة',durLbl(b.dur)],['طريقة الدفع',payStr]];
-  let tableRows=rows.map(r=>'<tr><td style="color:#555;width:35%">'+r[0]+'</td><td style="font-weight:700">'+r[1]+'</td></tr>').join('');
-  let totalRows='<tr class="print-total-row"><td>الإجمالي</td><td style="color:#00a651;font-size:16px">'+price.toLocaleString()+' ج</td></tr>';
-  if(dep>0)totalRows+='<tr class="print-total-row"><td>العربون المدفوع</td><td style="color:#c68000">'+dep.toLocaleString()+' ج</td></tr><tr class="print-total-row"><td>المتبقي</td><td style="color:#e03131">'+rem.toLocaleString()+' ج</td></tr>';
-  let html='<div class="print-page"><div class="print-logo">🏸 '+(D.settings.clubName||'Padel MGR')+'</div><div class="print-date-hdr">وصل حجز رسمي · طُبع: '+new Date().toLocaleString('ar-EG')+'</div><table class="print-table"><thead><tr><th colspan="2">تفاصيل الحجز</th></tr></thead><tbody>'+tableRows+totalRows+'</tbody></table>'+(b.notes?'<div style="background:#fff8e1;border:1px solid #ffd60a;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;"><strong>ملاحظات:</strong> '+b.notes+'</div>':'')+'<div class="print-footer">شكراً لحجزكم معنا · '+(D.settings.clubName||'Padel MGR')+'</div></div>';
+  let detailRows=rows.map(function(r){return '<tr><td style="padding:9px 16px;color:#64748b;font-weight:600;font-size:13px;width:38%;border-bottom:1px solid #e2e8f0">'+r[0]+'</td><td style="padding:9px 16px;font-weight:700;color:#0f172a;font-size:13px;border-bottom:1px solid #e2e8f0">'+r[1]+'</td></tr>';}).join('');
+  let totalBlock='';
+  if(dep>0){
+    totalBlock='<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="padding:8px 16px;font-size:13px;color:#64748b">المبلغ الإجمالي</td><td style="padding:8px 16px;text-align:left;font-weight:700">'+price.toLocaleString()+' ج</td></tr>'
+      +'<tr><td style="padding:8px 16px;font-size:13px;color:#F59E0B">العربون المدفوع</td><td style="padding:8px 16px;text-align:left;color:#F59E0B;font-weight:700">'+dep.toLocaleString()+' ج</td></tr>'
+      +'<tr style="background:linear-gradient(135deg,#F3E8FF,#FCE7F3)"><td style="padding:14px 16px;font-size:15px;font-weight:900;color:#7C3AED;border-radius:0 12px 12px 0">المتبقي للدفع</td><td style="padding:14px 16px;text-align:left;font-size:22px;font-weight:900;color:#A21CAF;border-radius:12px 0 0 12px">'+rem.toLocaleString()+' ج</td></tr></table>';
+  } else {
+    totalBlock='<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr style="background:linear-gradient(135deg,#F3E8FF,#FCE7F3)"><td style="padding:14px 16px;font-size:15px;font-weight:900;color:#7C3AED;border-radius:0 12px 12px 0">الإجمالي المستحق</td><td style="padding:14px 16px;text-align:left;font-size:22px;font-weight:900;color:#A21CAF;border-radius:12px 0 0 12px">'+price.toLocaleString()+' ج</td></tr></table>';
+  }
+  let html='<div class="print-page" style="background:#fff;color:#0f172a;direction:rtl;padding:0;margin:0;font-family:Tajawal,Cairo,Arial,sans-serif">'
+    +'<div style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 35%,#EC4899 100%);color:#fff;padding:22px 28px;text-align:center;border-radius:0 0 16px 16px">'
+    +'<div style="font-size:24px;font-weight:900;letter-spacing:-.4px">'+clubName+'</div>'
+    +'<div style="font-size:11px;opacity:.92;margin-top:5px;font-weight:600;letter-spacing:.5px">وصل حجز رسمي · رقم #'+receiptNum+'</div>'
+    +'<div style="font-size:11px;opacity:.85;margin-top:2px">طُبع: '+new Date().toLocaleString('ar-EG')+'</div>'
+    +'</div>'
+    +'<div style="padding:20px 28px">'
+    +'<table style="width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0">'+detailRows+'</table>'
+    +totalBlock
+    +(b.notes?'<div style="margin-top:14px;padding:12px 16px;background:#FFF7ED;border-right:4px solid #F59E0B;border-radius:8px;font-size:12px"><strong style="color:#92400E">ملاحظات:</strong> <span style="color:#78350F">'+b.notes+'</span></div>':'')
+    +'<div style="margin-top:14px;padding:10px 14px;background:#F1F5F9;border-radius:8px;font-size:11px;color:#475569;text-align:center"><strong style="color:#0f172a">التفقيط:</strong> '+tafqeet(price)+'</div>'
+    +'</div>'
+    +'<div style="border-top:2px dashed #cbd5e1;padding:18px 28px;text-align:center;background:#F8FAFC">'
+    +'<div style="font-size:14px;font-weight:800;color:#7C3AED;margin-bottom:3px">شكراً لاختياركم '+clubName+'</div>'
+    +'<div style="font-size:11px;color:#64748b">نتشرف بحضوركم</div>'
+    +'</div>'
+    +'</div>';
   document.getElementById('printArea').innerHTML=html; window.print(); setTimeout(function(){document.getElementById('printArea').innerHTML='';},2000);
 }
 function shareAsImage(){
@@ -3094,7 +3266,7 @@ function quickExportManual(fmt){
   var expTotal=expList.reduce(function(s,e){return s+(parseFloat(e.amt)||0);},0)+expAmt;
   var netFinal=cash+visa-expTotal+expAmt;
   var clubName=D.settings.clubName||'Padel Club';
-  var accent='#00a651';
+  var gradHdr='linear-gradient(135deg,#7C3AED 0%,#A855F7 35%,#EC4899 100%)';
   if(fmt==='excel'){
     if(!window.XLSX){showToast('xlsx غير متاح ⚠️','#e03131');return;}
     var wb=XLSX.utils.book_new();
@@ -3106,20 +3278,24 @@ function quickExportManual(fmt){
     XLSX.utils.book_append_sheet(wb,ws,'تقفيل يدوي');
     XLSX.writeFile(wb,'padel_manual_'+dv+'.xlsx');showToast('تم تصدير الإكسيل ✓');return;
   }
-  var html='<div style="background:#fff;color:#1a2533;padding:28px;font-family:Arial,Tahoma,sans-serif;direction:rtl;width:600px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-size:22px;font-weight:900;color:'+accent+'">🏸 '+clubName+'</div><div style="font-size:11px;color:#888">تقفيل يدوي · '+new Date().toLocaleString('ar-EG')+'</div></div>'
-    +'<div style="font-size:16px;font-weight:800;margin-bottom:16px;padding:10px;background:rgba(0,166,81,.06);border-radius:10px;text-align:center">'+formatDateAr(dv)+'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">'
-    +'<div style="background:rgba(0,166,81,.06);border:2px solid rgba(0,166,81,.3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💵 كاش</div><div style="font-size:22px;font-weight:900;color:'+accent+'">'+cash.toLocaleString()+'</div></div>'
-    +'<div style="background:rgba(26,127,196,.06);border:2px solid rgba(26,127,196,.3);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💳 فيزا</div><div style="font-size:22px;font-weight:900;color:#1a7fc4">'+visa.toLocaleString()+'</div></div>'
-    +'<div style="background:rgba(0,166,81,.1);border:2px solid rgba(0,166,81,.4);border-radius:12px;padding:14px;text-align:center"><div style="font-size:10px;color:#888">💡 صافي</div><div style="font-size:22px;font-weight:900;color:'+accent+'">'+netFinal.toLocaleString()+'</div></div>'
+  var html='<div style="background:#fff;color:#0f172a;padding:0;font-family:Tajawal,Cairo,Arial,sans-serif;direction:rtl;width:640px;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)">'
+    +'<div style="background:'+gradHdr+';color:#fff;padding:22px 28px;text-align:center">'
+    +'<div style="font-size:24px;font-weight:900;letter-spacing:-.3px">'+clubName+'</div>'
+    +'<div style="font-size:11px;opacity:.9;margin-top:4px;font-weight:600">تقفيل يدوي · '+new Date().toLocaleString("ar-EG")+'</div>'
+    +'<div style="display:inline-block;margin-top:10px;padding:6px 16px;background:rgba(255,255,255,.18);border-radius:30px;font-size:13px;font-weight:700">'+formatDateAr(dv)+'</div>'
+    +'</div>'
+    +'<div style="padding:24px 28px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px">'
+    +'<div style="background:linear-gradient(135deg,#10B981,#06B6D4);border-radius:14px;padding:16px;text-align:center;color:#fff"><div style="font-size:11px;font-weight:600;opacity:.95;margin-bottom:4px">💵 كاش</div><div style="font-size:24px;font-weight:900">'+cash.toLocaleString()+'</div></div>'
+    +'<div style="background:linear-gradient(135deg,#3B82F6,#06B6D4);border-radius:14px;padding:16px;text-align:center;color:#fff"><div style="font-size:11px;font-weight:600;opacity:.95;margin-bottom:4px">💳 فيزا</div><div style="font-size:24px;font-weight:900">'+visa.toLocaleString()+'</div></div>'
+    +'<div style="background:'+gradHdr+';border-radius:14px;padding:16px;text-align:center;color:#fff"><div style="font-size:11px;font-weight:600;opacity:.95;margin-bottom:4px">💡 الصافي</div><div style="font-size:24px;font-weight:900">'+netFinal.toLocaleString()+'</div></div>'
     +'</div>';
   if(expList.length){
-    html+='<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><tr style="background:#fde8e8"><td colspan="2" style="padding:8px 12px;font-weight:800;color:#e03131;font-size:13px">المصاريف</td></tr>';
-    expList.forEach(function(e){html+='<tr style="border-bottom:1px solid #eee"><td style="padding:6px 12px;font-size:12px">'+(e.desc||'مصروف')+'</td><td style="padding:6px 12px;font-size:13px;font-weight:700;color:#e03131;text-align:left">−'+(parseFloat(e.amt)||0).toLocaleString()+' ج</td></tr>';});
-    html+='</table>';
+    html+='<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:12px 14px;margin-bottom:12px"><div style="font-weight:800;color:#DC2626;font-size:13px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #FCA5A5">🔴 المصاريف التفصيلية</div>';
+    expList.forEach(function(e){html+='<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px dotted #FCA5A5"><span style="color:#7F1D1D">'+(e.desc||'مصروف')+'</span><span style="font-weight:800;color:#B91C1C">−'+(parseFloat(e.amt)||0).toLocaleString()+' ج</span></div>';});
+    html+='</div>';
   }
-  html+='<div style="text-align:center;font-size:10px;color:#aaa;margin-top:12px;padding-top:8px;border-top:1px solid #ddd">'+clubName+' · '+formatDateAr(dv)+'</div></div>';
+  html+='</div><div style="background:#F8FAFC;padding:14px 28px;text-align:center;font-size:11px;color:#64748b;border-top:1px solid #E2E8F0">'+clubName+' · '+formatDateAr(dv)+'</div></div>';
   var container=document.createElement('div');container.style.cssText='position:fixed;top:-9999px;left:-9999px;z-index:-1;width:660px;';container.innerHTML=html;document.body.appendChild(container);
   if(fmt==='pdf'){
     html2canvas(container.firstChild,{scale:3,backgroundColor:'#fff',useCORS:true,logging:false}).then(function(canvas){
@@ -3319,7 +3495,32 @@ function calcInventory(){
   document.getElementById('invDateLabel').textContent=from===to?formatDateAr(from):formatDateAr(from)+' — '+formatDateAr(to);
   document.getElementById('invBookCount').textContent=bookCount+' حجز';
   document.getElementById('invResult').style.display='block';
+  // store expected for comparison
+  window._invExpected={cash:totalCash,visa:totalVisa};
+  updateInventoryCompare();
 }
+
+// V20: compare actual on-hand cash/visa vs expected (from bookings)
+function updateInventoryCompare(){
+  var exp=window._invExpected; if(!exp)return;
+  var aC=parseFloat(document.getElementById('invActualCash').value)||0;
+  var aV=parseFloat(document.getElementById('invActualVisa').value)||0;
+  var dC=aC-exp.cash, dV=aV-exp.visa, dT=dC+dV;
+  var cmp=document.getElementById('invCompareResult');
+  var aCInput=document.getElementById('invActualCash').value;
+  var aVInput=document.getElementById('invActualVisa').value;
+  if(!aCInput && !aVInput){cmp.style.display='none';return;}
+  cmp.style.display='block';
+  function fmt(v){var sign=v>0?'+':v<0?'−':'';return sign+Math.abs(v).toLocaleString()+' ج';}
+  function clr(v){return v===0?'var(--success)':v>0?'var(--warning)':'var(--danger)';}
+  var cElCash=document.getElementById('invDiffCash');cElCash.textContent=fmt(dC);cElCash.style.color=clr(dC);
+  var cElVisa=document.getElementById('invDiffVisa');cElVisa.textContent=fmt(dV);cElVisa.style.color=clr(dV);
+  var cElTot=document.getElementById('invDiffTotal');cElTot.textContent=fmt(dT);cElTot.style.color=clr(dT);
+  var st=document.getElementById('invDiffStatus');
+  st.className='inv-diff-status '+(dT===0?'ok':dT>0?'surplus':'short');
+  st.textContent=dT===0?'مطابقة كاملة ✓':dT>0?'زيادة عن المتوقع +'+Math.abs(dT).toLocaleString()+' ج':'عجز '+Math.abs(dT).toLocaleString()+' ج';
+}
+
 function renderHistory(){
   let el=document.getElementById('hlist');
   if(!el)return;
@@ -3520,7 +3721,7 @@ function exportInventoryImage(){
   let from=document.getElementById('invFrom').value, to=document.getElementById('invTo').value;
   if(!from||!to){showToast('اختر الفترة أولاً ⚠️','#e03131');return;}
   calcInventory();
-  let accent='#00a651', borderC='#d0d8e0', textC='#1a2533';
+  let accent='#7C3AED', accent2='#A855F7', accentSoft='rgba(124,58,237,.08)', borderC='#e2e8f0', textC='#0f172a';
   let totalCashNum=0,totalVisaNum=0,totalExpNum=0,totalBookings=0,totalHrsNum=0;
   let label=from===to?formatDateAr(from):formatDateAr(from)+' — '+formatDateAr(to);
   let dayTables='';
