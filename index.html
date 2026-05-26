@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Padel MGR v19</title>
-<meta name="theme-color" content="#6366F1">
+<meta name="theme-color" content="#185FA5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,35 +23,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  /* === V18 Indigo/Violet Palette — Dark Mode === */
-  --bg:#0F0F14;
-  --surface:#1A1A24;
-  --card:#1E1E2E;
-  --card2:#24243A;
-  --primary:#818CF8;          /* Indigo-400 — main accent */
-  --primary-dim:rgba(129,140,248,.10);
-  --primary-glow:rgba(129,140,248,.22);
-  --primary-solid:#6366F1;    /* Indigo-500 — buttons */
-  --text:#E8E8F0;
-  --text2:#9090B0;
-  --border:rgba(255,255,255,.06);
+  /* === V19 Blue/Orange Palette — Dark Mode === */
+  --bg:#060d18;
+  --surface:#0c1626;
+  --card:#101e30;
+  --card2:#162438;
+  --primary:#2d7dd2;          /* Blue — main accent */
+  --primary-dim:rgba(45,125,210,.13);
+  --primary-glow:rgba(45,125,210,.32);
+  --primary-solid:#2d7dd2;
+  --text:#f0f6ff;
+  --text2:#6a8aaa;
+  --border:rgba(45,125,210,.18);
   --success:#34D399;          /* Emerald */
   --success-dim:rgba(52,211,153,.10);
-  --danger:#F87171;           /* Rose */
-  --danger-dim:rgba(248,113,113,.10);
-  --warning:#FBBF24;          /* Amber */
-  --warning-dim:rgba(251,191,36,.10);
-  --purple:#C084FC;           /* Violet — أكاديمية */
-  --purple-dim:rgba(192,132,252,.10);
-  --teal:#2DD4BF;             /* Teal — مزامنة/كلاود */
-  --teal-dim:rgba(45,212,191,.10);
-  --orange:#FB923C;           /* Orange — إشعارات */
-  --orange-dim:rgba(251,146,60,.10);
+  --danger:#E05530;           /* Coral red */
+  --danger-dim:rgba(224,85,48,.14);
+  --warning:#f5a623;          /* Amber */
+  --warning-dim:rgba(245,166,35,.11);
+  --purple:#7b9fd4;           /* Soft blue-violet — أكاديمية */
+  --purple-dim:rgba(123,159,212,.13);
+  --teal:#38d9c0;             /* Teal — مزامنة/كلاود */
+  --teal-dim:rgba(56,217,192,.10);
+  --orange:#E05530;           /* Orange — أوفرتايم/إشعارات */
+  --orange-dim:rgba(224,85,48,.12);
   --shadow:rgba(0,0,0,.45);
   --nav-h:68px;
-  --hdr-bg:rgba(15,15,20,.94);
-  --toast-color:#0F0F14;
-  --grid-dot:rgba(129,140,248,.025);
+  --hdr-bg:rgba(6,13,24,.95);
+  --toast-color:#060d18;
+  --grid-dot:rgba(45,125,210,.05);
   /* === Legacy aliases (keep existing code working) === */
   --surf:var(--surface);
   --accent:var(--primary);
@@ -59,42 +59,42 @@
   --accent-dim:var(--primary-dim);
   --accent-glow:var(--primary-glow);
   --muted:var(--text2);
-  --blue:#60A5FA;
-  --blue-dim:rgba(96,165,250,.10);
+  --blue:#58c4ff;
+  --blue-dim:rgba(88,196,255,.10);
   --red:var(--danger);
   --red-dim:var(--danger-dim);
   --yellow:var(--warning);
   --yellow-dim:var(--warning-dim);
 }
 [data-theme="light"]{
-  /* === V18 Indigo/Violet Palette — Light Mode === */
-  --bg:#F4F4F8;
-  --surface:#FFFFFF;
-  --card:#FFFFFF;
-  --card2:#F0F0F8;
-  --primary:#6366F1;          /* Indigo-500 */
-  --primary-dim:rgba(99,102,241,.08);
-  --primary-glow:rgba(99,102,241,.18);
-  --primary-solid:#4F46E5;    /* Indigo-600 */
-  --text:#1A1A2E;
-  --text2:#64648A;
-  --border:rgba(0,0,0,.07);
+  /* === V19 Blue/Orange Palette — Light Mode === */
+  --bg:#F1EFE8;
+  --surface:#ffffff;
+  --card:#ffffff;
+  --card2:#f5f3ec;
+  --primary:#185FA5;          /* Deep blue */
+  --primary-dim:rgba(24,95,165,.09);
+  --primary-glow:rgba(24,95,165,.22);
+  --primary-solid:#185FA5;
+  --text:#1a2533;
+  --text2:#6b7e94;
+  --border:rgba(0,0,0,.09);
   --success:#059669;
   --success-dim:rgba(5,150,105,.08);
-  --danger:#DC2626;
-  --danger-dim:rgba(220,38,38,.08);
-  --warning:#D97706;
-  --warning-dim:rgba(217,119,6,.08);
-  --purple:#7C3AED;
-  --purple-dim:rgba(124,58,237,.08);
-  --teal:#0D9488;
+  --danger:#D85A30;
+  --danger-dim:rgba(216,90,48,.09);
+  --warning:#c17a00;
+  --warning-dim:rgba(193,122,0,.09);
+  --purple:#185FA5;
+  --purple-dim:rgba(24,95,165,.09);
+  --teal:#0d9488;
   --teal-dim:rgba(13,148,136,.08);
-  --orange:#EA580C;
-  --orange-dim:rgba(234,88,12,.08);
+  --orange:#D85A30;
+  --orange-dim:rgba(216,90,48,.09);
   --shadow:rgba(0,0,0,.07);
-  --hdr-bg:rgba(255,255,255,.96);
-  --grid-dot:rgba(99,102,241,.03);
-  --toast-color:#FFFFFF;
+  --hdr-bg:rgba(241,239,232,.96);
+  --grid-dot:rgba(24,95,165,.04);
+  --toast-color:#F1EFE8;
   /* === Legacy aliases === */
   --surf:var(--surface);
   --accent:var(--primary);
@@ -102,8 +102,8 @@
   --accent-dim:var(--primary-dim);
   --accent-glow:var(--primary-glow);
   --muted:var(--text2);
-  --blue:#2563EB;
-  --blue-dim:rgba(37,99,235,.08);
+  --blue:#2d7dd2;
+  --blue-dim:rgba(45,125,210,.09);
   --red:var(--danger);
   --red-dim:var(--danger-dim);
   --yellow:var(--warning);
@@ -727,7 +727,7 @@ i.nico.ph{font-size:22px;}
 .cgrid{display:grid;min-width:320px;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card);margin-bottom:10px;}
 .cgrid-head-cell{background:var(--card2);padding:8px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--primary);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2;}
 .cgrid-time-cell{background:var(--card2);padding:6px 8px;font-size:11px;color:var(--text2);text-align:center;border-left:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;justify-content:center;}
-.cgrid-slot{border-bottom:1px solid var(--border);border-left:1px solid var(--border);min-height:44px;cursor:pointer;transition:background .15s;position:relative;display:flex;align-items:center;justify-content:center;padding:4px;}
+.cgrid-slot{border-bottom:1px solid var(--border);border-left:1px solid var(--border);min-height:44px;min-width:48px;cursor:pointer;transition:background .15s;position:relative;display:flex;align-items:center;justify-content:center;padding:4px;}
 .cgrid-slot:hover:not(.cgrid-slot-booked){background:var(--primary-dim);}
 .cgrid-slot-booked{background:var(--primary-dim);border-right:3px solid var(--primary);cursor:pointer;}
 .cgrid-slot-booked.pay-cash{border-right-color:var(--success);background:var(--success-dim);}
@@ -737,10 +737,19 @@ i.nico.ph{font-size:22px;}
 .cgrid-slot-inner{font-size:10px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
 .cgrid-slot-add{font-size:20px;color:var(--border);opacity:0;transition:opacity .15s;}
 .cgrid-slot:not(.cgrid-slot-booked):hover .cgrid-slot-add{opacity:1;}
-#gridView{overflow-x:auto;overflow-y:auto;max-height:70vh;-webkit-overflow-scrolling:touch;padding-bottom:8px;border-radius:14px;}
-/* v19 — overflow:visible on .cgrid lets sticky head/time cells pin to #gridView */
-.cgrid{overflow:visible;}
-/* v19 — sticky time column (RTL: pinned to right edge) */
+#gridView{overflow:hidden;max-height:60vh;-webkit-overflow-scrolling:touch;border-radius:14px;border:1px solid var(--border);background:var(--card);}
+#gridView>#courtGrid{display:flex;flex-direction:row;width:100%;}
+/* v19 — Two-pane horizontal grid layout (avoids Chrome's RTL sticky drift bug):
+   - .cgrid-fixed-col: court labels stay pinned on the right edge (RTL)
+   - .cgrid-scroll-area: time-headers + slot cells scroll horizontally */
+.cgrid-fixed-col{display:grid;flex:0 0 auto;background:var(--card2);border-left:1px solid var(--border);}
+.cgrid-scroll-area{flex:1 1 auto;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.cgrid{overflow:visible;border:0!important;border-radius:0!important;margin-bottom:0!important;min-width:0!important;}
+.cgrid-time-head{background:var(--card2);padding:6px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--primary);border-bottom:1px solid var(--border);border-left:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.15;white-space:nowrap;}
+.cgrid-time-head.cgrid-time-next{background:linear-gradient(180deg,rgba(139,92,246,.18) 0%,rgba(139,92,246,.06) 100%) !important;color:var(--purple);}
+.cgrid-court-head{background:var(--card2);padding:8px 10px;font-size:13px;font-weight:800;color:var(--primary);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-start;white-space:nowrap;}
+.cgrid-corner{background:var(--card2);border-bottom:1px solid var(--border);}
+/* legacy vertical-grid classes kept for fallback */
 .cgrid-time-cell{position:sticky;right:0;z-index:1;}
 .cgrid-head-cell:first-child{position:sticky;right:0;top:0;z-index:3;}
 /* v19 — overtime badge style */
@@ -911,18 +920,33 @@ body{transition:background .18s,color .18s;}
   body{overscroll-behavior-y:none;}
 }
 
-/* ============ V20 MODERN GRADIENT THEME ============ */
+/* ============ V19 UX POLISH ============ */
+/* Enforce 44px touch targets on every button (Apple HIG / accessibility) */
+.btn,.btn-blue,.btn-green,.btn-ghost,.btn-purple,.btn-red,.btn-orange,.btn-teal,.auth-btn,.mode-btn,.subtab-pill,.theme-btn,.lang-btn,.fab,.bact,.nbtn,.mm-btn{min-height:44px;}
+.theme-btn,.lang-btn{min-width:33px;}
+.bact{min-height:32px;min-width:32px;}
+/* iPhone notch / home indicator safe area */
+.bnav{padding-bottom:env(safe-area-inset-bottom);}
+.msheet{padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+/* Visible focus ring for keyboard users */
+.fi:focus,input:not([type="checkbox"]):not([type="radio"]):focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px var(--accent-dim);border-color:var(--accent);}
+/* Hover affordance on pointer devices only (avoids sticky-hover on touch) */
+@media (hover:hover){
+  .bitem:hover,.cust-card:hover{border-color:var(--accent);}
+}
+
+/* ============ V19 BLUE/ORANGE GRADIENT THEME ============ */
 :root{
-  /* Vibrant modern gradients */
-  --g-primary:linear-gradient(135deg,#7C3AED 0%,#A855F7 35%,#EC4899 100%);
-  --g-success:linear-gradient(135deg,#10B981 0%,#06B6D4 100%);
-  --g-warning:linear-gradient(135deg,#F59E0B 0%,#F97316 100%);
-  --g-danger:linear-gradient(135deg,#EF4444 0%,#EC4899 100%);
-  --g-blue:linear-gradient(135deg,#3B82F6 0%,#06B6D4 100%);
-  --g-purple:linear-gradient(135deg,#8B5CF6 0%,#D946EF 100%);
-  --g-sunset:linear-gradient(135deg,#F97316 0%,#EC4899 100%);
-  --g-ocean:linear-gradient(135deg,#0EA5E9 0%,#6366F1 100%);
-  --g-emerald:linear-gradient(135deg,#059669 0%,#10B981 100%);
+  /* Blue/orange brand gradients aligned with v19 palette */
+  --g-primary:linear-gradient(135deg,#2d7dd2 0%,#185FA5 60%,#E05530 100%);
+  --g-success:linear-gradient(135deg,#34D399 0%,#38d9c0 100%);
+  --g-warning:linear-gradient(135deg,#f5a623 0%,#E05530 100%);
+  --g-danger:linear-gradient(135deg,#E05530 0%,#c43d1a 100%);
+  --g-blue:linear-gradient(135deg,#58c4ff 0%,#2d7dd2 100%);
+  --g-purple:linear-gradient(135deg,#7b9fd4 0%,#185FA5 100%);
+  --g-sunset:linear-gradient(135deg,#E05530 0%,#f5a623 100%);
+  --g-ocean:linear-gradient(135deg,#58c4ff 0%,#185FA5 100%);
+  --g-emerald:linear-gradient(135deg,#34D399 0%,#38d9c0 100%);
 }
 
 /* Apply modern gradients to existing primary surfaces */
@@ -1226,6 +1250,7 @@ body{transition:background .18s,color .18s;}
   <div class="mode-switch">
     <button class="mode-btn on" id="cmode-bookings" onclick="setCloseMode('bookings')">📋 من الحجوزات</button>
     <button class="mode-btn" id="cmode-manual" onclick="setCloseMode('manual')">🧮 حساب يدوي</button>
+    <button class="mode-btn" id="cmode-period" onclick="setCloseMode('period')">📆 فترة</button>
   </div>
   <div id="closingConflictWarning" style="display:none;padding:10px;margin-bottom:10px;border-radius:10px;background:rgba(255,193,7,.1);border:1px solid var(--yellow);font-size:12px;color:var(--yellow);text-align:center">⚠️ لديك حساب من الحجوزات وحساب يدوي — أيهما تريد حفظه؟</div>
   <div class="cl-date-bar">
@@ -1396,6 +1421,47 @@ body{transition:background .18s,color .18s;}
         <button onclick="quickExportManual('excel')" class="btn btn-teal">Excel 📊</button>
       </div>
     </div>
+  </div>
+
+  <!-- PERIOD MODE (v19 — تقفيل فترة) -->
+  <div id="closeMode-period" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="iwrap"><span class="flbl">من تاريخ</span><input class="fi" type="date" id="periodFrom" onchange="calcPeriodClosing()"></div>
+      <div class="iwrap"><span class="flbl">إلى تاريخ</span><input class="fi" type="date" id="periodTo" onchange="calcPeriodClosing()"></div>
+    </div>
+
+    <!-- System expected from bookings -->
+    <div class="rev-breakdown" id="periodExpected" style="display:none">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 المتوقع من الحجوزات</div>
+      <div class="rev-row"><span class="lbl">⏱ إجمالي الساعات</span><span class="val" id="periodHrs">0 س</span></div>
+      <div class="rev-row"><span class="lbl">💵 كاش متوقع</span><span class="val" id="periodExpCash" style="color:var(--accent)">0 ج</span></div>
+      <div class="rev-row"><span class="lbl">💳 فيزا متوقع</span><span class="val" id="periodExpVisa" style="color:var(--blue)">0 ج</span></div>
+      <div class="rev-row"><span class="lbl">🔴 أوفر تايم متوقع</span><span class="val" id="periodExpOT" style="color:var(--orange)">0 ج</span></div>
+      <div class="rev-row rev-total-row"><span class="lbl">💰 الإجمالي المتوقع</span><span class="val" id="periodExpTotal" style="color:var(--yellow)">0 ج</span></div>
+    </div>
+
+    <!-- Actual manual input -->
+    <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;margin-top:14px">📥 الإدخال الفعلي للفترة</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="ibox g"><label style="color:var(--accent)">💵 كاش</label><input type="number" id="periodActCash" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()"></div>
+      <div class="ibox b"><label style="color:var(--blue)">💳 فيزا</label><input type="number" id="periodActVisa" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()"></div>
+      <div class="ibox r"><label style="color:var(--red)">🔴 مصاريف</label><input type="number" id="periodActExp" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()"></div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="verdict" id="periodVerdict" style="display:none">
+      <div class="verdict-hdr"><div class="verdict-icon" id="periodVIco"></div><div><div class="verdict-title" id="periodVTitle"></div><div class="verdict-sub" id="periodVSub"></div></div></div>
+      <div class="verdict-cells" id="periodVCells"></div>
+      <div id="periodVPills"></div>
+    </div>
+
+    <!-- Day breakdown table -->
+    <div class="rev-breakdown" id="periodDayBreakdown" style="display:none;margin-top:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📅 تفصيل يوم بيوم</div>
+      <div id="periodDayRows"></div>
+    </div>
+
+    <button onclick="savePeriodClosing()" class="btn btn-blue" style="margin-top:12px">💾 حفظ تقفيل الفترة</button>
   </div>
   </div><!-- /subtab-daily -->
 
@@ -2311,20 +2377,24 @@ function setBookView(v,btn){
     renderBooks();
   }
 }
+// v19 — HORIZONTAL two-pane grid: time = columns (RTL scroll right→left), courts = rows.
+// Continuous timeline through midnight so the closing day (which crosses 00:00)
+// reads as a single uninterrupted strip. Fixed-column pane keeps court labels pinned
+// on the right edge while the time grid scrolls horizontally underneath.
 function renderCourtGrid(){
   let el=document.getElementById('courtGrid'); if(!el)return;
   let cnt=parseInt(D.settings.courts)||2;
   let startHour=8,endHour=30,slotMins=30;
   let totalSlots=(endHour-startHour)*60/slotMins;
   let list=booksFor(curDate);
-  let skip={};
-  let cells='';
-  // header row
-  cells+='<div class="cgrid-head-cell" style="grid-column:1;grid-row:1"></div>';
+  let skip={}; // skip[court+'_'+slotIdx]=true if covered by a multi-slot booking
+  // --- Fixed pane (court labels) ---
+  let fixedCells='<div class="cgrid-corner" style="grid-column:1;grid-row:1"></div>';
   for(let c=1;c<=cnt;c++){
-    cells+='<div class="cgrid-head-cell" style="grid-column:'+(1+c)+';grid-row:1">ملعب '+c+'</div>';
+    fixedCells+='<div class="cgrid-court-head" style="grid-column:1;grid-row:'+(1+c)+'">ملعب '+c+'</div>';
   }
-  // time labels
+  // --- Scroll pane (time headers + slot cells) ---
+  let scrollCells='';
   for(let s=0;s<totalSlots;s++){
     let totalMin=startHour*60+s*slotMins;
     let isNextDay=totalMin>=24*60;
@@ -2332,8 +2402,8 @@ function renderCourtGrid(){
     let ap=h24>=12?'م':'ص', h12=(h24%12)||12;
     let tlabel=h12+':'+String(m).padStart(2,'0')+' '+ap;
     let nextDayCls=isNextDay?' cgrid-time-next':'';
-    let nextDayMark=isNextDay?'<span style="font-size:8px;color:var(--purple);font-weight:800;display:block;margin-top:2px">+1 يوم</span>':'';
-    cells+='<div class="cgrid-time-cell'+nextDayCls+'" style="grid-column:1;grid-row:'+(2+s)+'">'+tlabel+nextDayMark+'</div>';
+    let nextDayMark=isNextDay?'<span style="font-size:8px;color:var(--purple);font-weight:800;display:block;margin-top:1px">+1</span>':'';
+    scrollCells+='<div class="cgrid-time-head'+nextDayCls+'" style="grid-column:'+(1+s)+';grid-row:1">'+tlabel+nextDayMark+'</div>';
   }
   // booked cells
   list.forEach(b=>{
@@ -2344,29 +2414,36 @@ function renderCourtGrid(){
     let startIdx=Math.floor(mins/slotMins);
     let span=Math.max(1,Math.round((parseFloat(b.dur)||1)*60/slotMins));
     if(startIdx+span>totalSlots)span=totalSlots-startIdx;
-    let col=1+ct, row=2+startIdx;
+    let row=1+ct, col=1+startIdx;
     let payCls=b.pay?('pay-'+b.pay):'pay-pending';
     let cust=(b.cust||'عميل').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,"\\'");
     let lblTime=fmt12(b.time);
     let isOvernight=mins>=16*60;let overnightCls=isOvernight?' cgrid-slot-overnight':'';
-    cells+='<div class="cgrid-slot cgrid-slot-booked '+payCls+overnightCls+'" data-row="'+row+'" data-col="'+col+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+col+';grid-row:'+row+'/span '+span+'" onclick="openModal(\''+b.id+'\')"><div class="cgrid-slot-inner">'+cust+'<br><span style="font-size:9px;font-weight:500;color:var(--text2)">'+lblTime+'</span></div></div>';
-    for(let i=0;i<span;i++) skip[col+'_'+(2+startIdx+i)]=true;
+    scrollCells+='<div class="cgrid-slot cgrid-slot-booked '+payCls+overnightCls+'" data-row="'+row+'" data-col="'+col+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+col+'/span '+span+';grid-row:'+row+'" onclick="openModal(\''+b.id+'\')"><div class="cgrid-slot-inner">'+cust+'<br><span style="font-size:9px;font-weight:500;color:var(--text2)">'+lblTime+'</span></div></div>';
+    for(let i=0;i<span;i++) skip[ct+'_'+(startIdx+i)]=true;
   });
   // empty slots — drag-to-book via pointer events (v19 F1)
-  for(let s=0;s<totalSlots;s++){
-    let totalMin=startHour*60+s*slotMins;
-    let h24=Math.floor(totalMin/60)%24,m=totalMin%60;
-    let t24=String(h24).padStart(2,'0')+':'+String(m).padStart(2,'0');
-    let row=2+s;
-    for(let c=1;c<=cnt;c++){
-      let col=1+c;
-      if(skip[col+'_'+row])continue;
-      cells+='<div class="cgrid-slot" data-row="'+row+'" data-col="'+col+'" data-court="'+c+'" data-t24="'+t24+'" data-slot-idx="'+s+'" style="grid-column:'+col+';grid-row:'+row+';touch-action:none"><span class="cgrid-slot-add">+</span></div>';
+  for(let c=1;c<=cnt;c++){
+    let row=1+c;
+    for(let s=0;s<totalSlots;s++){
+      if(skip[c+'_'+s])continue;
+      let col=1+s;
+      let totalMin=startHour*60+s*slotMins;
+      let h24=Math.floor(totalMin/60)%24,m=totalMin%60;
+      let t24=String(h24).padStart(2,'0')+':'+String(m).padStart(2,'0');
+      scrollCells+='<div class="cgrid-slot" data-row="'+row+'" data-col="'+col+'" data-court="'+c+'" data-t24="'+t24+'" data-slot-idx="'+s+'" style="grid-column:'+col+';grid-row:'+row+';touch-action:none"><span class="cgrid-slot-add">+</span></div>';
     }
   }
-  let tplCols='60px repeat('+cnt+',minmax(70px,1fr))';
-  let tplRows='34px repeat('+totalSlots+',44px)';
-  el.innerHTML='<div class="cgrid" id="cgridInner" style="grid-template-columns:'+tplCols+';grid-template-rows:'+tplRows+';touch-action:pan-y;user-select:none">'+cells+'</div>';
+  let tplCols='repeat('+totalSlots+',64px)';
+  let tplRows='42px repeat('+cnt+',60px)';
+  let fixedTplRows='42px repeat('+cnt+',60px)';
+  // In RTL flex containers the first child sits on the right edge, so put the
+  // fixed court-labels pane first to pin it visually on the right.
+  el.innerHTML=''+
+    '<div class="cgrid-fixed-col" style="grid-template-rows:'+fixedTplRows+';width:86px">'+fixedCells+'</div>'+
+    '<div class="cgrid-scroll-area" id="cgridScroll">'+
+      '<div class="cgrid" id="cgridInner" style="grid-template-columns:'+tplCols+';grid-template-rows:'+tplRows+';touch-action:pan-x pan-y;user-select:none">'+scrollCells+'</div>'+
+    '</div>';
   el.style.position='relative';
   _attachGridDrag(el);
 }
@@ -2387,13 +2464,14 @@ function _slotFromEvent(e){
   if(!el)return null;
   return {el:el, row:parseInt(el.dataset.row||0), col:parseInt(el.dataset.col||0), court:parseInt(el.dataset.court||0), t24:el.dataset.t24||null, booked:el.dataset.booked==='1'};
 }
-function _slotAtPoint(x,y,startCol){
+// v19 — Horizontal layout: drag spans COLUMNS (time) along the same ROW (court).
+function _slotAtPoint(x,y,startRow){
   let elems=document.elementsFromPoint(x,y);
   for(let i=0;i<elems.length;i++){
     let el=elems[i];
     if(el&&el.classList&&el.classList.contains('cgrid-slot')){
-      let c=parseInt(el.dataset.col||0);
-      if(c!==startCol)return null;
+      let r=parseInt(el.dataset.row||0);
+      if(r!==startRow)return null;
       if(el.dataset.booked==='1')return null;
       return el;
     }
@@ -2405,52 +2483,54 @@ function gridPointerDown(e){
   if(!s||s.booked)return;
   if(document.querySelector('.mini-modal')){closeMini();return;}
   e.preventDefault();
-  gridDrag={active:true,court:s.court,startRow:s.row,endRow:s.row,startCol:s.col,t24:s.t24,startTime:Date.now()};
+  gridDrag={active:true,court:s.court,startRow:s.row,endRow:s.row,startCol:s.col,endCol:s.col,t24:s.t24,startTime:Date.now()};
   _gridHighlight();
   try{ s.el.setPointerCapture&&s.el.setPointerCapture(e.pointerId); }catch(err){}
 }
 function gridPointerMove(e){
   if(!gridDrag.active)return;
-  let cur=_slotAtPoint(e.clientX,e.clientY,gridDrag.startCol);
+  let cur=_slotAtPoint(e.clientX,e.clientY,gridDrag.startRow);
   if(!cur)return;
-  let curRow=parseInt(cur.dataset.row||0);
-  if(!curRow||curRow===gridDrag.endRow)return;
-  // ensure no booked slot in between
-  let lo=Math.min(gridDrag.startRow,curRow), hi=Math.max(gridDrag.startRow,curRow);
+  let curCol=parseInt(cur.dataset.col||0);
+  if(!curCol||curCol===gridDrag.endCol)return;
+  // ensure no booked slot in between (same court row)
+  let lo=Math.min(gridDrag.startCol,curCol), hi=Math.max(gridDrag.startCol,curCol);
   let blocked=false;
   document.querySelectorAll('.cgrid-slot[data-booked="1"]').forEach(function(b){
     let r=parseInt(b.dataset.row||0), c=parseInt(b.dataset.col||0);
-    if(c===gridDrag.startCol && r>=lo && r<=hi)blocked=true;
+    let bSpan=1; // multi-slot bookings cover c..c+span-1 in our flat data-col scheme
+    let gc=b.style.gridColumn||''; let mm=gc.match(/span\s+(\d+)/i); if(mm)bSpan=parseInt(mm[1])||1;
+    if(r!==gridDrag.startRow)return;
+    let cEnd=c+bSpan-1;
+    if(cEnd>=lo && c<=hi)blocked=true;
   });
   if(blocked)return;
-  gridDrag.endRow=curRow;
+  gridDrag.endCol=curCol;
   _gridHighlight();
 }
 function gridPointerUp(e){
   if(!gridDrag.active)return;
-  let lo=Math.min(gridDrag.startRow,gridDrag.endRow), hi=Math.max(gridDrag.startRow,gridDrag.endRow);
+  let lo=Math.min(gridDrag.startCol,gridDrag.endCol), hi=Math.max(gridDrag.startCol,gridDrag.endCol);
   let slots=(hi-lo+1);
   let dur=slots*0.5;
   let elapsed=Date.now()-gridDrag.startTime;
   if(slots===1 && elapsed<300)dur=1;
-  let firstRow=lo, court=gridDrag.court, t24=gridDrag.t24;
-  // If endRow < startRow, t24 stays as startTime (which is gridDrag.t24)
-  // But if user dragged up, the booking starts at endRow (earlier time)
-  if(gridDrag.endRow<gridDrag.startRow){
-    let earlySlot=document.querySelector('.cgrid-slot[data-col="'+gridDrag.startCol+'"][data-row="'+lo+'"]');
+  let startCol=lo, court=gridDrag.court, startRow=gridDrag.startRow, t24=gridDrag.t24;
+  // earliest col = start time; if drag went toward earlier times, re-read t24 from the earliest cell
+  if(gridDrag.endCol<gridDrag.startCol){
+    let earlySlot=document.querySelector('.cgrid-slot[data-row="'+startRow+'"][data-col="'+lo+'"]');
     if(earlySlot&&earlySlot.dataset.t24)t24=earlySlot.dataset.t24;
   }
   _gridClearHighlight();
-  let savedDrag=gridDrag;
   gridDrag={active:false};
-  showMiniModal(t24,court,dur,firstRow,savedDrag.startCol);
+  showMiniModal(t24,court,dur,startRow,startCol);
 }
 function _gridHighlight(){
   _gridClearHighlight();
   if(!gridDrag.active)return;
-  let lo=Math.min(gridDrag.startRow,gridDrag.endRow), hi=Math.max(gridDrag.startRow,gridDrag.endRow);
-  for(let r=lo;r<=hi;r++){
-    let el=document.querySelector('.cgrid-slot[data-col="'+gridDrag.startCol+'"][data-row="'+r+'"]');
+  let lo=Math.min(gridDrag.startCol,gridDrag.endCol), hi=Math.max(gridDrag.startCol,gridDrag.endCol);
+  for(let c=lo;c<=hi;c++){
+    let el=document.querySelector('.cgrid-slot[data-row="'+gridDrag.startRow+'"][data-col="'+c+'"]');
     if(el&&el.dataset.booked!=='1')el.classList.add('cgrid-slot-selecting');
   }
 }
@@ -3147,8 +3227,97 @@ function setCloseMode(m){
   closeMode=m;
   document.getElementById('cmode-bookings').classList.toggle('on',m==='bookings');
   document.getElementById('cmode-manual').classList.toggle('on',m==='manual');
+  var pb=document.getElementById('cmode-period'); if(pb)pb.classList.toggle('on',m==='period');
   document.getElementById('closeMode-bookings').style.display=m==='bookings'?'block':'none';
   document.getElementById('closeMode-manual').style.display=m==='manual'?'block':'none';
+  var pp=document.getElementById('closeMode-period'); if(pp)pp.style.display=m==='period'?'block':'none';
+}
+
+// ========================= PERIOD CLOSING (v19) =========================
+// Calculates expected totals from D.bookings over a date range, lets the user
+// enter what's actually in the till, and shows verdict + day-by-day breakdown.
+function calcPeriodClosing(){
+  var from=document.getElementById('periodFrom').value;
+  var to=document.getElementById('periodTo').value;
+  if(!from||!to||from>to)return;
+  var s=D.settings||{};
+  var priceAM=parseFloat(s.priceAM)||0, pricePM=parseFloat(s.pricePM)||0;
+  var totalHrs=0,totalExpCash=0,totalExpVisa=0,totalExpOT=0;
+  var dayRows='';
+  var cur=new Date(from+'T00:00:00');
+  var endD=new Date(to+'T00:00:00');
+  while(cur<=endD){
+    var y=cur.getFullYear(), mo=String(cur.getMonth()+1).padStart(2,'0'), dd=String(cur.getDate()).padStart(2,'0');
+    var dateKey=y+'-'+mo+'-'+dd;
+    var dayBooks=(D.bookings&&D.bookings[dateKey])?D.bookings[dateKey]:[];
+    var dayHrs=0,dayCash=0,dayVisa=0,dayOT=0;
+    dayBooks.forEach(function(b){
+      var hrs=parseFloat(b.dur)||0; dayHrs+=hrs;
+      var p=parseFloat(b.price)||0;
+      if(b.pay==='cash')dayCash+=p;
+      else if(b.pay==='visa')dayVisa+=p;
+      else if(b.pay==='split'){dayCash+=(parseFloat(b.splitCash)||0); dayVisa+=(parseFloat(b.splitVisa)||0);}
+      // Overtime cost: any hour after 01:00 AM × 1.5 × PM rate (uses existing helper)
+      if(typeof calcOvertimeCost==='function'){
+        try{ dayOT+=calcOvertimeCost(b,priceAM,pricePM)||0; }catch(e){}
+      }
+    });
+    totalHrs+=dayHrs; totalExpCash+=dayCash; totalExpVisa+=dayVisa; totalExpOT+=dayOT;
+    if(dayBooks.length>0){
+      var dayLabel=cur.toLocaleDateString('ar-EG',{weekday:'short',month:'short',day:'numeric'});
+      var dayTotal=dayCash+dayVisa;
+      dayRows+='<div class="rev-row"><span class="lbl">'+dayLabel+'</span><span class="val" style="font-size:12px">'+dayBooks.length+' حجز · '+(dayHrs%1===0?dayHrs:dayHrs.toFixed(1))+'س · '+dayTotal.toLocaleString()+' ج</span></div>';
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  var totalExpected=totalExpCash+totalExpVisa+totalExpOT;
+  document.getElementById('periodExpected').style.display='block';
+  document.getElementById('periodHrs').textContent=(totalHrs%1===0?totalHrs:totalHrs.toFixed(1))+' س';
+  document.getElementById('periodExpCash').textContent=totalExpCash.toLocaleString()+' ج';
+  document.getElementById('periodExpVisa').textContent=totalExpVisa.toLocaleString()+' ج';
+  document.getElementById('periodExpOT').textContent=totalExpOT.toLocaleString()+' ج';
+  document.getElementById('periodExpTotal').textContent=totalExpected.toLocaleString()+' ج';
+  var dbe=document.getElementById('periodDayBreakdown');
+  if(dayRows){dbe.style.display='block'; document.getElementById('periodDayRows').innerHTML=dayRows;}
+  else{dbe.style.display='none';}
+  var actCash=parseFloat(document.getElementById('periodActCash').value)||0;
+  var actVisa=parseFloat(document.getElementById('periodActVisa').value)||0;
+  var actExp=parseFloat(document.getElementById('periodActExp').value)||0;
+  var v=document.getElementById('periodVerdict');
+  if(actCash===0&&actVisa===0){v.style.display='none'; return;}
+  var actGross=actCash+actVisa+actExp;
+  var actNet=actCash+actVisa-actExp;
+  var expectedNet=totalExpected;
+  var diff=actNet-expectedNet;
+  v.style.display='block';
+  var cls,ico,title,sub;
+  if(Math.abs(diff)<5){cls='ok'; ico='✅'; title='تمام — الحسابات متطابقة'; sub='الفترة مغلقة بدون فروق';}
+  else if(diff>0){cls='over'; ico='📈'; title='زيادة '+diff.toLocaleString()+' ج'; sub='الموجود أكتر من المتوقع';}
+  else{cls='under'; ico='📉'; title='عجز '+Math.abs(diff).toLocaleString()+' ج'; sub='الموجود أقل من المتوقع';}
+  v.className='verdict '+cls;
+  document.getElementById('periodVIco').textContent=ico;
+  document.getElementById('periodVTitle').textContent=title;
+  document.getElementById('periodVSub').textContent=sub;
+  document.getElementById('periodVCells').innerHTML=''+
+    '<div class="vcell"><div class="vcell-k">المتوقع الصافي</div><div class="vcell-v">'+expectedNet.toLocaleString()+' ج</div></div>'+
+    '<div class="vcell"><div class="vcell-k">الموجود الصافي</div><div class="vcell-v">'+actNet.toLocaleString()+' ج</div></div>'+
+    '<div class="vcell"><div class="vcell-k">إجمالي الإيراد</div><div class="vcell-v">'+actGross.toLocaleString()+' ج</div></div>'+
+    '<div class="vcell"><div class="vcell-k">المصاريف</div><div class="vcell-v neg">'+actExp.toLocaleString()+' ج</div></div>'+
+    '<div class="vcell net-cell" style="grid-column:1/-1"><div class="vcell-k">الفرق</div><div class="vcell-v '+(diff>=0?'pos':'neg')+'">'+(diff>=0?'+':'')+diff.toLocaleString()+' ج</div></div>';
+}
+function savePeriodClosing(){
+  var from=document.getElementById('periodFrom').value;
+  var to=document.getElementById('periodTo').value;
+  if(!from||!to){showToast('اختار الفترة الأول'); return;}
+  var actCash=parseFloat(document.getElementById('periodActCash').value)||0;
+  var actVisa=parseFloat(document.getElementById('periodActVisa').value)||0;
+  var actExp=parseFloat(document.getElementById('periodActExp').value)||0;
+  var record={id:Date.now(), type:'period', from:from, to:to, actCash:actCash, actVisa:actVisa, actExp:actExp, savedAt:new Date().toISOString()};
+  var closings=[];
+  try{closings=JSON.parse(localStorage.getItem('pmgr_closings')||'[]');}catch(e){closings=[];}
+  closings.push(record);
+  try{localStorage.setItem('pmgr_closings',JSON.stringify(closings));}catch(e){}
+  showToast('✅ تم حفظ تقفيل الفترة');
 }
 
 function onClosingDateChange(){
