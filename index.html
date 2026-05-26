@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Padel MGR v15</title>
-<meta name="theme-color" content="#0fff6e">
+<title>Padel MGR v19</title>
+<meta name="theme-color" content="#185FA5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,42 +16,81 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{
-  --bg:#060c14;--surf:#0b1520;--card:#101d2e;--card2:#162538;
-  --accent:#0fff6e;--accent-dim:rgba(15,255,110,.08);--accent-glow:rgba(15,255,110,.25);
-  --blue:#4db8ff;--blue-dim:rgba(77,184,255,.08);
-  --red:#ff4d4d;--red-dim:rgba(255,77,77,.1);
-  --yellow:#ffd60a;--yellow-dim:rgba(255,214,10,.08);
-  --purple:#c084fc;--purple-dim:rgba(192,132,252,.08);
-  --orange:#ff8c42;--orange-dim:rgba(255,140,66,.1);
-  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,.08);
-  --text:#dde8f5;--muted:#536f8f;
-  --border:rgba(255,255,255,.055);--nav-h:68px;
-  --shadow:rgba(0,0,0,.3);--grid-dot:rgba(15,255,110,.03);
-  --hdr-bg:rgba(6,12,20,.92);--toast-color:#060c14;--accent-solid:#00c853;
+:root {
+  --bg: #060d18;
+  --surf: #0c1626;
+  --card: #101e30;
+  --card2: #162438;
+  --accent: #2d7dd2;
+  --accent-dim: rgba(45,125,210,0.13);
+  --accent-glow: rgba(45,125,210,0.32);
+  --blue: #58c4ff;
+  --blue-dim: rgba(88,196,255,0.10);
+  --red: #E05530;
+  --red-dim: rgba(224,85,48,0.14);
+  --yellow: #f5a623;
+  --yellow-dim: rgba(245,166,35,0.11);
+  --purple: #7b9fd4;
+  --purple-dim: rgba(123,159,212,0.13);
+  --orange: #E05530;
+  --orange-dim: rgba(224,85,48,0.12);
+  --teal: #38d9c0;
+  --teal-dim: rgba(56,217,192,0.10);
+  --text: #f0f6ff;
+  --muted: #6a8aaa;
+  --border: rgba(45,125,210,0.18);
+  --nav-h: 68px;
+  --shadow: rgba(0,0,0,0.45);
+  --grid-dot: rgba(45,125,210,0.05);
+  --hdr-bg: rgba(6,13,24,0.95);
+  --toast-color: #060d18;
+  --accent-solid: #2d7dd2;
 }
-[data-theme="light"]{
-  --bg:#f0f4f8;--surf:#ffffff;--card:#ffffff;--card2:#f5f8fb;
-  --accent:#00a651;--accent-dim:rgba(0,166,81,.08);--accent-glow:rgba(0,166,81,.2);
-  --blue:#1a7fc4;--blue-dim:rgba(26,127,196,.08);
-  --red:#e03131;--red-dim:rgba(224,49,49,.08);
-  --yellow:#c68000;--yellow-dim:rgba(198,128,0,.08);
-  --purple:#9333ea;--purple-dim:rgba(147,51,234,.08);
-  --orange:#d46a00;--orange-dim:rgba(212,106,0,.08);
-  --teal:#0d9488;--teal-dim:rgba(13,148,136,.08);
-  --text:#1a2533;--muted:#6b8299;
-  --border:rgba(0,0,0,.09);--shadow:rgba(0,0,0,.08);
-  --grid-dot:rgba(0,166,81,.04);--hdr-bg:rgba(240,244,248,.95);
-  --toast-color:#ffffff;--accent-solid:#00a651;
+
+[data-theme="light"] {
+  --bg: #F1EFE8;
+  --surf: #ffffff;
+  --card: #ffffff;
+  --card2: #f5f3ec;
+  --accent: #185FA5;
+  --accent-dim: rgba(24,95,165,0.09);
+  --accent-glow: rgba(24,95,165,0.22);
+  --blue: #2d7dd2;
+  --blue-dim: rgba(45,125,210,0.09);
+  --red: #D85A30;
+  --red-dim: rgba(216,90,48,0.09);
+  --yellow: #c17a00;
+  --yellow-dim: rgba(193,122,0,0.09);
+  --purple: #185FA5;
+  --purple-dim: rgba(24,95,165,0.09);
+  --orange: #D85A30;
+  --orange-dim: rgba(216,90,48,0.09);
+  --teal: #0d9488;
+  --teal-dim: rgba(13,148,136,0.08);
+  --text: #1a2533;
+  --muted: #6b7e94;
+  --border: rgba(0,0,0,0.09);
+  --shadow: rgba(0,0,0,0.07);
+  --grid-dot: rgba(24,95,165,0.04);
+  --hdr-bg: rgba(241,239,232,0.96);
+  --toast-color: #F1EFE8;
+  --accent-solid: #185FA5;
 }
+
+/* Dark mode visibility fixes */
+:root:not([data-theme="light"]) body::before{background-image:radial-gradient(circle at 1px 1px,rgba(45,125,210,0.06) 1px,transparent 0)!important;}
+:root:not([data-theme="light"]) .stat-v,
+:root:not([data-theme="light"]) .day-kpi-v,
+:root:not([data-theme="light"]) .acad-kpi-v{text-shadow:0 0 20px currentColor;opacity:1;}
+:root:not([data-theme="light"]) .stat-v{text-shadow:0 0 20px currentColor;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);transition:background .3s,color .3s;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);transition:background .3s,color .3s;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 1px 1px,var(--grid-dot) 1px,transparent 0);background-size:28px 28px;pointer-events:none;z-index:0;}
 #app{position:relative;z-index:1}
 .hdr{position:sticky;top:0;z-index:100;background:var(--hdr-bg);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;}
-.hdr-logo{font-size:20px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--accent),#00c4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.hdr-logo em{font-style:normal;-webkit-text-fill-color:rgba(128,128,128,.5);font-weight:400}
+.hdr-logo{font-size:20px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#2d7dd2,#E05530);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr-logo em{font-style:normal;-webkit-text-fill-color:var(--muted);color:var(--muted);font-weight:400}
 .hdr-right{display:flex;align-items:center;gap:7px;}
 .hdr-meta{font-size:10px;color:var(--muted);text-align:left;line-height:1.5}
 .theme-btn,.lang-btn{background:var(--card);border:1px solid var(--border);border-radius:50%;width:33px;height:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;font-weight:900;font-family:'Cairo',sans-serif;transition:all .2s;flex-shrink:0;color:var(--text);}
@@ -59,21 +98,21 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .scanner{display:none;margin:10px 14px;padding:10px 14px;background:var(--accent-dim);border:1px solid rgba(15,255,110,.35);border-radius:12px;font-size:12px;color:var(--accent);text-align:center;animation:scanPulse 2s infinite;}
 [data-theme="light"] .scanner{border-color:rgba(0,166,81,.35);}
 @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.65}}
-.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surf);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 20px var(--shadow);transition:background .3s;}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surf);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 20px var(--shadow);transition:background .3s;padding-bottom:env(safe-area-inset-bottom);}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'Cairo',sans-serif;font-size:8px;font-weight:700;transition:color .2s;padding-bottom:4px;position:relative;}
 .nbtn .nico{font-size:17px;line-height:1;transition:transform .2s}
 .nbtn.active{color:var(--accent)}.nbtn.active .nico{transform:scale(1.15)}
 .nbtn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:3px;background:var(--accent);border-radius:2px 2px 0 0;}
 .tab{display:none;padding:12px 14px}.tab.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);border:1px solid var(--border);}
 .card-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;}
-.sb{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);}
+.sb{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);border:1px solid var(--border);}
 .sb-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;gap:10px;}
 .sb-top:active{background:var(--card2)}.sb-top-lbl{font-size:12px;font-weight:700;flex-shrink:0}
 .sb-top-val{font-size:11px;color:var(--accent);flex:1;text-align:center}
 .sb-chevron{color:var(--muted);font-size:16px;transition:transform .2s;flex-shrink:0}
 .sb-body{padding:0 14px 14px;display:none}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 6px;text-align:center;box-shadow:0 2px 6px var(--shadow);}
 .stat-v{font-size:19px;font-weight:800;line-height:1.1}.stat-l{font-size:9px;color:var(--muted);margin-top:3px;font-weight:700;letter-spacing:.5px}
 .pending-alert{background:var(--red-dim);border:1px solid rgba(224,49,49,.35);border-radius:12px;padding:9px 14px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--red);text-align:center;cursor:pointer;animation:alertPulse 2s infinite;}
@@ -87,7 +126,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .filter-bar::-webkit-scrollbar{display:none}
 .fbtn{flex-shrink:0;padding:6px 13px;border-radius:50px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .fbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
-.bitem{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease;border-right-width:3px;box-shadow:0 2px 8px var(--shadow);}
+.bitem{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease;border-right-width:4px;box-shadow:0 2px 8px var(--shadow);}
 .bitem.c1{border-right-color:rgba(15,255,110,.7)}.bitem.c2{border-right-color:rgba(77,184,255,.7)}.bitem.c3{border-right-color:rgba(255,214,10,.7)}.bitem.c4{border-right-color:rgba(255,77,77,.7)}
 [data-theme="light"] .bitem.c1{border-right-color:rgba(0,166,81,.8)}
 .bitem.overdue{border-color:rgba(224,49,49,.5);background:rgba(224,49,49,.04)}
@@ -111,12 +150,12 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .fab:active{transform:scale(.92)}.fab-hidden{display:none!important}
 .moverlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
 .moverlay.open{opacity:1;pointer-events:all}
-.msheet{width:100%;background:var(--surf);border-radius:24px 24px 0 0;padding:0 16px 34px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:94vh;overflow-y:auto;}
+.msheet{width:100%;background:var(--surf);border-radius:24px 24px 0 0;padding:0 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:94vh;overflow-y:auto;}
 .moverlay.open .msheet{transform:translateY(0)}.mhandle{width:36px;height:4px;background:var(--muted);border-radius:2px;margin:12px auto 18px;opacity:.4}
 .mtitle{font-size:17px;font-weight:800;margin-bottom:16px}
 .fg{margin-bottom:13px}.flbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.8px;display:block;margin-bottom:6px;}
-.fi{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;color:var(--text);font-family:'Cairo',sans-serif;font-size:15px;outline:none;transition:border-color .2s;}
-.fi:focus{border-color:var(--accent)}.fi::placeholder{color:var(--muted)}select.fi{cursor:pointer}
+.fi{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;color:var(--text);font-family:'Cairo',sans-serif;font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s;}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}.fi::placeholder{color:var(--muted)}select.fi{cursor:pointer}
 .ipair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.iwrap{display:flex;flex-direction:column;gap:6px}
 .bgr{display:flex;gap:6px;flex-wrap:wrap}
 .bc{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;min-width:44px;}
@@ -365,9 +404,19 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   .bnav{max-width:560px;left:50%;transform:translateX(-50%);right:auto;border-radius:16px 16px 0 0;}
   .fab{right:calc(50% - 280px + 16px);}.fab-menu{right:calc(50% - 280px + 16px);}
   .moverlay{align-items:center;}.msheet{border-radius:20px;max-width:520px;margin:auto;}
-  .stats,.acad-stats-grid{grid-template-columns:repeat(4,1fr);}
+  .acad-stats-grid{grid-template-columns:repeat(4,1fr);}
   .day-grid{grid-template-columns:repeat(4,1fr);}
   .inv-kpi-grid{grid-template-columns:repeat(3,1fr);}
+}
+
+/* ===== v19 UX POLISH ===== */
+.btn,.btn-blue,.btn-green,.btn-ghost,.btn-purple,.btn-orange{min-height:44px;min-width:44px;}
+.mode-btn{min-height:44px;}
+.fbtn{min-height:36px;}
+.theme-btn,.lang-btn{min-width:44px;min-height:44px;width:44px;height:44px;}
+@media (hover:hover){
+  .bitem:hover,.cust-card:hover{border-color:var(--accent);transition:border-color .2s;}
+  .stat:hover,.card:hover{border-color:var(--accent);transition:border-color .2s;}
 }
 </style>
 </head>
@@ -379,7 +428,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 <div id="licenseScreen" style="display:none;position:fixed;inset:0;z-index:999999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
   <div style="text-align:center;width:340px;max-width:90vw">
     <div style="font-size:42px;margin-bottom:8px">🔑</div>
-    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em style="font-style:normal;color:var(--muted)">MGR v15</em></div>
+    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em style="font-style:normal;color:var(--muted)">MGR v19</em></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:24px">تفعيل الترخيص</div>
     <div style="background:var(--accent-dim);border:1px solid rgba(15,255,110,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--accent)">🔐 أدخل مفتاح الترخيص للوصول إلى التطبيق</div>
     <input type="text" id="licenseKeyInput" class="fi" placeholder="XXXX-XXXX-XXXX-XXXX" style="text-align:center;font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:12px;padding:14px;direction:ltr" onkeydown="if(event.key==='Enter')activateLicense()">
@@ -394,7 +443,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 <div id="loginScreen" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;font-family:Cairo,sans-serif">
   <div style="text-align:center;width:320px;max-width:90vw">
     <div style="font-size:42px;margin-bottom:8px">🏸</div>
-    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em>MGR v15</em></div>
+    <div style="font-size:24px;font-weight:900;color:var(--accent);margin-bottom:4px">Padel <em>MGR v19</em></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:28px">إدارة ملاعب البادل</div>
     <div id="loginSetupMsg" style="display:none;background:var(--accent-dim);border:1px solid rgba(15,255,110,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--accent)">🔐 أول مرة؟ اكتب باسورد جديد لحماية التطبيق</div>
     <input type="password" id="loginPass" class="fi" placeholder="الباسورد..." style="text-align:center;font-size:16px;margin-bottom:12px;padding:14px" onkeydown="if(event.key==='Enter')doLogin()">
@@ -408,7 +457,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-logo">Padel <em>MGR v15</em></div>
+  <div class="hdr-logo">Padel <em>MGR v19</em></div>
   <div class="hdr-right">
     <div class="hdr-meta" id="hdrMeta"></div>
     <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
@@ -449,6 +498,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
     <div class="stat"><div class="stat-v" id="s-hours" style="color:var(--accent)">0</div><div class="stat-l" id="lbl-hours">ساعات</div></div>
     <div class="stat"><div class="stat-v" id="s-cash" style="color:var(--accent)">0</div><div class="stat-l" id="lbl-cash">كاش ج</div></div>
     <div class="stat"><div class="stat-v" id="s-visa" style="color:var(--blue)">0</div><div class="stat-l" id="lbl-visa">فيزا ج</div></div>
+    <div class="stat"><div class="stat-v" id="s-overtime" style="color:var(--orange)">0</div><div class="stat-l" id="lbl-overtime">أوفر تايم ج</div></div>
   </div>
   <div class="pending-alert" id="pendingAlert" style="display:none" onclick="scrollToPending()"></div>
   <div class="dnav">
@@ -525,6 +575,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
   <div class="mode-switch">
     <button class="mode-btn on" id="cmode-bookings" onclick="setCloseMode('bookings')">📋 من الحجوزات</button>
     <button class="mode-btn" id="cmode-manual" onclick="setCloseMode('manual')">🧮 حساب يدوي</button>
+    <button class="mode-btn" id="cmode-period" onclick="setCloseMode('period')">📆 فترة</button>
   </div>
   <div class="cl-date-bar">
     <span style="font-size:20px">📅</span>
@@ -686,6 +737,93 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
       <button onclick="resetCalc()" class="btn btn-ghost">↺ إعادة ضبط</button>
       <button onclick="saveClosing('man')" class="btn btn-green">💾 حفظ التقفيل</button>
     </div>
+  </div>
+
+  <!-- PERIOD MODE (v19) -->
+  <div id="closeMode-period" style="display:none">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="iwrap">
+        <span class="flbl">من تاريخ</span>
+        <input class="fi" type="date" id="periodFrom" onchange="calcPeriodClosing()">
+      </div>
+      <div class="iwrap">
+        <span class="flbl">إلى تاريخ</span>
+        <input class="fi" type="date" id="periodTo" onchange="calcPeriodClosing()">
+      </div>
+    </div>
+
+    <!-- System expected from bookings -->
+    <div class="rev-breakdown" id="periodExpected" style="display:none">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
+        📊 المتوقع من الحجوزات
+      </div>
+      <div class="rev-row">
+        <span class="lbl">⏱ إجمالي الساعات</span>
+        <span class="val" id="periodHrs">0 س</span>
+      </div>
+      <div class="rev-row">
+        <span class="lbl">💵 كاش متوقع</span>
+        <span class="val" id="periodExpCash" style="color:var(--accent)">0 ج</span>
+      </div>
+      <div class="rev-row">
+        <span class="lbl">💳 فيزا متوقع</span>
+        <span class="val" id="periodExpVisa" style="color:var(--blue)">0 ج</span>
+      </div>
+      <div class="rev-row">
+        <span class="lbl">🔴 أوفر تايم متوقع</span>
+        <span class="val" id="periodExpOT" style="color:var(--orange)">0 ج</span>
+      </div>
+      <div class="rev-row rev-total-row">
+        <span class="lbl">💰 الإجمالي المتوقع</span>
+        <span class="val" id="periodExpTotal" style="color:var(--yellow)">0 ج</span>
+      </div>
+    </div>
+
+    <!-- Actual manual input -->
+    <div style="font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;margin-top:14px">
+      📥 الإدخال الفعلي للفترة
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="ibox g">
+        <label style="color:var(--accent)">💵 كاش</label>
+        <input type="number" id="periodActCash" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()">
+      </div>
+      <div class="ibox b">
+        <label style="color:var(--blue)">💳 فيزا</label>
+        <input type="number" id="periodActVisa" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()">
+      </div>
+      <div class="ibox r">
+        <label style="color:var(--red)">🔴 مصاريف</label>
+        <input type="number" id="periodActExp" placeholder="0" inputmode="numeric" oninput="calcPeriodClosing()">
+      </div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="verdict" id="periodVerdict">
+      <div class="verdict-hdr">
+        <div class="verdict-icon" id="periodVIco"></div>
+        <div>
+          <div class="verdict-title" id="periodVTitle"></div>
+          <div class="verdict-sub" id="periodVSub"></div>
+        </div>
+      </div>
+      <div class="verdict-cells" id="periodVCells"></div>
+      <div id="periodVPills"></div>
+    </div>
+
+    <!-- Day breakdown table -->
+    <div class="rev-breakdown" id="periodDayBreakdown" style="display:none;margin-top:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
+        📅 تفصيل يوم بيوم
+      </div>
+      <div id="periodDayRows"></div>
+    </div>
+
+    <button onclick="savePeriodClosing()" class="btn btn-blue" style="margin-top:12px">
+      💾 حفظ تقفيل الفترة
+    </button>
+
   </div>
 </div>
 
@@ -1296,19 +1434,60 @@ function updateDNav(){
 
 function setFilter(f,btn){ activeFilter=f; document.querySelectorAll('#tab-bookings .fbtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderBooks(); }
 
+// ========================= OVERTIME (v19) =========================
+// Overtime = any booking hour that runs past 01:00 AM the following day.
+// Threshold expressed on a post-midnight scale: 25 = 1:00 AM next day.
+function timeStrTo24(timeStr){
+  // Accepts "HH:MM" (24h) OR "h:mm AM/PM"
+  if(!timeStr)return 0;
+  let s=String(timeStr).trim();
+  if(/AM|PM|am|pm/.test(s)){
+    let parts=s.split(/\s+/);
+    let time=parts[0]; let period=(parts[1]||'').toUpperCase();
+    let [h,m]=time.split(':').map(Number); m=m||0;
+    if(period==='PM'&&h!==12)h+=12;
+    if(period==='AM'&&h===12)h=0;
+    return h+m/60;
+  }
+  let [h,m]=s.split(':').map(Number); m=m||0;
+  return (h||0)+m/60;
+}
+function calcOvertimeHours(startTime24,endTime24){
+  const OT_START=25; // 01:00 AM next day
+  let start=startTime24, end=endTime24;
+  if(end<=start)end+=24;
+  // Treat evening starts (>=12) on a post-midnight scale by adding 24 when relevant.
+  const normStart=start<12?start+24:start;
+  const normEnd=end<12?end+24:(end<=start?end+24:end);
+  if(normEnd<=OT_START)return 0;
+  if(normStart>=OT_START)return normEnd-normStart;
+  return normEnd-OT_START;
+}
+function calcOvertimeCost(b,priceAM,pricePM){
+  const baseRate=pricePM||priceAM||0;
+  const startDec=timeStrTo24(b.time);
+  const dur=parseFloat(b.dur)||0;
+  const endDec=startDec+dur;
+  const otHours=calcOvertimeHours(startDec,endDec);
+  return { hours: otHours, cost: otHours*baseRate*1.5 };
+}
+
 function renderBooks(){
   updateDNav();
   let allList=booksFor(curDate), today=ymd(new Date());
-  let hrs=0,cash=0,visa=0;
+  let hrs=0,cash=0,visa=0,otTotal=0;
+  let priceAM=parseFloat((D.settings||{}).priceAM)||0, pricePM=parseFloat((D.settings||{}).pricePM)||0;
   allList.forEach(b=>{
     hrs+=parseFloat(b.dur)||0; let p=parseFloat(b.price)||0;
     if(b.pay==='cash')cash+=p;
     else if(b.pay==='visa')visa+=p;
     else if(b.pay==='split'){cash+=(parseFloat(b.splitCash)||0);visa+=(parseFloat(b.splitVisa)||0);}
+    otTotal+=calcOvertimeCost(b,priceAM,pricePM).cost;
   });
   document.getElementById('s-hours').textContent=hrs%1===0?hrs:hrs.toFixed(1);
   document.getElementById('s-cash').textContent=cash.toLocaleString();
   document.getElementById('s-visa').textContent=visa.toLocaleString();
+  let otEl=document.getElementById('s-overtime'); if(otEl)otEl.textContent=Math.round(otTotal).toLocaleString();
   let isFuturePage=curDate>today;
   let pending=allList.filter(b=>!b.pay&&!isFuturePage);
   let pa=document.getElementById('pendingAlert');
@@ -1334,6 +1513,8 @@ function renderBooks(){
     let priceColor=b.pay==='visa'?'var(--blue)':b.pay==='split'?'var(--purple)':b.pay==='cash'?'var(--accent)':'var(--muted)';
     let qpayBtn=io?'<button class="bact pay" onclick="openQpay(\''+b.id+'\')" title="تسديد الآن">💳</button>':'';
     let expNote=(b.expenses&&b.expenses.length)?'<div class="bnotes" style="color:var(--red)">🔴 مصاريف: '+(b.expenses.reduce(function(s,e){return s+(parseFloat(e.amt)||0);},0)).toLocaleString()+' ج</div>':'';
+    let otInfo=calcOvertimeCost(b,priceAM,pricePM);
+    let otBadge=otInfo.hours>0?'<span class="badge" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(224,85,48,0.3)">OT: '+(otInfo.hours%1===0?otInfo.hours:otInfo.hours.toFixed(1))+'س</span>':'';
     return '<div class="bitem c'+b.court+' '+(io?'overdue':'')+'" id="bi_'+b.id+'">'
       +'<div class="btcol"><div class="bts">'+fmt12(b.time)+'</div><div class="bte">'+fmt12(et)+'</div></div>'
       +'<div class="binfo" onclick="openRcptModal(\''+b.id+'\')">'
@@ -1343,7 +1524,7 @@ function renderBooks(){
       +(b.notes?'<div class="bnotes">💬 '+b.notes+'</div>':'')+expNote
       +'</div>'
       +'<div class="bright"><div class="bprice" style="color:'+priceColor+'">'+price.toLocaleString()+' ج</div>'
-      +(dep>0?'<div class="brem">باقي: '+rem+' ج</div>':'')+badge+'</div>'
+      +(dep>0?'<div class="brem">باقي: '+rem+' ج</div>':'')+badge+otBadge+'</div>'
       +'<div class="bacts">'+qpayBtn
       +'<button class="bact edit" onclick="openModal(\''+b.id+'\')" title="تعديل">✏️</button>'
       +'<button class="bact del" onclick="delBook(\''+b.id+'\')" title="حذف">×</button>'
@@ -1595,12 +1776,15 @@ function openRcptModal(id){
   let dep=parseFloat(b.deposit)||0,price=parseFloat(b.price)||0,rem=Math.max(0,price-dep),et=endT(b.time,b.dur);
   let payStr=b.pay==='cash'?'💵 كاش':b.pay==='visa'?'💳 فيزا':b.pay==='split'?'🔗 كاش '+(b.splitCash||0)+' + فيزا '+(b.splitVisa||0)+' ج':'⏳ معلق';
   let dateStr=bDate?formatDateAr(bDate):'';
+  let _pAM=parseFloat((D.settings||{}).priceAM)||0,_pPM=parseFloat((D.settings||{}).pricePM)||0;
+  let _ot=calcOvertimeCost(b,_pAM,_pPM);
   let rows=[['👤 العميل',b.cust||'—'],['📞 الهاتف',b.phone||'—'],['🏟️ الملعب','ملعب '+b.court],['⏰ الجلسة',fmt12(b.time)+' ← '+fmt12(et)],['⌛ المدة',durLbl(b.dur)],['💳 طريقة الدفع',payStr]];
   document.getElementById('rcptContent').innerHTML=
     '<div style="text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">'
     +'<div style="font-size:18px;font-weight:900;color:var(--accent)">🏸 '+(D.settings.clubName||'Padel MGR')+'</div>'
     +'<div style="font-size:12px;color:var(--muted);margin-top:3px">'+dateStr+'</div></div>'
     +rows.map(r=>'<div class="rcpt-row"><span class="lbl">'+r[0]+'</span><span class="val">'+r[1]+'</span></div>').join('')
+    +(_ot.hours>0?'<div class="rcpt-row"><span class="lbl">🔴 أوفر تايم</span><span class="val" style="color:var(--orange)">'+(_ot.hours%1===0?_ot.hours:_ot.hours.toFixed(1))+'س · '+Math.round(_ot.cost).toLocaleString()+' ج</span></div>':'')
     +'<div style="border-top:2px solid var(--border);margin-top:10px;padding-top:10px">'
     +'<div class="rcpt-row"><span class="lbl" style="font-weight:800">💰 الإجمالي</span><span class="val" style="color:var(--accent);font-size:18px">'+price.toLocaleString()+' ج</span></div>'
     +(dep>0?'<div class="rcpt-row"><span class="lbl">💵 العربون</span><span class="val" style="color:var(--yellow)">'+dep+' ج</span></div><div class="rcpt-row"><span class="lbl">📌 المتبقي</span><span class="val" style="color:var(--red)">'+rem+' ج</span></div>':'')
@@ -1673,8 +1857,10 @@ function setCloseMode(m){
   closeMode=m;
   document.getElementById('cmode-bookings').classList.toggle('on',m==='bookings');
   document.getElementById('cmode-manual').classList.toggle('on',m==='manual');
+  let pBtn=document.getElementById('cmode-period'); if(pBtn)pBtn.classList.toggle('on',m==='period');
   document.getElementById('closeMode-bookings').style.display=m==='bookings'?'block':'none';
   document.getElementById('closeMode-manual').style.display=m==='manual'?'block':'none';
+  let pPane=document.getElementById('closeMode-period'); if(pPane)pPane.style.display=m==='period'?'block':'none';
 }
 
 function onClosingDateChange(){
@@ -1750,6 +1936,131 @@ function saveClosing(mode){
   if(expList.length) D.dayExpenses[dv]=expList;
   D.closings.unshift({id:'cl_'+Date.now(),ts:Date.now(),date:dv,cash:actCash,visa:actVisa,expenses:actExpInput,detailedExpenses:detailedExpT,grossRevenue:grossRev,net,mode,expList});
   saveData(); renderHistory(); showToast('تم حفظ التقفيل ✓ 💾');
+}
+
+// ========================= PERIOD CLOSING (v19) =========================
+function calcPeriodClosing(){
+  const from = document.getElementById('periodFrom').value;
+  const to = document.getElementById('periodTo').value;
+  if(!from || !to || from > to) return;
+
+  const fromD = new Date(from);
+  const toD = new Date(to);
+  const priceAM = parseFloat((D.settings||{}).priceAM) || 0;
+  const pricePM = parseFloat((D.settings||{}).pricePM) || 0;
+
+  let totalHrs = 0, totalExpCash = 0, totalExpVisa = 0, totalExpOT = 0;
+  let dayRows = '';
+
+  let cur = new Date(fromD);
+  while(cur <= toD){
+    const dateKey = ymd(cur);
+    const dayBookings = (D.bookings && D.bookings[dateKey]) ? D.bookings[dateKey] : [];
+
+    let dayHrs = 0, dayCash = 0, dayVisa = 0, dayOT = 0;
+    dayBookings.forEach(b=>{
+      const hrs = parseFloat(b.dur) || 0;
+      dayHrs += hrs;
+      const price = parseFloat(b.price) || 0;
+      if(b.pay === 'visa') dayVisa += price;
+      else if(b.pay === 'split'){ dayCash += (parseFloat(b.splitCash)||0); dayVisa += (parseFloat(b.splitVisa)||0); }
+      else if(b.pay === 'cash') dayCash += price;
+      dayOT += calcOvertimeCost(b, priceAM, pricePM).cost;
+    });
+
+    totalHrs += dayHrs;
+    totalExpCash += dayCash;
+    totalExpVisa += dayVisa;
+    totalExpOT += dayOT;
+
+    if(dayBookings.length > 0){
+      const dayLabel = cur.toLocaleDateString('ar-EG', { weekday:'short', month:'short', day:'numeric' });
+      const dayTotal = dayCash + dayVisa;
+      dayRows += '<div class="rev-row"><span class="lbl">'+dayLabel+'</span>'
+        +'<span class="val" style="font-size:12px">'+dayBookings.length+' حجز · '+(dayHrs%1===0?dayHrs:dayHrs.toFixed(1))+'س · '+dayTotal.toLocaleString()+' ج</span></div>';
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+
+  const totalExpected = totalExpCash + totalExpVisa + totalExpOT;
+
+  document.getElementById('periodExpected').style.display = 'block';
+  document.getElementById('periodHrs').textContent = (totalHrs%1===0?totalHrs:totalHrs.toFixed(1))+' س';
+  document.getElementById('periodExpCash').textContent = Math.round(totalExpCash).toLocaleString()+' ج';
+  document.getElementById('periodExpVisa').textContent = Math.round(totalExpVisa).toLocaleString()+' ج';
+  document.getElementById('periodExpOT').textContent = Math.round(totalExpOT).toLocaleString()+' ج';
+  document.getElementById('periodExpTotal').textContent = Math.round(totalExpected).toLocaleString()+' ج';
+
+  if(dayRows){
+    document.getElementById('periodDayBreakdown').style.display = 'block';
+    document.getElementById('periodDayRows').innerHTML = dayRows;
+  } else {
+    document.getElementById('periodDayBreakdown').style.display = 'none';
+    document.getElementById('periodDayRows').innerHTML = '';
+  }
+
+  const actCash = parseFloat(document.getElementById('periodActCash').value) || 0;
+  const actVisa = parseFloat(document.getElementById('periodActVisa').value) || 0;
+  const actExp = parseFloat(document.getElementById('periodActExp').value) || 0;
+
+  if(actCash === 0 && actVisa === 0){
+    document.getElementById('periodVerdict').style.display = 'none';
+    return;
+  }
+
+  const actGross = actCash + actVisa + actExp;
+  const actNet = actCash + actVisa - actExp;
+  const expectedNet = totalExpected;
+  const diff = actNet - expectedNet;
+
+  const verdictEl = document.getElementById('periodVerdict');
+  verdictEl.style.display = 'block';
+
+  let cls, ico, title, sub;
+  if(Math.abs(diff) < 5){
+    cls = 'ok'; ico = '✅'; title = 'تمام — الحسابات متطابقة';
+    sub = 'الفترة مغلقة بدون فروق';
+  } else if(diff > 0){
+    cls = 'over'; ico = '📈'; title = 'زيادة '+Math.round(diff).toLocaleString()+' ج';
+    sub = 'الموجود أكتر من المتوقع';
+  } else {
+    cls = 'under'; ico = '📉'; title = 'عجز '+Math.round(Math.abs(diff)).toLocaleString()+' ج';
+    sub = 'الموجود أقل من المتوقع';
+  }
+
+  verdictEl.className = 'verdict '+cls;
+  document.getElementById('periodVIco').textContent = ico;
+  document.getElementById('periodVTitle').textContent = title;
+  document.getElementById('periodVSub').textContent = sub;
+  document.getElementById('periodVCells').innerHTML =
+    '<div class="vcell"><div class="vcell-k">المتوقع الصافي</div><div class="vcell-v">'+Math.round(expectedNet).toLocaleString()+' ج</div></div>'
+    +'<div class="vcell"><div class="vcell-k">الموجود الصافي</div><div class="vcell-v">'+Math.round(actNet).toLocaleString()+' ج</div></div>'
+    +'<div class="vcell"><div class="vcell-k">إجمالي الإيراد</div><div class="vcell-v">'+Math.round(actGross).toLocaleString()+' ج</div></div>'
+    +'<div class="vcell"><div class="vcell-k">المصاريف</div><div class="vcell-v neg">'+Math.round(actExp).toLocaleString()+' ج</div></div>'
+    +'<div class="vcell net-cell" style="grid-column:1/-1"><div class="vcell-k">الفرق</div>'
+    +'<div class="vcell-v '+(diff>=0?'pos':'neg')+'">'+(diff>=0?'+':'')+Math.round(diff).toLocaleString()+' ج</div></div>';
+}
+
+function savePeriodClosing(){
+  const from = document.getElementById('periodFrom').value;
+  const to = document.getElementById('periodTo').value;
+  const actCash = parseFloat(document.getElementById('periodActCash').value) || 0;
+  const actVisa = parseFloat(document.getElementById('periodActVisa').value) || 0;
+  const actExp = parseFloat(document.getElementById('periodActExp').value) || 0;
+  if(!from || !to){ showToast('اختار الفترة الأول','#e03131'); return; }
+
+  const record = {
+    id: Date.now(),
+    type: 'period',
+    from: from, to: to,
+    actCash: actCash, actVisa: actVisa, actExp: actExp,
+    savedAt: new Date().toISOString()
+  };
+
+  const closings = JSON.parse(localStorage.getItem('pmgr_closings') || '[]');
+  closings.push(record);
+  localStorage.setItem('pmgr_closings', JSON.stringify(closings));
+  showToast('✅ تم حفظ تقفيل الفترة');
 }
 
 // MANUAL CALC
