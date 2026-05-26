@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Padel MGR v19</title>
+<title>Padel MGR v20</title>
 <meta name="theme-color" content="#185FA5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,20 +23,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  /* === V19 Blue/Orange Palette — Dark Mode === */
+  /* === V20 Padel Finder Palette — Dark Mode === */
   --bg:#060d18;
   --surface:#0c1626;
-  --card:#101e30;
+  --card:#0f1a2e;
   --card2:#162438;
-  --primary:#2d7dd2;          /* Blue — main accent */
+  --primary:#2d7dd2;          /* Secondary blue — main accent */
   --primary-dim:rgba(45,125,210,.13);
   --primary-glow:rgba(45,125,210,.32);
   --primary-solid:#2d7dd2;
+  --primary-deep:#185FA5;     /* Deep blue */
   --text:#f0f6ff;
   --text2:#6a8aaa;
   --border:rgba(45,125,210,.18);
-  --success:#34D399;          /* Emerald */
-  --success-dim:rgba(52,211,153,.10);
+  --booked:#22c55e;           /* Booked green (lighter for dark mode contrast) */
+  --booked-dim:rgba(34,197,94,.16);
+  --success:#22c55e;
+  --success-dim:rgba(34,197,94,.12);
   --danger:#E05530;           /* Coral red */
   --danger-dim:rgba(224,85,48,.14);
   --warning:#f5a623;          /* Amber */
@@ -67,20 +70,23 @@
   --yellow-dim:var(--warning-dim);
 }
 [data-theme="light"]{
-  /* === V19 Blue/Orange Palette — Light Mode === */
-  --bg:#F1EFE8;
+  /* === V20 Padel Finder Palette — Light Mode === */
+  --bg:#f0f4f8;
   --surface:#ffffff;
   --card:#ffffff;
-  --card2:#f5f3ec;
+  --card2:#f1f5fa;
   --primary:#185FA5;          /* Deep blue */
   --primary-dim:rgba(24,95,165,.09);
   --primary-glow:rgba(24,95,165,.22);
   --primary-solid:#185FA5;
+  --primary-deep:#0d4a85;
   --text:#1a2533;
   --text2:#6b7e94;
-  --border:rgba(0,0,0,.09);
-  --success:#059669;
-  --success-dim:rgba(5,150,105,.08);
+  --border:rgba(24,95,165,.12);
+  --booked:#1e8c45;           /* Booked green */
+  --booked-dim:rgba(30,140,69,.12);
+  --success:#1e8c45;
+  --success-dim:rgba(30,140,69,.10);
   --danger:#D85A30;
   --danger-dim:rgba(216,90,48,.09);
   --warning:#c17a00;
@@ -92,9 +98,9 @@
   --orange:#D85A30;
   --orange-dim:rgba(216,90,48,.09);
   --shadow:rgba(0,0,0,.07);
-  --hdr-bg:rgba(241,239,232,.96);
+  --hdr-bg:rgba(240,244,248,.96);
   --grid-dot:rgba(24,95,165,.04);
-  --toast-color:#F1EFE8;
+  --toast-color:#1a2533;
   /* === Legacy aliases === */
   --surf:var(--surface);
   --accent:var(--primary);
@@ -111,10 +117,10 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
-body{font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);transition:background .3s,color .3s;}
+body{font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:var(--nav-h);transition:background .3s,color .3s;line-height:1.6;font-weight:400;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 12% 10%,var(--primary-dim) 0%,transparent 35%),radial-gradient(circle at 88% 90%,var(--purple-dim) 0%,transparent 38%);pointer-events:none;z-index:0;}
 #app{position:relative;z-index:1}
-.hdr{position:sticky;top:0;z-index:100;background:var(--hdr-bg);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;}
+.hdr{position:sticky;top:0;z-index:100;background:var(--hdr-bg);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;min-height:52px;}
 .hdr-logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--primary);}
 .hdr-logo em{font-style:normal;-webkit-text-fill-color:rgba(128,128,128,.5);font-weight:400}
 .hdr-right{display:flex;align-items:center;gap:7px;}
@@ -124,11 +130,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .scanner{display:none;margin:10px 14px;padding:10px 14px;background:var(--primary-dim);border:1px solid var(--primary);border-radius:12px;font-size:12px;color:var(--primary);text-align:center;animation:scanPulse 2s infinite;}
 [data-theme="light"] .scanner{border-color:rgba(0,166,81,.35);}
 @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.65}}
-.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -1px 3px var(--shadow);transition:background .3s;}
-.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:10px;font-weight:700;transition:color .2s;padding-bottom:4px;position:relative;}
-.nbtn .nico{font-size:22px;line-height:1;transition:transform .2s}
-.nbtn.active{color:var(--accent)}.nbtn.active .nico{transform:scale(1.15)}
-.nbtn.active::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:28px;height:3px;background:var(--accent);border-radius:0 0 3px 3px;}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 12px var(--shadow);transition:background .3s;padding-bottom:env(safe-area-inset-bottom);}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:9px;font-weight:700;transition:color .2s ease;padding:6px 2px;position:relative;min-height:48px;}
+.nbtn .nico{font-size:22px;line-height:1;transition:transform .2s ease;display:inline-block;}
+.nbtn .nav-lbl{font-size:9px;line-height:1.1;letter-spacing:.2px;}
+.nbtn.active{color:var(--accent);}
+.nbtn.active .nico{transform:scale(1.1);}
+.nbtn.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:3px;background:var(--accent);border-radius:0 0 3px 3px;}
 .tab{display:none;padding:12px 14px}.tab.active{display:block}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);}
 .card-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;}
@@ -138,22 +146,29 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .sb-top-val{font-size:11px;color:var(--accent);flex:1;text-align:center}
 .sb-chevron{color:var(--muted);font-size:16px;transition:transform .2s;flex-shrink:0}
 .sb-body{padding:0 14px 14px;display:none}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 6px;text-align:center;box-shadow:0 2px 6px var(--shadow);}
-.stat-v{font-size:22px;font-weight:800;line-height:1.1}.stat-l{font-size:11px;color:var(--muted);margin-top:3px;font-weight:700;letter-spacing:.5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 6px;text-align:center;box-shadow:0 2px 8px var(--shadow);transition:transform .2s ease,box-shadow .2s ease;}
+.stat:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow);}
+.stat-v{font-size:22px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums;}
+.stat-l{font-size:10px;color:var(--muted);margin-top:4px;font-weight:700;letter-spacing:.4px;}
+.stat-sub{font-size:9px;color:var(--muted);margin-top:2px;font-weight:600;}
 .pending-alert{background:var(--red-dim);border:1px solid rgba(224,49,49,.35);border-radius:12px;padding:9px 14px;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--red);text-align:center;cursor:pointer;animation:alertPulse 2s infinite;}
 @keyframes alertPulse{0%,100%{border-color:rgba(224,49,49,.35)}50%{border-color:rgba(224,49,49,.8)}}
 .dnav{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px 10px;margin-bottom:10px;box-shadow:0 2px 6px var(--shadow);}
-.dnavbtn{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .2s;}
-.dnavbtn:active{background:var(--card2)}.dnav-center{display:flex;flex-direction:column;align-items:center;gap:5px}
+.dnavbtn{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s ease;}
+.dnavbtn:hover{background:var(--accent-dim);color:var(--accent);}
+.dnavbtn:active{background:var(--card2);}
+.dnav-center{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:16px;font-weight:800;}
 .dnav-lbl{font-size:13px;font-weight:800}
 .dnav-today-btn{background:var(--accent-dim);border:1px solid rgba(0,166,81,.3);color:var(--accent);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;cursor:pointer;}
-.filter-bar{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;}
+.filter-bar{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scroll-snap-type:x proximity;scrollbar-width:none;}
 .filter-bar::-webkit-scrollbar{display:none}
-.fbtn{flex-shrink:0;padding:8px 16px;border-radius:50px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.fbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
-.bitem{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease;border-right-width:3px;box-shadow:0 2px 8px var(--shadow);}
-.bitem.c1{border-right-color:var(--primary)}.bitem.c2{border-right-color:var(--success)}.bitem.c3{border-right-color:var(--yellow)}.bitem.c4{border-right-color:var(--danger)}
+.fbtn{flex-shrink:0;padding:8px 16px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s ease;white-space:nowrap;scroll-snap-align:start;}
+.fbtn:hover{border-color:var(--accent);color:var(--accent);}
+.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.bitem{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:8px;animation:fadeUp .2s ease;border-right-width:4px;box-shadow:0 2px 8px var(--shadow);transition:transform .2s ease,box-shadow .2s ease;}
+.bitem:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow);}
+.bitem.c1{border-right-color:var(--primary)}.bitem.c2{border-right-color:var(--booked)}.bitem.c3{border-right-color:var(--orange)}.bitem.c4{border-right-color:var(--danger)}
 .bitem.overdue{border-color:rgba(224,49,49,.5);background:rgba(224,49,49,.04)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .btcol{min-width:56px;text-align:center;flex-shrink:0}.bts{font-size:16px;font-weight:800;color:var(--accent);line-height:1.2}.bte{font-size:11px;color:var(--muted);line-height:1.2}
@@ -171,9 +186,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .bact{background:none;border:none;font-size:15px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s;color:var(--muted);}
 .bact.edit:active{color:var(--blue);background:var(--blue-dim)}.bact.del:active{color:var(--red);background:var(--red-dim)}
 .bact.pay:active{color:var(--accent);background:var(--accent-dim)}
-.fab{position:fixed;bottom:calc(var(--nav-h)+14px);right:16px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--toast-color);border:none;font-size:26px;font-weight:900;cursor:pointer;display:flex!important;align-items:center;justify-content:center;box-shadow:0 4px 24px var(--accent-glow),0 2px 8px rgba(0,0,0,.4);transition:transform .15s;z-index:9999;line-height:1;contain:layout;}
+.fab{position:fixed;bottom:calc(var(--nav-h)+14px);right:16px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:26px;font-weight:900;cursor:pointer;display:flex!important;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--accent-glow),0 2px 8px rgba(0,0,0,.3);transition:transform .15s ease,box-shadow .15s ease;z-index:150;line-height:1;contain:layout;}
+.fab:hover{transform:translateY(-2px);box-shadow:0 6px 28px var(--accent-glow),0 3px 12px rgba(0,0,0,.35);}
+.fab:active{transform:scale(.96);}
 .fab:active{transform:scale(.92)}.fab-hidden{display:none!important}
-.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s ease;}
 .moverlay.open{opacity:1;pointer-events:all}
 .msheet{width:100%;background:var(--surf);border-radius:24px 24px 0 0;padding:0 16px 34px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:94vh;overflow-y:auto;}
 .moverlay.open .msheet{transform:translateY(0)}.mhandle{width:36px;height:4px;background:var(--muted);border-radius:2px;margin:12px auto 18px;opacity:.4}
@@ -181,6 +198,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .fg{margin-bottom:13px}.flbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.8px;display:block;margin-bottom:6px;}
 .fi{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--text);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:16px;outline:none;transition:border-color .2s;}
 .fi:focus{border-color:var(--accent)}.fi::placeholder{color:var(--muted)}select.fi{cursor:pointer}
+/* v20 — toggle switch (used in overtime settings) */
+.ot-switch{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;}
+.ot-switch input{opacity:0;width:0;height:0;}
+.ot-switch-slider{position:absolute;cursor:pointer;inset:0;background:var(--card2);border:1px solid var(--border);border-radius:26px;transition:.25s;}
+.ot-switch-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.25s;}
+.ot-switch input:checked + .ot-switch-slider{background:var(--accent);border-color:var(--accent);}
+.ot-switch input:checked + .ot-switch-slider::before{transform:translateX(20px);background:#fff;}
 .ipair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.iwrap{display:flex;flex-direction:column;gap:6px}
 .bgr{display:flex;gap:6px;flex-wrap:wrap}
 .bc{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;min-width:44px;}
@@ -418,15 +442,15 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 .print-total-row td{font-weight:800;font-size:13px;background:#e8f5e9!important;border-top:2px solid #00a651;}
 .print-footer{font-size:11px;color:#999;text-align:center;margin-top:20px;border-top:1px solid #eee;padding-top:12px;}
 /* TOAST NOTIFICATION SYSTEM */
-.toast-container{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column-reverse;gap:8px;align-items:center;pointer-events:none;}
-.toast{position:relative;top:auto;left:auto;transform:translateY(20px);background:var(--accent);color:var(--toast-color);padding:12px 24px;border-radius:14px;font-size:13px;font-weight:800;z-index:99999;opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 20px var(--accent-glow);display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;}
+.toast-container{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column-reverse;gap:8px;align-items:center;pointer-events:none;}
+.toast{position:relative;top:auto;left:auto;transform:translateY(20px);background:var(--accent);color:var(--toast-color);padding:12px 24px;border-radius:14px;font-size:13px;font-weight:800;z-index:999;opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 20px var(--accent-glow);display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.toast-success{background:var(--accent);color:var(--toast-color);}
 .toast.toast-error{background:var(--red);color:#fff;}
 .toast.toast-warning{background:var(--yellow);color:#1a2533;}
 .toast .toast-icon{font-size:16px;flex-shrink:0;}
-/* NAV PILL INDICATOR */
-.nbtn.active::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:32px;height:4px;background:var(--accent);border-radius:4px;box-shadow:0 0 8px var(--accent-glow);}
+/* NAV PILL INDICATOR — v20: indicator bar at top of active tab */
+.nbtn.active::after{content:'';position:absolute;top:0;bottom:auto;left:50%;transform:translateX(-50%);width:36px;height:3px;background:var(--accent);border-radius:0 0 3px 3px;box-shadow:0 2px 8px var(--accent-glow);}
 /* CONFIRM MODAL */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99998;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
 .confirm-overlay.open{opacity:1;pointer-events:all;}
@@ -439,7 +463,7 @@ input:checked + .toggle-slider:before{transform:translateX(20px);background:#fff
 .confirm-btns{display:flex;gap:10px;}
 .confirm-btns .btn{flex:1;}
 /* AUTH SCREENS — GLASS MORPHISM */
-.auth-bg{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;overflow:hidden;background:var(--bg);}
+.auth-bg{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;overflow:hidden;background:var(--bg);}
 .auth-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 0%,var(--primary-dim) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,var(--purple-dim) 0%,transparent 50%);pointer-events:none;}
 .auth-bg::after{display:none;}
 @keyframes authGridDrift{0%{transform:translate(0,0)}100%{transform:translate(32px,32px)}}
@@ -724,36 +748,146 @@ i.nico.ph{font-size:22px;}
 .view-btn.active{background:var(--primary-dim);border-color:var(--primary);color:var(--primary);}
 
 /* Court grid (calendar view) */
-.cgrid{display:grid;min-width:320px;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card);margin-bottom:10px;}
-.cgrid-head-cell{background:var(--card2);padding:8px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--primary);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2;}
-.cgrid-time-cell{background:var(--card2);padding:6px 8px;font-size:11px;color:var(--text2);text-align:center;border-left:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;display:flex;align-items:center;justify-content:center;}
-.cgrid-slot{border-bottom:1px solid var(--border);border-left:1px solid var(--border);min-height:44px;min-width:48px;cursor:pointer;transition:background .15s;position:relative;display:flex;align-items:center;justify-content:center;padding:4px;}
+/* ============ V20 GRID (Padel Finder style — courts left, time scrolling right) ============ */
+#gridView{
+  border-radius:14px;border:1px solid var(--border);background:var(--card);
+  overflow:auto;-webkit-overflow-scrolling:touch;
+  max-height:70vh;position:relative;margin-bottom:10px;
+  direction:ltr; /* force LTR so time flows left→right; court column sits on the left */
+}
+.cgrid-inner{
+  display:grid;
+  grid-template-columns:70px 1fr;
+  position:relative;
+  width:max-content;min-width:100%;
+}
+.cgrid-corner{
+  grid-column:1;grid-row:1;
+  background:var(--card2);
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  position:sticky;left:0;top:0;z-index:5;
+  height:40px;
+}
+.cgrid-time-head-row{
+  grid-column:2;grid-row:1;
+  display:grid;grid-auto-flow:column;grid-auto-columns:80px;
+  position:sticky;top:0;z-index:3;
+  background:var(--card2);
+  border-bottom:1px solid var(--border);
+  height:40px;
+}
+.cgrid-time-head{
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--primary);
+  border-right:1px solid var(--border);
+  white-space:nowrap;letter-spacing:.2px;
+}
+.cgrid-time-head.cgrid-time-next{
+  background:linear-gradient(180deg,rgba(123,159,212,.20) 0%,rgba(123,159,212,.06) 100%);
+  color:var(--purple);
+}
+.cgrid-courts-col{
+  grid-column:1;grid-row:2;
+  display:flex;flex-direction:column;
+  position:sticky;left:0;z-index:2;
+  background:var(--g-brand);
+  border-right:1px solid var(--border);
+}
+.cgrid-court-head{
+  flex:1 1 0;min-height:80px;
+  color:#fff;
+  padding:8px 6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;
+  border-bottom:1px solid rgba(255,255,255,.22);letter-spacing:.5px;
+  text-align:center;
+}
+.cgrid-court-head:last-child{border-bottom:0;}
+.cgrid-body-inner{
+  grid-column:2;grid-row:2;
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:80px;
+  grid-auto-rows:80px;
+  position:relative;
+}
+.cgrid-slot{
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+  cursor:pointer;
+  transition:background .15s;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:4px;min-height:60px;
+}
 .cgrid-slot:hover:not(.cgrid-slot-booked){background:var(--primary-dim);}
-.cgrid-slot-booked{background:var(--primary-dim);border-right:3px solid var(--primary);cursor:pointer;}
-.cgrid-slot-booked.pay-cash{border-right-color:var(--success);background:var(--success-dim);}
-.cgrid-slot-booked.pay-visa{border-right-color:var(--blue);background:var(--blue-dim);}
-.cgrid-slot-booked.pay-pending{border-right-color:var(--warning);background:var(--warning-dim);}
-.cgrid-slot-booked.pay-split{border-right-color:var(--purple);background:var(--purple-dim);}
-.cgrid-slot-inner{font-size:10px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
-.cgrid-slot-add{font-size:20px;color:var(--border);opacity:0;transition:opacity .15s;}
-.cgrid-slot:not(.cgrid-slot-booked):hover .cgrid-slot-add{opacity:1;}
-#gridView{overflow:hidden;max-height:60vh;-webkit-overflow-scrolling:touch;border-radius:14px;border:1px solid var(--border);background:var(--card);}
-#gridView>#courtGrid{display:flex;flex-direction:row;width:100%;}
-/* v19 — Two-pane horizontal grid layout (avoids Chrome's RTL sticky drift bug):
-   - .cgrid-fixed-col: court labels stay pinned on the right edge (RTL)
-   - .cgrid-scroll-area: time-headers + slot cells scroll horizontally */
-.cgrid-fixed-col{display:grid;flex:0 0 auto;background:var(--card2);border-left:1px solid var(--border);}
-.cgrid-scroll-area{flex:1 1 auto;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.cgrid{overflow:visible;border:0!important;border-radius:0!important;margin-bottom:0!important;min-width:0!important;}
-.cgrid-time-head{background:var(--card2);padding:6px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--primary);border-bottom:1px solid var(--border);border-left:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.15;white-space:nowrap;}
-.cgrid-time-head.cgrid-time-next{background:linear-gradient(180deg,rgba(139,92,246,.18) 0%,rgba(139,92,246,.06) 100%) !important;color:var(--purple);}
-.cgrid-court-head{background:var(--card2);padding:8px 10px;font-size:13px;font-weight:800;color:var(--primary);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-start;white-space:nowrap;}
-.cgrid-corner{background:var(--card2);border-bottom:1px solid var(--border);}
-/* legacy vertical-grid classes kept for fallback */
-.cgrid-time-cell{position:sticky;right:0;z-index:1;}
-.cgrid-head-cell:first-child{position:sticky;right:0;top:0;z-index:3;}
-/* v19 — overtime badge style */
-.bitem .ot-badge{display:inline-flex;align-items:center;gap:3px;background:var(--orange-dim);color:var(--orange);border:1px solid rgba(251,146,60,0.35);border-radius:8px;padding:2px 6px;font-size:10px;font-weight:800;margin-top:3px;letter-spacing:.3px}
+.cgrid-slot-add{font-size:18px;color:var(--text2);opacity:0;transition:opacity .15s;font-weight:900;}
+.cgrid-slot:not(.cgrid-slot-booked):hover .cgrid-slot-add{opacity:.7;}
+/* Booked block spans multiple slots via grid-column */
+.cgrid-booking{
+  background:var(--booked-dim);
+  border-left:3px solid var(--booked);
+  border-radius:6px;
+  padding:6px 8px;
+  display:flex;flex-direction:column;justify-content:center;gap:2px;
+  cursor:pointer;
+  overflow:hidden;
+  margin:2px;
+  transition:transform .15s,box-shadow .15s;
+  position:relative;
+  z-index:1;
+}
+.cgrid-booking:hover{transform:scale(1.01);box-shadow:0 2px 10px var(--shadow);}
+.cgrid-booking.pay-pending{background:var(--orange-dim);border-left-color:var(--orange);}
+.cgrid-booking.pay-visa{background:var(--blue-dim);border-left-color:var(--blue);}
+.cgrid-booking.pay-split{background:var(--purple-dim);border-left-color:var(--purple);}
+.cgrid-booking-name{font-size:11px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:right;}
+.cgrid-booking-time{font-size:9px;color:var(--text2);font-weight:600;direction:ltr;text-align:left;}
+.cgrid-booking-price{font-size:10px;color:var(--booked);font-weight:900;direction:rtl;text-align:right;}
+.cgrid-booking.pay-pending .cgrid-booking-price{color:var(--orange);}
+.cgrid-booking.pay-visa .cgrid-booking-price{color:var(--blue);}
+.cgrid-booking.pay-split .cgrid-booking-price{color:var(--purple);}
+/* Current time vertical line */
+.cgrid-now-line{
+  position:absolute;top:0;bottom:0;width:2px;
+  background:var(--primary);
+  pointer-events:none;z-index:4;
+  box-shadow:0 0 8px var(--primary-glow);
+}
+.cgrid-now-line::before{
+  content:'';position:absolute;top:0;left:-4px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--primary);
+  box-shadow:0 0 0 4px var(--primary-glow);
+  animation:cgrid-now-pulse 2s ease-out infinite;
+}
+@keyframes cgrid-now-pulse{
+  0%{box-shadow:0 0 0 0 var(--primary-glow);}
+  70%{box-shadow:0 0 0 10px transparent;}
+  100%{box-shadow:0 0 0 0 transparent;}
+}
+.cgrid-now-label{
+  position:absolute;top:2px;left:6px;
+  background:var(--primary);color:#fff;
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;
+  white-space:nowrap;z-index:5;direction:rtl;
+}
+/* End of day marker */
+.cgrid-eod{
+  position:absolute;top:0;bottom:0;width:0;
+  border-left:2px dashed var(--orange);
+  pointer-events:none;z-index:3;
+}
+.cgrid-eod-label{
+  position:absolute;top:2px;
+  background:var(--orange-dim);color:var(--orange);
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;
+  white-space:nowrap;direction:rtl;border:1px solid var(--orange);
+}
+/* v20 — overtime badge */
+.bitem .ot-badge{display:inline-flex;align-items:center;gap:3px;background:var(--orange);color:#fff;border-radius:8px;padding:3px 8px;font-size:10px;font-weight:800;margin-top:3px;letter-spacing:.3px;}
 
 /* ===================================================================
    V19 — Color Overhaul: Harmonious Gradients + Glassmorphism + Micro-anim
@@ -935,18 +1069,19 @@ body{transition:background .18s,color .18s;}
   .bitem:hover,.cust-card:hover{border-color:var(--accent);}
 }
 
-/* ============ V19 BLUE/ORANGE GRADIENT THEME ============ */
+/* ============ V20 PADEL FINDER GRADIENT THEME ============ */
 :root{
-  /* Blue/orange brand gradients aligned with v19 palette */
-  --g-primary:linear-gradient(135deg,#2d7dd2 0%,#185FA5 60%,#E05530 100%);
-  --g-success:linear-gradient(135deg,#34D399 0%,#38d9c0 100%);
+  /* Brand gradient: blue → green (matches Padel Finder logo style) */
+  --g-primary:linear-gradient(135deg,#2d7dd2 0%,#185FA5 60%,#1e8c45 100%);
+  --g-brand:linear-gradient(135deg,#185FA5 0%,#1e8c45 100%);
+  --g-success:linear-gradient(135deg,#22c55e 0%,#1e8c45 100%);
   --g-warning:linear-gradient(135deg,#f5a623 0%,#E05530 100%);
   --g-danger:linear-gradient(135deg,#E05530 0%,#c43d1a 100%);
   --g-blue:linear-gradient(135deg,#58c4ff 0%,#2d7dd2 100%);
   --g-purple:linear-gradient(135deg,#7b9fd4 0%,#185FA5 100%);
   --g-sunset:linear-gradient(135deg,#E05530 0%,#f5a623 100%);
   --g-ocean:linear-gradient(135deg,#58c4ff 0%,#185FA5 100%);
-  --g-emerald:linear-gradient(135deg,#34D399 0%,#38d9c0 100%);
+  --g-emerald:linear-gradient(135deg,#22c55e 0%,#1e8c45 100%);
 }
 
 /* Apply modern gradients to existing primary surfaces */
@@ -956,9 +1091,9 @@ body{transition:background .18s,color .18s;}
 .btn-blue{background:var(--g-blue)!important;color:#fff!important;}
 .btn-purple{background:var(--g-purple)!important;color:#fff!important;}
 
-/* Brand logo / hdr-logo — gradient text */
-.hdr-logo{background:var(--g-primary);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;}
-.hdr-logo em{-webkit-text-fill-color:var(--muted)!important;background:none;}
+/* Brand logo / hdr-logo — blue → green gradient text (Padel Finder style) */
+.hdr-logo{background:var(--g-brand);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;font-weight:900;}
+.hdr-logo em{-webkit-text-fill-color:var(--muted)!important;background:none;font-style:normal;font-weight:600;font-size:.7em;letter-spacing:.5px;}
 
 /* KPI stat cards — soft gradient backgrounds */
 .day-kpi,.inv-kpi,.stat{position:relative;overflow:hidden;}
@@ -1106,7 +1241,7 @@ body{transition:background .18s,color .18s;}
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-logo">Padel <em>MGR v19</em></div>
+  <div class="hdr-logo">Padel <em>MGR v20</em></div>
   <div class="hdr-right">
     <div class="hdr-meta" id="hdrMeta"></div>
     <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
@@ -1154,7 +1289,7 @@ body{transition:background .18s,color .18s;}
     <div class="stat"><div class="stat-v" id="s-hours" style="color:var(--accent)">0</div><div class="stat-l" id="lbl-hours">ساعات</div></div>
     <div class="stat"><div class="stat-v" id="s-cash" style="color:var(--accent)">0</div><div class="stat-l" id="lbl-cash">كاش ج</div></div>
     <div class="stat"><div class="stat-v" id="s-visa" style="color:var(--blue)">0</div><div class="stat-l" id="lbl-visa">فيزا ج</div></div>
-    <div class="stat"><div class="stat-v" id="s-overtime" style="color:var(--orange)">0</div><div class="stat-l" id="lbl-overtime">أوفر تايم ج</div></div>
+    <div class="stat"><div class="stat-v" id="s-overtime" style="color:var(--orange)">0 س</div><div class="stat-sub" id="s-overtime-cost" style="color:var(--orange)">0 ج</div><div class="stat-l" id="lbl-overtime">أوفر تايم</div></div>
   </div>
   <div class="pending-alert" id="pendingAlert" style="display:none" onclick="scrollToPending()"></div>
   <!-- View toggle (v18): list / grid -->
@@ -1473,31 +1608,7 @@ body{transition:background .18s,color .18s;}
     </div>
     <div id="searchResults" style="display:none;margin-bottom:10px;"></div>
 
-    <!-- v19 F2: Multi-day (range) closing -->
-    <div class="card section-closing" id="rangeClosingCard" style="border-color:var(--border-glow)">
-      <div class="section-badge section-badge-closing">تقفيل</div>
-      <div class="card-title"><i class="ph ph-calendar-dots" aria-hidden="true"></i> تقفيل متعدد الأيام</div>
-      <div class="ipair" style="margin-bottom:10px">
-        <div class="iwrap"><span class="flbl">من</span><input class="fi" type="date" id="rcFrom"></div>
-        <div class="iwrap"><span class="flbl">إلى</span><input class="fi" type="date" id="rcTo"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-blue" onclick="calcRangeClosing()" style="padding:9px">عرض الملخص ↗</button>
-        <button class="btn btn-green" onclick="saveRangeClosing()" style="padding:9px">💾 حفظ تقفيل الفترة</button>
-      </div>
-      <div id="rcResult" style="display:none;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--border);background:var(--card2)">
-        <div style="font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px" id="rcDateLabel"></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px" id="rcBookCount"></div>
-        <div class="inv-kpi-grid">
-          <div class="inv-kpi green"><div class="inv-kpi-lbl">💵 كاش</div><div class="inv-kpi-val" id="rcCash" style="color:var(--success)">0</div></div>
-          <div class="inv-kpi blue"><div class="inv-kpi-lbl">💳 فيزا</div><div class="inv-kpi-val" id="rcVisa" style="color:var(--blue)">0</div></div>
-          <div class="inv-kpi"><div class="inv-kpi-lbl">⏱ الساعات</div><div class="inv-kpi-val" id="rcHrs" style="color:var(--text)">0</div></div>
-          <div class="inv-kpi red"><div class="inv-kpi-lbl">🔴 مصاريف</div><div class="inv-kpi-val" id="rcExp" style="color:var(--danger)">0</div></div>
-          <div class="inv-kpi fullw"><div class="inv-kpi-lbl">📦 الإجمالي</div><div class="inv-kpi-val" id="rcTotal" style="color:var(--warning)">0</div></div>
-          <div class="inv-kpi net"><div class="inv-kpi-lbl">💡 الصافي</div><div class="inv-kpi-val" id="rcNet" style="color:var(--primary);font-size:22px">0</div></div>
-        </div>
-      </div>
-    </div>
+    <!-- v20: تقفيل متعدد الأيام moved to "📆 فترة" mode in التقفيل tab (duplicate removed) -->
 
     <div class="card section-inventory" id="inventoryCard" style="border-color:rgba(139,92,246,.4)">
       <div class="section-badge section-badge-inventory">جرد</div>
@@ -1617,6 +1728,25 @@ body{transition:background .18s,color .18s;}
       <div class="iwrap"><span class="flbl">سعر المساء ج/س</span><input class="fi" type="number" id="setPM2" inputmode="numeric"></div>
     </div>
     <button class="btn btn-green" onclick="saveSettings2()">حفظ الإعدادات ✓</button>
+  </div>
+  <!-- v20: Overtime settings -->
+  <div class="card" style="border-color:rgba(216,90,48,.25)">
+    <div class="card-title"><span style="font-size:14px">⏱️</span> الأوفر تايم</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+      الأوفر تايم بيتحسب لأي ساعة من الحجز بعد <strong style="color:var(--orange)">01:00 ص</strong>
+    </p>
+    <div class="fg" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+      <label class="flbl" for="setOvertimeEnabled" style="margin:0;flex:1">تفعيل حساب الأوفر تايم</label>
+      <label class="ot-switch">
+        <input type="checkbox" id="setOvertimeEnabled" onchange="saveOvertimeSettings()">
+        <span class="ot-switch-slider"></span>
+      </label>
+    </div>
+    <div class="fg">
+      <label class="flbl">سعر ساعة الأوفر تايم (ج)</label>
+      <input class="fi" type="number" id="setOvertimeRate" inputmode="numeric" placeholder="فاضي = ١.٥× سعر المساء" oninput="saveOvertimeSettings()">
+      <p style="font-size:11px;color:var(--muted);margin-top:4px">لو سيبته فاضي، الحساب هيبقى تلقائي ١.٥× من سعر المساء</p>
+    </div>
   </div>
   <div class="card" style="border-color:rgba(192,132,252,.2)">
     <div class="card-title"><i class="ph ph-arrows-clockwise" aria-hidden="true"></i> مزامنة البيانات</div>
@@ -1785,13 +1915,13 @@ body{transition:background .18s,color .18s;}
 
 <!-- BOTTOM NAV -->
 <nav class="bnav" role="navigation" aria-label="القائمة الرئيسية">
-  <button class="nbtn active" id="n-bookings" onclick="goTab('bookings')" aria-label="الحجوزات"><i class="ph ph-calendar-check nico" aria-hidden="true"></i><span class="nav-lbl">الحجوزات</span></button>
-  <button class="nbtn" id="n-academy" onclick="goTab('academy')" aria-label="الأكاديمية"><i class="ph ph-graduation-cap nico" aria-hidden="true"></i><span class="nav-lbl">الأكاديمية</span></button>
-  <button class="nbtn" id="n-closing" onclick="goTab('closing')" aria-label="التقفيل"><i class="ph ph-cash-register nico" aria-hidden="true"></i><span class="nav-lbl">التقفيل</span></button>
-  <button class="nbtn" id="n-customers" onclick="goTab('customers')" aria-label="العملاء"><i class="ph ph-users-three nico" aria-hidden="true"></i><span class="nav-lbl">العملاء</span></button>
-  <button class="nbtn" id="n-trainers" onclick="goTab('trainers')" aria-label="المدربين"><i class="ph ph-whistle nico" aria-hidden="true"></i><span class="nav-lbl">المدربين</span></button>
-  <button class="nbtn" id="n-dashboard" onclick="goTab('dashboard')" aria-label="إحصائيات"><i class="ph ph-chart-bar nico" aria-hidden="true"></i><span class="nav-lbl">إحصائيات</span></button>
-  <button class="nbtn" id="n-settings" onclick="goTab('settings')" aria-label="الإعدادات"><i class="ph ph-gear-six nico" aria-hidden="true"></i><span class="nav-lbl">الإعدادات</span></button>
+  <button class="nbtn active" id="n-bookings" onclick="goTab('bookings')" aria-label="الحجوزات"><span class="nico" aria-hidden="true">🏸</span><span class="nav-lbl">الحجوزات</span></button>
+  <button class="nbtn" id="n-academy" onclick="goTab('academy')" aria-label="الأكاديمية"><span class="nico" aria-hidden="true">🎓</span><span class="nav-lbl">الأكاديمية</span></button>
+  <button class="nbtn" id="n-closing" onclick="goTab('closing')" aria-label="التقفيل"><span class="nico" aria-hidden="true">💰</span><span class="nav-lbl">التقفيل</span></button>
+  <button class="nbtn" id="n-customers" onclick="goTab('customers')" aria-label="العملاء"><span class="nico" aria-hidden="true">👥</span><span class="nav-lbl">العملاء</span></button>
+  <button class="nbtn" id="n-trainers" onclick="goTab('trainers')" aria-label="المدربين"><span class="nico" aria-hidden="true">🎯</span><span class="nav-lbl">المدربين</span></button>
+  <button class="nbtn" id="n-dashboard" onclick="goTab('dashboard')" aria-label="إحصائيات"><span class="nico" aria-hidden="true">📊</span><span class="nav-lbl">إحصائيات</span></button>
+  <button class="nbtn" id="n-settings" onclick="goTab('settings')" aria-label="الإعدادات"><span class="nico" aria-hidden="true">⚙️</span><span class="nav-lbl">الإعدادات</span></button>
 </nav>
 </div><!-- /app -->
 <div id="fabMenu" class="fab-menu" style="display:none"></div>
@@ -1882,6 +2012,17 @@ body{transition:background .18s,color .18s;}
       <div class="pdi"><span class="lbl">الباقي</span><span class="val" id="calcRem">0 ج</span></div>
     </div>
     <div class="conf-warn" id="confWarn"></div>
+    <!-- v20: overtime breakdown (auto-shows when booking spans past 01:00 ص) -->
+    <div id="otBreakdown" style="display:none;margin:10px 0;padding:10px 12px;background:var(--orange-dim);border:1px solid var(--orange);border-radius:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--orange);margin-bottom:6px;letter-spacing:.4px">⏱️ تفصيل الأوفر تايم</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+        <div><span style="color:var(--muted)">عادي:</span> <span id="otNormalH" style="font-weight:900">0 س</span></div>
+        <div><span style="color:var(--muted)">أوفر تايم:</span> <span id="otOvertimeH" style="font-weight:900;color:var(--orange)">0 س</span></div>
+        <div style="grid-column:1/-1;padding-top:4px;border-top:1px dashed var(--orange);margin-top:2px">
+          <span style="color:var(--muted)">سعر الـOT:</span> <span id="otCostV" style="font-weight:900;color:var(--orange)">0 ج</span>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-green" id="modalSaveBtn" onclick="saveBooking()">حفظ الحجز ✓</button>
     <button class="btn btn-ghost mtsep" onclick="closeModal()">إلغاء</button>
   </div>
@@ -2177,6 +2318,9 @@ function initApp(){
   document.getElementById('setAM2').value = D.settings.priceAM;
   document.getElementById('setPM2').value = D.settings.pricePM;
   document.getElementById('setClubName').value = D.settings.clubName||'';
+  // v20: overtime settings
+  let otE=document.getElementById('setOvertimeEnabled'); if(otE)otE.checked=(D.settings.overtimeEnabled!==false);
+  let otR=document.getElementById('setOvertimeRate'); if(otR)otR.value=(D.settings.overtimeRate>0?D.settings.overtimeRate:'');
   loadWalletSettings();
   buildDaySelectGrid();
   showLicenseInfo();
@@ -2377,24 +2521,19 @@ function setBookView(v,btn){
     renderBooks();
   }
 }
-// v19 — HORIZONTAL two-pane grid: time = columns (RTL scroll right→left), courts = rows.
-// Continuous timeline through midnight so the closing day (which crosses 00:00)
-// reads as a single uninterrupted strip. Fixed-column pane keeps court labels pinned
-// on the right edge while the time grid scrolls horizontally underneath.
+// v20 — Padel Finder–style grid: courts pinned LEFT (LTR), time scrolls right.
+// Continuous timeline through midnight so the closing day reads as one strip.
+// Layout: grid-area "corner | time-head" / "courts-col | body".
 function renderCourtGrid(){
   let el=document.getElementById('courtGrid'); if(!el)return;
   let cnt=parseInt(D.settings.courts)||2;
   let startHour=8,endHour=30,slotMins=30;
   let totalSlots=(endHour-startHour)*60/slotMins;
+  let slotPx=80;
   let list=booksFor(curDate);
-  let skip={}; // skip[court+'_'+slotIdx]=true if covered by a multi-slot booking
-  // --- Fixed pane (court labels) ---
-  let fixedCells='<div class="cgrid-corner" style="grid-column:1;grid-row:1"></div>';
-  for(let c=1;c<=cnt;c++){
-    fixedCells+='<div class="cgrid-court-head" style="grid-column:1;grid-row:'+(1+c)+'">ملعب '+c+'</div>';
-  }
-  // --- Scroll pane (time headers + slot cells) ---
-  let scrollCells='';
+  let skip={};
+  // --- Time header (sticky top) ---
+  let timeHeadCells='';
   for(let s=0;s<totalSlots;s++){
     let totalMin=startHour*60+s*slotMins;
     let isNextDay=totalMin>=24*60;
@@ -2402,10 +2541,18 @@ function renderCourtGrid(){
     let ap=h24>=12?'م':'ص', h12=(h24%12)||12;
     let tlabel=h12+':'+String(m).padStart(2,'0')+' '+ap;
     let nextDayCls=isNextDay?' cgrid-time-next':'';
-    let nextDayMark=isNextDay?'<span style="font-size:8px;color:var(--purple);font-weight:800;display:block;margin-top:1px">+1</span>':'';
-    scrollCells+='<div class="cgrid-time-head'+nextDayCls+'" style="grid-column:'+(1+s)+';grid-row:1">'+tlabel+nextDayMark+'</div>';
+    let mark=isNextDay?'<span style="font-size:8px;color:var(--purple);font-weight:800;margin-right:3px">+1</span>':'';
+    timeHeadCells+='<div class="cgrid-time-head'+nextDayCls+'">'+mark+tlabel+'</div>';
   }
-  // booked cells
+  // --- Courts column (sticky left) ---
+  let courtCells='';
+  for(let c=1;c<=cnt;c++){
+    courtCells+='<div class="cgrid-court-head">ملعب '+c+'</div>';
+  }
+  // --- Body: empty slots + booking blocks ---
+  let bodyCells='';
+  // Layout: row = court (1..cnt), column = time slot (1..totalSlots)
+  // Bookings (multi-slot spans first so they sit above empty slots)
   list.forEach(b=>{
     let ct=parseInt(b.court);
     if(!ct||ct<1||ct>cnt)return;
@@ -2414,37 +2561,81 @@ function renderCourtGrid(){
     let startIdx=Math.floor(mins/slotMins);
     let span=Math.max(1,Math.round((parseFloat(b.dur)||1)*60/slotMins));
     if(startIdx+span>totalSlots)span=totalSlots-startIdx;
-    let row=1+ct, col=1+startIdx;
-    let payCls=b.pay?('pay-'+b.pay):'pay-pending';
-    let cust=(b.cust||'عميل').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,"\\'");
+    let payCls=b.pay==='pending'?'pay-pending':(b.pay==='visa'?'pay-visa':(b.pay==='split'?'pay-split':''));
+    let cust=(b.cust||'عميل').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
     let lblTime=fmt12(b.time);
-    let isOvernight=mins>=16*60;let overnightCls=isOvernight?' cgrid-slot-overnight':'';
-    scrollCells+='<div class="cgrid-slot cgrid-slot-booked '+payCls+overnightCls+'" data-row="'+row+'" data-col="'+col+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+col+'/span '+span+';grid-row:'+row+'" onclick="openModal(\''+b.id+'\')"><div class="cgrid-slot-inner">'+cust+'<br><span style="font-size:9px;font-weight:500;color:var(--text2)">'+lblTime+'</span></div></div>';
+    let endMin=t2min(b.time)+(parseFloat(b.dur)||1)*60;
+    let endH=Math.floor(endMin/60)%24, endM=endMin%60;
+    let endAp=endH>=12?'م':'ص',endH12=(endH%12)||12;
+    let lblEnd=endH12+':'+String(endM).padStart(2,'0')+' '+endAp;
+    let price=parseFloat(b.price)||0;
+    bodyCells+='<div class="cgrid-booking '+payCls+'" data-row="'+ct+'" data-col="'+(1+startIdx)+'" data-court="'+ct+'" data-booked="1" style="grid-column:'+(1+startIdx)+'/span '+span+';grid-row:'+ct+'" onclick="openModal(\''+b.id+'\')">'+
+      '<div class="cgrid-booking-name">'+cust+'</div>'+
+      '<div class="cgrid-booking-time">'+lblTime+' — '+lblEnd+'</div>'+
+      (price>0?'<div class="cgrid-booking-price">'+price.toLocaleString()+' ج</div>':'')+
+      '</div>';
     for(let i=0;i<span;i++) skip[ct+'_'+(startIdx+i)]=true;
   });
-  // empty slots — drag-to-book via pointer events (v19 F1)
+  // Empty slots
   for(let c=1;c<=cnt;c++){
-    let row=1+c;
     for(let s=0;s<totalSlots;s++){
       if(skip[c+'_'+s])continue;
-      let col=1+s;
       let totalMin=startHour*60+s*slotMins;
       let h24=Math.floor(totalMin/60)%24,m=totalMin%60;
       let t24=String(h24).padStart(2,'0')+':'+String(m).padStart(2,'0');
-      scrollCells+='<div class="cgrid-slot" data-row="'+row+'" data-col="'+col+'" data-court="'+c+'" data-t24="'+t24+'" data-slot-idx="'+s+'" style="grid-column:'+col+';grid-row:'+row+';touch-action:none"><span class="cgrid-slot-add">+</span></div>';
+      bodyCells+='<div class="cgrid-slot" data-row="'+c+'" data-col="'+(1+s)+'" data-court="'+c+'" data-t24="'+t24+'" data-slot-idx="'+s+'" style="grid-column:'+(1+s)+';grid-row:'+c+';touch-action:none"><span class="cgrid-slot-add">+</span></div>';
     }
   }
-  let tplCols='repeat('+totalSlots+',64px)';
-  let tplRows='42px repeat('+cnt+',60px)';
-  let fixedTplRows='42px repeat('+cnt+',60px)';
-  // In RTL flex containers the first child sits on the right edge, so put the
-  // fixed court-labels pane first to pin it visually on the right.
-  el.innerHTML=''+
-    '<div class="cgrid-fixed-col" style="grid-template-rows:'+fixedTplRows+';width:86px">'+fixedCells+'</div>'+
-    '<div class="cgrid-scroll-area" id="cgridScroll">'+
-      '<div class="cgrid" id="cgridInner" style="grid-template-columns:'+tplCols+';grid-template-rows:'+tplRows+';touch-action:pan-x pan-y;user-select:none">'+scrollCells+'</div>'+
+  // Current time vertical line position (only if curDate == today)
+  let nowMarker='';
+  let endOfDayMarker='';
+  try{
+    let today=ymd(new Date());
+    if(curDate===today){
+      let now=new Date();
+      let nowMin=now.getHours()*60+now.getMinutes();
+      if(nowMin>=startHour*60 && nowMin<endHour*60){
+        let nowSlots=(nowMin-startHour*60)/slotMins;
+        let leftPx=nowSlots*slotPx;
+        nowMarker='<div class="cgrid-now-line" style="left:'+leftPx+'px"></div>'+
+                  '<div class="cgrid-now-label" style="left:'+(leftPx+8)+'px">أنت هنا</div>';
+      }
+    }
+    // End-of-day at midnight (column 1 + 16 = 32 slots from 8AM, since 24:00 - 8:00 = 16h = 32 slots)
+    let eodSlots=(24-startHour)*60/slotMins;
+    let eodLeft=eodSlots*slotPx;
+    endOfDayMarker='<div class="cgrid-eod" style="left:'+eodLeft+'px"></div>'+
+                   '<div class="cgrid-eod-label" style="left:'+(eodLeft+6)+'px;bottom:6px">نهاية اليوم</div>';
+  }catch(e){}
+  let tplCols='repeat('+totalSlots+','+slotPx+'px)';
+  let tplRows='repeat('+cnt+',80px)';
+  el.innerHTML=
+    '<div class="cgrid-inner" style="grid-template-rows:40px '+tplRows+'">'+
+      '<div class="cgrid-corner"></div>'+
+      '<div class="cgrid-time-head-row" style="grid-template-columns:'+tplCols+'">'+timeHeadCells+'</div>'+
+      '<div class="cgrid-courts-col" style="height:'+(cnt*80)+'px">'+courtCells+'</div>'+
+      '<div class="cgrid-body-inner" style="grid-template-columns:'+tplCols+';grid-template-rows:'+tplRows+'">'+
+        bodyCells+nowMarker+endOfDayMarker+
+      '</div>'+
     '</div>';
   el.style.position='relative';
+  // Auto-scroll to current time (or 8AM if before). #gridView is the scroll container.
+  let scrollEl=document.getElementById('gridView');
+  setTimeout(function(){
+    if(!scrollEl)return;
+    try{
+      let today=ymd(new Date());
+      let targetMin = startHour*60;
+      if(curDate===today){
+        let now=new Date();
+        let nowMin=now.getHours()*60+now.getMinutes();
+        if(nowMin>startHour*60 && nowMin<endHour*60) targetMin = nowMin;
+      }
+      let slotsFromStart=(targetMin-startHour*60)/slotMins;
+      let scrollLeft=Math.max(0,(slotsFromStart-1)*slotPx);
+      scrollEl.scrollLeft=scrollLeft;
+    }catch(e){}
+  },50);
   _attachGridDrag(el);
 }
 
@@ -2956,6 +3147,21 @@ function calcBookingTotal(){
   document.getElementById('calcDep').textContent=dep+' ج';
   document.getElementById('calcRem').textContent=rem+' ج';
   if(draft.pay==='split'){let sc=parseFloat(document.getElementById('fSplitCash').value)||0;let sv=parseFloat(document.getElementById('fSplitVisa').value)||0;if(sc>0||sv>0)document.getElementById('calcRem').textContent=sc+'ك+'+sv+'ف ج';}
+  // v20: live overtime breakdown
+  try{
+    let otInfo=calcOvertimeCost({time:t24,dur:dur},liveAM,livePM);
+    let box=document.getElementById('otBreakdown');
+    if(box){
+      if(otInfo.hours>0){
+        let h=otInfo.hours; let hLbl=(h%1===0)?h:h.toFixed(1);
+        let normal=Math.max(0,dur-h); let nLbl=(normal%1===0)?normal:normal.toFixed(1);
+        document.getElementById('otNormalH').textContent=nLbl+' س';
+        document.getElementById('otOvertimeH').textContent=hLbl+' س';
+        document.getElementById('otCostV').textContent=Math.round(otInfo.cost)+' ج';
+        box.style.display='block';
+      }else box.style.display='none';
+    }
+  }catch(e){}
 }
 function checkConflict(){
   let t24=getT24(),dur=getDur(),w=document.getElementById('confWarn');
@@ -3178,6 +3384,18 @@ function saveSettings2(){
   document.getElementById('setCourtCount').value=D.settings.courts;
 }
 function updatePricePreview(){ document.getElementById('pricePreview').textContent='ص: '+D.settings.priceAM+' | م: '+D.settings.pricePM+' ج/س'; }
+// v20 — overtime settings persistence
+function saveOvertimeSettings(){
+  let en=document.getElementById('setOvertimeEnabled');
+  let rt=document.getElementById('setOvertimeRate');
+  if(en)D.settings.overtimeEnabled=!!en.checked;
+  if(rt){
+    let v=parseFloat(rt.value);
+    D.settings.overtimeRate=(isFinite(v)&&v>0)?v:0;
+  }
+  saveData();
+  if(typeof _updateOvertimeStat==='function') _updateOvertimeStat();
+}
 
 // ========================= QR PAYMENT =========================
 function saveWalletSettings(){
@@ -6064,12 +6282,17 @@ function calcOvertimeHours(startTime24,endTime24){
 }
 function calcOvertimeCost(b,priceAM,pricePM){
   if(!b)return {hours:0,cost:0};
+  // v20: honour overtime toggle + custom price from settings
+  const s=(typeof D!=='undefined'&&D&&D.settings)||{};
+  if(s.overtimeEnabled===false)return {hours:0,cost:0};
   const baseRate=pricePM||priceAM||0;
+  const customRate=parseFloat(s.overtimeRate)||0;
+  const otRate=customRate>0?customRate:baseRate*1.5;
   const startDec=timeStrTo24(b.time);
   const dur=parseFloat(b.dur)||0;
   const endDec=startDec+dur;
   const otHours=calcOvertimeHours(startDec,endDec);
-  return { hours:otHours, cost:otHours*baseRate*1.5 };
+  return { hours:otHours, cost:otHours*otRate };
 }
 // Recompute OT total for selected date + inject OT badges on list items
 function _updateOvertimeStat(){
@@ -6078,10 +6301,17 @@ function _updateOvertimeStat(){
     let pricePM=parseFloat((D.settings||{}).pricePM)||0;
     let cdate=(typeof curDate!=='undefined')?curDate:null;
     let all=(cdate&&D.bookings&&D.bookings[cdate])||[];
-    let otTotal=0;
-    all.forEach(function(b){ otTotal += calcOvertimeCost(b,priceAM,pricePM).cost; });
-    let el=document.getElementById('s-overtime');
-    if(el)el.textContent=Math.round(otTotal).toLocaleString();
+    let otTotal=0,otHours=0;
+    all.forEach(function(b){
+      let info=calcOvertimeCost(b,priceAM,pricePM);
+      otTotal+=info.cost;
+      otHours+=info.hours;
+    });
+    let hLbl=(otHours%1===0)?otHours:otHours.toFixed(1);
+    let elHrs=document.getElementById('s-overtime');
+    if(elHrs)elHrs.textContent=hLbl+' س';
+    let elCost=document.getElementById('s-overtime-cost');
+    if(elCost)elCost.textContent=Math.round(otTotal).toLocaleString()+' ج';
     all.forEach(function(b){
       let info=calcOvertimeCost(b,priceAM,pricePM);
       if(info.hours<=0)return;
@@ -6092,8 +6322,8 @@ function _updateOvertimeStat(){
       if(!rightCol)return;
       let badge=document.createElement('span');
       badge.className='ot-badge';
-      let hLbl=(info.hours%1===0)?info.hours:info.hours.toFixed(1);
-      badge.textContent='OT: '+hLbl+'س';
+      let bH=(info.hours%1===0)?info.hours:info.hours.toFixed(1);
+      badge.textContent='OT: '+bH+'س — '+Math.round(info.cost)+'ج';
       rightCol.appendChild(badge);
     });
   }catch(e){console.error('OT update error:',e);}
