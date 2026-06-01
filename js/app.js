@@ -156,15 +156,15 @@
   /* ---------------- Theme toggle ---------------- */
   var THEME_KEY = 'pmgr_theme';
   function currentTheme() {
-    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
   }
   function applyTheme(theme) {
-    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
     else document.documentElement.removeAttribute('data-theme');
     var btn = document.getElementById('themeBtn');
-    if (btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#f0f4f8' : '#060d18');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0e1626' : '#f4f7fb');
   }
   window.PMGR.applyTheme = applyTheme;
   function setupHeader() {

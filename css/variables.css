@@ -1,41 +1,44 @@
 /* ===================================================================
-   variables.css — v20 design tokens (dark default + light theme)
-   Ported from the v20 redesign. The modular components reference these.
+   variables.css — design tokens
+   Default (:root) = v2 clean LIGHT theme.
+   [data-theme="dark"] = refined high-contrast dark theme (comfortable,
+   readable even in bright daylight).
+   The modular components reference these token names.
    =================================================================== */
 :root {
-  /* === v20 Padel palette — Dark Mode (default) === */
-  --bg: #060d18;
-  --surface: #0c1626;
-  --card: #0f1a2e;
-  --card2: #162438;
-  --primary: #2d7dd2;
-  --primary-dim: rgba(45,125,210,.13);
-  --primary-glow: rgba(45,125,210,.32);
-  --primary-solid: #2d7dd2;
-  --primary-deep: #185FA5;
-  --text: #f0f6ff;
-  --text2: #6a8aaa;
-  --border: rgba(45,125,210,.18);
-  --booked: #22c55e;
-  --booked-dim: rgba(34,197,94,.16);
-  --success: #22c55e;
-  --success-dim: rgba(34,197,94,.12);
-  --danger: #E05530;
-  --danger-dim: rgba(224,85,48,.14);
-  --warning: #f5a623;
-  --warning-dim: rgba(245,166,35,.11);
-  --purple: #7b9fd4;
-  --purple-dim: rgba(123,159,212,.13);
-  --teal: #38d9c0;
-  --teal-dim: rgba(56,217,192,.10);
-  --orange: #E05530;
-  --orange-dim: rgba(224,85,48,.12);
-  --shadow: rgba(0,0,0,.45);
-  --hdr-bg: rgba(6,13,24,.95);
-  --toast-color: #060d18;
-  --grid-dot: rgba(45,125,210,.05);
-  --blue: #58c4ff;
-  --blue-dim: rgba(88,196,255,.10);
+  /* === v2 Padel palette — Light Mode (default) === */
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card2: #eef3f9;
+  --primary: #185FA5;
+  --primary-dim: rgba(24,95,165,.09);
+  --primary-glow: rgba(24,95,165,.22);
+  --primary-solid: #185FA5;
+  --primary-deep: #0d4a85;
+  --text: #1a2533;
+  --text2: #5b6b7e;
+  --border: #e2e8f0;
+  --booked: #1e8c45;
+  --booked-dim: rgba(30,140,69,.12);
+  --success: #1e8c45;
+  --success-dim: rgba(30,140,69,.10);
+  --danger: #d8482a;
+  --danger-dim: rgba(216,72,42,.09);
+  --warning: #b9750a;
+  --warning-dim: rgba(185,117,10,.10);
+  --purple: #6d4bd0;
+  --purple-dim: rgba(109,75,208,.09);
+  --teal: #0d9488;
+  --teal-dim: rgba(13,148,136,.08);
+  --orange: #d8482a;
+  --orange-dim: rgba(216,72,42,.09);
+  --shadow: rgba(15,40,80,.10);
+  --hdr-bg: rgba(255,255,255,.92);
+  --toast-color: #ffffff;
+  --grid-dot: rgba(24,95,165,.04);
+  --blue: #2d7dd2;
+  --blue-dim: rgba(45,125,210,.09);
 
   /* Legacy/semantic aliases used by the modules (resolve per-theme) */
   --accent: var(--primary);
@@ -48,11 +51,12 @@
   --yellow: var(--warning);
   --yellow-dim: var(--warning-dim);
   --primary-light: var(--primary-dim);
+  --primary-dark: var(--primary-deep);
   --text-primary: var(--text);
   --text-secondary: var(--text2);
   --text-muted: var(--text2);
   --bg-primary: var(--card);
-  --bg-secondary: var(--surface);
+  --bg-secondary: var(--bg);
   --bg-tertiary: var(--card2);
   --border-dark: var(--border);
   --success-text: var(--success);
@@ -77,42 +81,47 @@
   --radius-lg: 16px;
 
   /* Shadow */
-  --shadow-sm: 0 2px 8px var(--shadow);
-  --shadow-md: 0 4px 14px var(--shadow);
+  --shadow-sm: 0 1px 3px var(--shadow);
+  --shadow-md: 0 6px 18px var(--shadow);
 }
 
-[data-theme="light"] {
-  /* === v20 Padel palette — Light Mode === */
-  --bg: #f0f4f8;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --card2: #f1f5fa;
-  --primary: #185FA5;
-  --primary-dim: rgba(24,95,165,.09);
-  --primary-glow: rgba(24,95,165,.22);
-  --primary-solid: #185FA5;
-  --primary-deep: #0d4a85;
-  --text: #1a2533;
-  --text2: #6b7e94;
-  --border: rgba(24,95,165,.12);
-  --booked: #1e8c45;
-  --booked-dim: rgba(30,140,69,.12);
-  --success: #1e8c45;
-  --success-dim: rgba(30,140,69,.10);
-  --danger: #D85A30;
-  --danger-dim: rgba(216,90,48,.09);
-  --warning: #c17a00;
-  --warning-dim: rgba(193,122,0,.09);
-  --purple: #185FA5;
-  --purple-dim: rgba(24,95,165,.09);
-  --teal: #0d9488;
-  --teal-dim: rgba(13,148,136,.08);
-  --orange: #D85A30;
-  --orange-dim: rgba(216,90,48,.09);
-  --shadow: rgba(0,0,0,.07);
-  --hdr-bg: rgba(240,244,248,.96);
-  --grid-dot: rgba(24,95,165,.04);
-  --toast-color: #ffffff;
-  --blue: #2d7dd2;
-  --blue-dim: rgba(45,125,210,.09);
+[data-theme="dark"] {
+  /* === Refined dark theme — high contrast, eye-comfortable, daylight-readable ===
+     Slightly elevated slate-navy surfaces (not pure black, avoids glare washout),
+     near-white text for strong contrast, vivid-but-soft blue accent. */
+  --bg: #0e1626;
+  --surface: #172234;
+  --card: #1b2740;
+  --card2: #233149;
+  --primary: #4a9eff;
+  --primary-dim: rgba(74,158,255,.16);
+  --primary-glow: rgba(74,158,255,.40);
+  --primary-solid: #4a9eff;
+  --primary-deep: #2d7dd2;
+  --text: #eef4ff;
+  --text2: #a3b4cc;
+  --border: rgba(120,160,210,.22);
+  --booked: #2fd06f;
+  --booked-dim: rgba(47,208,111,.18);
+  --success: #2fd06f;
+  --success-dim: rgba(47,208,111,.14);
+  --danger: #ff6a45;
+  --danger-dim: rgba(255,106,69,.16);
+  --warning: #ffb340;
+  --warning-dim: rgba(255,179,64,.14);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,.15);
+  --teal: #2dd4bf;
+  --teal-dim: rgba(45,212,191,.12);
+  --orange: #ff6a45;
+  --orange-dim: rgba(255,106,69,.14);
+  --shadow: rgba(0,0,0,.50);
+  --hdr-bg: rgba(14,22,38,.95);
+  --toast-color: #0e1626;
+  --grid-dot: rgba(74,158,255,.05);
+  --blue: #58c4ff;
+  --blue-dim: rgba(88,196,255,.12);
+
+  --shadow-sm: 0 2px 8px var(--shadow);
+  --shadow-md: 0 6px 20px var(--shadow);
 }
