@@ -153,6 +153,32 @@
     document.getElementById('loginPwd').addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
   }
 
+  /* ---------------- Theme toggle ---------------- */
+  var THEME_KEY = 'pmgr_theme';
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  }
+  function applyTheme(theme) {
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    else document.documentElement.removeAttribute('data-theme');
+    var btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = theme === 'light' ? '☀️' : '🌙';
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#f0f4f8' : '#060d18');
+  }
+  window.PMGR.applyTheme = applyTheme;
+  function setupHeader() {
+    applyTheme(currentTheme());
+    var tb = document.getElementById('themeBtn');
+    if (tb) tb.addEventListener('click', function () {
+      var next = currentTheme() === 'light' ? 'dark' : 'light';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+    var lb = document.getElementById('langBtn');
+    if (lb) lb.addEventListener('click', function () { ui.toast('الإنجليزي قريباً 🇬🇧'); });
+  }
+
   /* ---------------- Service worker ---------------- */
   function registerSW() {
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -164,6 +190,7 @@
   function boot() {
     window.db.migrate();
     updateClubName();
+    setupHeader();
     window.router.initRouter();
     renderPage(window.router.getCurrentPage());
 

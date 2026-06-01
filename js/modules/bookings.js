@@ -153,7 +153,7 @@
             '<span>🎾 ملعب ' + b.courtNumber + '</span>' +
             (b.phone ? '<span>📞 ' + ui.esc(b.phone) + '</span>' : '') +
           '</div>' +
-          '<div class="mt-12">' + payBadge(b) + (c.hasOvertime ? ' <span class="badge badge-warning">⏱ OT ' + c.overtimeMinutes + 'د</span>' : '') + '</div>' +
+          '<div class="mt-12">' + payBadge(b) + (c.hasOvertime ? ' <span class="badge badge-warning">⏱ OT: ' + window.fmt.num(c.overtimeMinutes / 60) + 'س — ' + window.fmt.money(c.overtimeAmount) + '</span>' : '') + '</div>' +
         '</div>' +
         '<div class="bc-amount">' + window.fmt.money(amount || c.expected) + '</div>' +
       '</div>' +

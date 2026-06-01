@@ -40,10 +40,21 @@
     for (var cc = 1; cc <= courts; cc++) head += '<th>ملعب ' + cc + '</th>';
     head += '</tr>';
 
+    // current-time slot (only when viewing today)
+    var isToday = gridDate === window.fmt.ymd(new Date());
+    var nowMin = -1, nowIdx = -1;
+    if (isToday) {
+      var nd = new Date();
+      nowMin = nd.getHours() * 60 + nd.getMinutes();
+      if (nowMin < SLOT_START) nowMin += 1440;
+      nowIdx = Math.round((nowMin - SLOT_START) / STEP);
+    }
+
     var body = '';
     slots.forEach(function (mm, si) {
       var t = window.fmt.min2t(mm % 1440);
-      body += '<tr><th class="grid-time-col">' + window.fmt.time12(t) + '</th>';
+      var nowCls = (si === nowIdx) ? ' grid-row-now' : '';
+      body += '<tr class="' + nowCls.trim() + '" data-slot="' + si + '"><th class="grid-time-col">' + window.fmt.time12(t) + '</th>';
       for (var court = 1; court <= courts; court++) {
         var cell = occ[court][si];
         if (cell && cell.type === 'covered') continue; // skipped due to rowspan
@@ -68,10 +79,24 @@
         '<button class="btn btn-secondary today-btn" data-nav="today">اليوم</button>' +
         '<button class="nav-arrow" data-nav="next">←</button>' +
       '</div>' +
-      '<div class="grid-legend"><span>🟢 متاح</span><span>🔵 محجوز</span><span>🟡 معلق</span></div>' +
+      '<div class="grid-legend">' +
+        '<span><i class="dot" style="background:var(--accent-dim)"></i> متاح</span>' +
+        '<span><i class="dot" style="background:var(--booked)"></i> محجوز</span>' +
+        '<span><i class="dot" style="background:var(--warning)"></i> معلق</span>' +
+      '</div>' +
       '<div class="grid-container"><table class="grid-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
 
     wire(container);
+
+    // auto-scroll to the current-time row when viewing today
+    if (nowIdx >= 0) {
+      var box = container.querySelector('.grid-container');
+      var row = container.querySelector('.grid-row-now');
+      if (box && row) {
+        var off = row.offsetTop - box.clientHeight / 2 + row.offsetHeight / 2;
+        box.scrollTop = Math.max(0, off);
+      }
+    }
   }
 
   function wire(container) {
