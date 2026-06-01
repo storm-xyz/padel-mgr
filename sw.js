@@ -1,4 +1,4 @@
-const CACHE = 'pmgr-v2';
+const CACHE = 'pmgr-v3';
 const ASSETS = [
   './',
   './index.html',
