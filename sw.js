@@ -1,72 +1,67 @@
-const CACHE = 'pmgr-v4';
-const ASSETS = [
+// Padel MGR Service Worker — v21
+const CACHE_NAME = 'padel-mgr-v21';
+const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './css/variables.css',
-  './css/layout.css',
-  './css/components.css',
-  './css/modules.css',
-  './js/db.js',
-  './js/router.js',
-  './js/app.js',
-  './js/modules/bookings.js',
-  './js/modules/grid.js',
-  './js/modules/closing.js',
-  './js/modules/academy.js',
-  './js/modules/stats.js',
-  './js/modules/ai.js',
-  './js/modules/settings.js',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap',
+  'https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS).catch(() => {})).then(() => self.skipWaiting())
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      // Use individual put() calls so one bad URL doesn't fail the whole install.
+      return Promise.all(urlsToCache.map(function(url) {
+        return fetch(url, { mode: 'no-cors' })
+          .then(function(res) { return cache.put(url, res); })
+          .catch(function() {});
+      }));
+    })
   );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-
-  // Don't cache cross-origin API calls (e.g. Anthropic, CDN scripts handled separately)
-  if (url.origin !== self.location.origin) return;
-
-  const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
-
-  if (isHTML) {
-    // Network-first for HTML, fall back to cached index.html offline
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-          return res;
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.filter(function(name) {
+          return name !== CACHE_NAME;
+        }).map(function(name) {
+          return caches.delete(name);
         })
-        .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
-    );
-    return;
-  }
+      );
+    })
+  );
+  self.clients.claim();
+});
 
-  // Cache-first for static assets
-  e.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-        return res;
+self.addEventListener('fetch', function(event) {
+  // Only handle GET requests; let everything else (POST/PUT/PATCH to JSONbin, etc.) pass through.
+  if (event.request.method !== 'GET') return;
+  // Don't cache JSONbin API calls — always go to network so sync is live.
+  if (event.request.url.indexOf('api.jsonbin.io') !== -1) return;
+
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      if (response) return response;
+      return fetch(event.request).then(function(response) {
+        if (!response || response.status !== 200 || response.type === 'opaque') return response;
+        var responseToCache = response.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(event.request, responseToCache);
+        });
+        return response;
+      }).catch(function() {
+        // Offline fallback: serve cached index.html for any navigation request.
+        if (event.request.mode === 'navigate') return caches.match('./index.html');
       });
     })
   );
