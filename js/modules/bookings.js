@@ -438,12 +438,22 @@
       (b.downPayment ? '<div class="r-line"><span>العربون</span><span>' + window.fmt.money(b.downPayment) + '</span></div>' : '') +
       '<div class="r-line r-total"><span>الإجمالي</span><span>' + window.fmt.money(paid || calc.expected) + '</span></div>';
 
+    var total = paid || calc.expected;
+    var w = s.wallet || {};
+    var showQR = w.enabled && w.number;
+    var qrBlock = showQR
+      ? '<div class="r-qr"><div class="r-qr-label">💳 ادفع إلكترونيًا — ' + ui.esc(w.provider || 'محفظة') + '</div>' +
+        '<div id="receiptQR" class="r-qr-box"></div>' +
+        '<div class="r-qr-num">' + ui.esc(w.number) + '</div></div>'
+      : '';
+
     var html =
       '<div class="modal-header"><div class="modal-title">🧾 وصل</div><button class="modal-close" data-close>✕</button></div>' +
       '<div class="receipt" id="receiptBody">' +
         '<div class="r-club">🏸 ' + ui.esc(s.clubName) + '</div>' +
         '<div class="r-no">وصل رقم: ' + (b.id || '').slice(-8) + '</div>' +
         lines +
+        qrBlock +
       '</div>' +
       '<div class="modal-actions mt-16">' +
         '<button class="btn btn-success" id="rWhats">واتساب</button>' +
@@ -451,6 +461,13 @@
         '<button class="btn btn-ghost" data-close>إغلاق</button>' +
       '</div>';
     var overlay = ui.openModal(html);
+    if (showQR && window.QRCode) {
+      var qrEl = overlay.querySelector('#receiptQR');
+      if (qrEl) {
+        var payload = 'PAY|' + (w.provider || '') + '|' + w.number + '|' + total;
+        try { new window.QRCode(qrEl, { text: payload, width: 130, height: 130, colorDark: '#1a1a2e', colorLight: '#ffffff', correctLevel: window.QRCode.CorrectLevel.M }); } catch (e) {}
+      }
+    }
     overlay.querySelectorAll('[data-close]').forEach(function (b2) { b2.addEventListener('click', function () { ui.closeModal(overlay); }); });
     overlay.querySelector('#rPrint').addEventListener('click', function () { window.print(); });
     overlay.querySelector('#rWhats').addEventListener('click', function () {

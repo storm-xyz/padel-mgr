@@ -6,7 +6,7 @@
   'use strict';
 
   var PREFIX = 'pmgr_';
-  var ENTITIES = ['bookings', 'closings', 'trainees', 'groups', 'trainers', 'sessions'];
+  var ENTITIES = ['bookings', 'closings', 'trainees', 'groups', 'trainers', 'sessions', 'customers', 'inventory'];
 
   var DEFAULTS = {
     settings: {
@@ -23,7 +23,9 @@
     trainees: [],
     groups: [],
     trainers: [],
-    sessions: []
+    sessions: [],
+    customers: [],
+    inventory: []
   };
 
   function generateId() {
@@ -325,6 +327,8 @@
     groups: stores.groups,
     trainers: stores.trainers,
     sessions: stores.sessions,
+    customers: stores.customers,
+    inventory: stores.inventory,
     migrate: migrate,
     exportAll: exportAll,
     importAll: importAll,

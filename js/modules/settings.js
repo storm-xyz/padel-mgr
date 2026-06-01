@@ -13,7 +13,7 @@
     var s = window.db.getSettings();
     container.innerHTML =
       '<div class="page-header"><div class="page-title">⚙️ الإعدادات</div></div>' +
-      clubSection(s) + overtimeSection(s) + trainersSection() + syncSection() +
+      clubSection(s) + overtimeSection(s) + trainersSection() + walletSection(s) + exportSection() + syncSection() +
       backupSection() + aiSection() + passwordSection() + dataSection() + aboutSection();
     wire(container);
   }
@@ -76,6 +76,28 @@
       '<button class="btn btn-secondary btn-block" id="exportBackup">تصدير نسخة احتياطية (JSON)</button>' +
       '<input type="file" id="importFile" accept="application/json" style="display:none">' +
       '<button class="btn btn-secondary btn-block mt-12" id="importBackup">استيراد نسخة احتياطية</button>');
+  }
+
+  /* Wallet / electronic payment (QR) */
+  function walletSection(s) {
+    var w = s.wallet || {};
+    return card('💳 الدفع الإلكتروني (QR)',
+      '<div class="muted mb-12">فعّل المحفظة الإلكترونية لعرض كود QR للدفع في الوصل.</div>' +
+      '<div class="flex" style="justify-content:space-between;align-items:center"><label>تفعيل الدفع بـ QR</label>' +
+        '<label class="switch"><input type="checkbox" id="setWalletOn"' + (w.enabled ? ' checked' : '') + '><span class="slider"></span></label></div>' +
+      '<div id="walletFields" style="display:' + (w.enabled ? 'block' : 'none') + '">' +
+        '<div class="form-group mt-12"><label>اسم المحفظة / المزوّد</label><input id="setWalletProvider" placeholder="مثال: InstaPay / فودافون كاش" value="' + ui.esc(w.provider || '') + '"></div>' +
+        '<div class="form-group"><label>رقم المحفظة / المعرّف</label><input id="setWalletNumber" placeholder="01000000000" value="' + ui.esc(w.number || '') + '"></div>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-block mt-12" id="saveWallet">حفظ</button>');
+  }
+
+  /* Export — Excel + iCal */
+  function exportSection() {
+    return card('📤 تصدير البيانات',
+      '<div class="muted mb-12">صدّر الحجوزات لفتحها في Excel أو لإضافتها للتقويم (iCal).</div>' +
+      '<button class="btn btn-secondary btn-block" id="exportExcel">📊 تصدير الحجوزات (Excel)</button>' +
+      '<button class="btn btn-secondary btn-block mt-12" id="exportICal">📅 تصدير التقويم (iCal)</button>');
   }
 
   /* 6. AI */
@@ -178,6 +200,21 @@
       reader.readAsText(file);
     });
 
+    // Wallet
+    if ($('setWalletOn')) $('setWalletOn').addEventListener('change', function () { $('walletFields').style.display = this.checked ? 'block' : 'none'; });
+    if ($('saveWallet')) $('saveWallet').addEventListener('click', function () {
+      window.db.saveSettings({ wallet: {
+        enabled: $('setWalletOn').checked,
+        provider: $('setWalletProvider') ? $('setWalletProvider').value.trim() : '',
+        number: $('setWalletNumber') ? $('setWalletNumber').value.trim() : ''
+      } });
+      ui.toast('تم حفظ بيانات الدفع ✓');
+    });
+
+    // Export
+    if ($('exportExcel')) $('exportExcel').addEventListener('click', exportExcel);
+    if ($('exportICal')) $('exportICal').addEventListener('click', exportICal);
+
     // AI key
     if ($('saveKey')) $('saveKey').addEventListener('click', function () {
       var v = $('aiKeyInput').value.trim(); if (!v) { ui.toast('أدخل المفتاح', '#e03131'); return; }
@@ -211,11 +248,74 @@
     $('resetAll').addEventListener('click', function () {
       var ans = prompt("اكتب 'تأكيد' للاستمرار في إعادة الضبط الكامل:");
       if (ans !== 'تأكيد') return;
-      ['bookings', 'closings', 'trainees', 'groups', 'trainers', 'sessions', 'settings', 'migrated'].forEach(function (k) {
+      ['bookings', 'closings', 'trainees', 'groups', 'trainers', 'sessions', 'customers', 'inventory', 'settings', 'migrated'].forEach(function (k) {
         localStorage.removeItem('pmgr_' + k);
       });
       ui.toast('تمت إعادة الضبط ✓'); window.db.migrate(); window.PMGR.updateClubName(); render(container);
     });
+  }
+
+  /* ---------------- Export helpers ---------------- */
+  function downloadFile(filename, content, mime) {
+    var blob = new Blob(['\ufeff' + content], { type: mime });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 100);
+  }
+
+  var PAY_LABEL = { cash: 'كاش', visa: 'فيزا', mixed: 'مختلط', pending: 'معلق' };
+
+  function sortedBookings() {
+    return window.db.bookings.getAll().slice().sort(function (a, b) {
+      return (a.date + a.startTime) < (b.date + b.startTime) ? -1 : 1;
+    });
+  }
+
+  // Excel-compatible HTML table (.xls) — opens natively in Excel, no library needed.
+  function exportExcel() {
+    var rows = sortedBookings();
+    if (!rows.length) { ui.toast('لا توجد حجوزات للتصدير', '#e03131'); return; }
+    var head = ['التاريخ', 'الوقت', 'المدة (دقيقة)', 'الملعب', 'العميل', 'الهاتف', 'طريقة الدفع', 'كاش', 'فيزا', 'الإجمالي'];
+    var body = rows.map(function (b) {
+      var cash = parseFloat(b.cash) || 0, visa = parseFloat(b.visa) || 0;
+      return '<tr>' + [
+        b.date, b.startTime, (b.duration || ''), b.courtNumber,
+        (b.clientName || ''), (b.phone || ''),
+        (PAY_LABEL[b.paymentMethod] || b.paymentMethod || ''),
+        cash, visa, (cash + visa)
+      ].map(function (c) { return '<td>' + ui.esc(String(c)) + '</td>'; }).join('') + '</tr>';
+    }).join('');
+    var html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>' +
+      '<table border="1"><thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') +
+      '</tr></thead><tbody>' + body + '</tbody></table></body></html>';
+    downloadFile('padel-bookings-' + window.fmt.ymd(new Date()) + '.xls', html, 'application/vnd.ms-excel');
+    ui.toast('تم تصدير Excel ✓');
+  }
+
+  // iCalendar (.ics) — one VEVENT per booking (floating local time).
+  function exportICal() {
+    var rows = sortedBookings();
+    if (!rows.length) { ui.toast('لا توجد حجوزات للتصدير', '#e03131'); return; }
+    var s = window.db.getSettings();
+    function stamp(date, time) { return date.replace(/-/g, '') + 'T' + (time || '00:00').replace(':', '') + '00'; }
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Padel MGR//AR//', 'CALSCALE:GREGORIAN'];
+    rows.forEach(function (b) {
+      if (b.status === 'cancelled') return;
+      var startMin = window.fmt.t2min(b.startTime);
+      var endT = window.fmt.min2t(startMin + (parseInt(b.duration, 10) || 60));
+      lines.push('BEGIN:VEVENT');
+      lines.push('UID:' + (b.id || Math.random()) + '@padel-mgr');
+      lines.push('DTSTART:' + stamp(b.date, b.startTime));
+      lines.push('DTEND:' + stamp(b.date, endT));
+      lines.push('SUMMARY:' + (b.clientName || 'حجز') + ' — ملعب ' + b.courtNumber);
+      lines.push('LOCATION:' + (s.clubName || 'نادي البادل'));
+      lines.push('END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    downloadFile('padel-calendar-' + window.fmt.ymd(new Date()) + '.ics', lines.join('\r\n'), 'text/calendar');
+    ui.toast('تم تصدير التقويم ✓');
   }
 
   function trainerModal(id, container) {

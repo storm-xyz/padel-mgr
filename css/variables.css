@@ -42,3 +42,42 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+/* ===================================================================
+   Dark theme — refined, eye-comfortable, daylight-readable.
+   High-contrast text + vivid (not washed-out) blue accent.
+   =================================================================== */
+[data-theme="dark"] {
+  /* Brand */
+  --primary: #4a9eff;
+  --primary-dark: #6fb3ff;   /* hover → lighter on dark */
+  --primary-light: rgba(74, 158, 255, 0.16);
+
+  /* Semantic — bright text on translucent tints so badges read in daylight */
+  --success-text: #5fd39a;
+  --success-bg: rgba(47, 208, 111, 0.16);
+  --danger-text: #ff8a6b;
+  --danger-bg: rgba(255, 106, 69, 0.16);
+  --warning-text: #ffc266;
+  --warning-bg: rgba(255, 179, 64, 0.16);
+  --info-text: #6db2ff;
+  --info-bg: rgba(74, 158, 255, 0.16);
+
+  /* Text */
+  --text-primary: #eaf1fb;
+  --text-secondary: #a7b6cc;
+  --text-muted: #7286a1;
+
+  /* Backgrounds — slate-navy, layered for depth */
+  --bg-primary: #161f30;   /* cards, sidebar, inputs, modals */
+  --bg-secondary: #0e1626; /* page background (darkest) */
+  --bg-tertiary: #1f2c42;  /* hover states, calc display */
+
+  /* Borders */
+  --border: #283750;
+  --border-dark: #3a4d6e;
+
+  /* Shadow — deeper for dark surfaces */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+}

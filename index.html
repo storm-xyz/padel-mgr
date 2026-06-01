@@ -11,6 +11,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <title>Padel MGR</title>
 
+  <!-- Pre-paint: default to v2 light; apply dark only if the user chose it -->
+  <script>(function(){try{var t=localStorage.getItem('pmgr_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
 
@@ -23,12 +26,15 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/modules.css">
 
+  <script src="js/lib/qrcode.min.js" defer></script>
   <script src="js/db.js" defer></script>
   <script src="js/router.js" defer></script>
   <script src="js/modules/bookings.js" defer></script>
   <script src="js/modules/grid.js" defer></script>
   <script src="js/modules/closing.js" defer></script>
+  <script src="js/modules/customers.js" defer></script>
   <script src="js/modules/academy.js" defer></script>
+  <script src="js/modules/inventory.js" defer></script>
   <script src="js/modules/stats.js" defer></script>
   <script src="js/modules/ai.js" defer></script>
   <script src="js/modules/settings.js" defer></script>
@@ -45,7 +51,9 @@
         <div class="nav-item active" data-page="bookings"><span class="nav-icon">🏸</span><span class="nav-label">الحجوزات</span></div>
         <div class="nav-item" data-page="grid"><span class="nav-icon">📊</span><span class="nav-label">الجريد</span></div>
         <div class="nav-item" data-page="closing"><span class="nav-icon">💰</span><span class="nav-label">التقفيل</span></div>
+        <div class="nav-item" data-page="customers"><span class="nav-icon">👥</span><span class="nav-label">العملاء</span></div>
         <div class="nav-item" data-page="academy"><span class="nav-icon">🎓</span><span class="nav-label">الأكاديمية</span></div>
+        <div class="nav-item" data-page="inventory"><span class="nav-icon">📦</span><span class="nav-label">المخزن</span></div>
         <div class="nav-item" data-page="stats"><span class="nav-icon">📈</span><span class="nav-label">إحصائيات</span></div>
         <div class="nav-item" data-page="ai"><span class="nav-icon">🤖</span><span class="nav-label">المساعد</span></div>
         <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات</span></div>
@@ -53,10 +61,17 @@
     </nav>
 
     <main class="main-content">
+      <div class="topbar">
+        <div class="topbar-spacer"></div>
+        <button class="topbar-btn icon-only" id="themeToggle" title="تبديل الوضع الليلي" aria-label="تبديل الوضع الليلي">🌙</button>
+        <button class="topbar-btn" id="langToggle" title="English" aria-label="تبديل اللغة">EN</button>
+      </div>
       <div class="page active" data-page="bookings"></div>
       <div class="page" data-page="grid"></div>
       <div class="page" data-page="closing"></div>
+      <div class="page" data-page="customers"></div>
       <div class="page" data-page="academy"></div>
+      <div class="page" data-page="inventory"></div>
       <div class="page" data-page="stats"></div>
       <div class="page" data-page="ai"></div>
       <div class="page" data-page="settings"></div>
@@ -66,8 +81,8 @@
       <div class="bottom-nav-item active" data-page="bookings"><span class="nav-icon">🏸</span><span>الحجوزات</span></div>
       <div class="bottom-nav-item" data-page="grid"><span class="nav-icon">📊</span><span>الجريد</span></div>
       <div class="bottom-nav-item" data-page="closing"><span class="nav-icon">💰</span><span>التقفيل</span></div>
+      <div class="bottom-nav-item" data-page="customers"><span class="nav-icon">👥</span><span>العملاء</span></div>
       <div class="bottom-nav-item" data-page="academy"><span class="nav-icon">🎓</span><span>الأكاديمية</span></div>
-      <div class="bottom-nav-item" data-page="stats"><span class="nav-icon">📈</span><span>إحصائيات</span></div>
       <div class="bottom-nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span>الإعدادات</span></div>
     </nav>
   </div>

@@ -153,6 +153,56 @@
     document.getElementById('loginPwd').addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
   }
 
+  /* ---------------- Theme toggle (light default / dark) ---------------- */
+  var THEME_KEY = 'pmgr_theme';
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0e1626' : '#185FA5');
+    var btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      btn.title = theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي';
+    }
+  }
+  window.PMGR.applyTheme = applyTheme;
+  function setupTheme() {
+    var stored = null;
+    try { stored = localStorage.getItem(THEME_KEY); } catch (e) {}
+    applyTheme(stored === 'dark' ? 'dark' : 'light');
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+      applyTheme(next);
+    });
+  }
+
+  /* ---------------- Language toggle (AR default / EN) ---------------- */
+  var LANG_KEY = 'pmgr_lang';
+  function applyLang(lang) {
+    var en = lang === 'en';
+    document.documentElement.setAttribute('lang', en ? 'en' : 'ar');
+    document.documentElement.setAttribute('dir', en ? 'ltr' : 'rtl');
+    var btn = document.getElementById('langToggle');
+    if (btn) { btn.textContent = en ? 'ع' : 'EN'; btn.title = en ? 'العربية' : 'English'; }
+  }
+  window.PMGR.lang = function () { var l = 'ar'; try { l = localStorage.getItem(LANG_KEY) || 'ar'; } catch (e) {} return l; };
+  function setupLang() {
+    applyLang(window.PMGR.lang());
+    var btn = document.getElementById('langToggle');
+    if (btn) btn.addEventListener('click', function () {
+      var next = window.PMGR.lang() === 'en' ? 'ar' : 'en';
+      try { localStorage.setItem(LANG_KEY, next); } catch (e) {}
+      applyLang(next);
+      if (next === 'en') ui.toast('English UI is being expanded — التطبيق عربي بالكامل حاليًا');
+    });
+  }
+
   /* ---------------- Service worker ---------------- */
   function registerSW() {
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -163,6 +213,8 @@
   /* ---------------- Boot ---------------- */
   function boot() {
     window.db.migrate();
+    setupTheme();
+    setupLang();
     updateClubName();
     window.router.initRouter();
     renderPage(window.router.getCurrentPage());

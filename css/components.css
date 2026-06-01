@@ -194,7 +194,8 @@ label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .divider { height: 1px; background: var(--border); margin: 16px 0; border: none; }
 
 .stat-card {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 14px;
   text-align: center;

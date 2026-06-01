@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var pages = ['bookings', 'grid', 'closing', 'academy', 'stats', 'ai', 'settings'];
+  var pages = ['bookings', 'grid', 'closing', 'customers', 'academy', 'inventory', 'stats', 'ai', 'settings'];
   var currentPage = 'bookings';
 
   function showPage(pageName) {

@@ -1,4 +1,4 @@
-const CACHE = 'pmgr-v2';
+const CACHE = 'pmgr-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,13 +7,16 @@ const ASSETS = [
   './css/layout.css',
   './css/components.css',
   './css/modules.css',
+  './js/lib/qrcode.min.js',
   './js/db.js',
   './js/router.js',
   './js/app.js',
   './js/modules/bookings.js',
   './js/modules/grid.js',
   './js/modules/closing.js',
+  './js/modules/customers.js',
   './js/modules/academy.js',
+  './js/modules/inventory.js',
   './js/modules/stats.js',
   './js/modules/ai.js',
   './js/modules/settings.js',

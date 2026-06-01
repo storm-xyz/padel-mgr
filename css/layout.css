@@ -56,6 +56,40 @@
   background: var(--bg-secondary);
 }
 
+/* ===== Top bar (theme + language toggles) ===== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px 0;
+  background: var(--bg-secondary);
+}
+.topbar-spacer { flex: 1; }
+.topbar-btn {
+  width: auto;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.topbar-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.topbar-btn.icon-only { width: 40px; padding: 0; font-size: 18px; }
+
 .page { display: none; padding: 20px; min-height: 100%; }
 .page.active { display: block; }
 
