@@ -1,0 +1,83 @@
+:root {
+  /* Brand */
+  --primary: #185FA5;
+  --primary-dark: #0C447C;
+  --primary-light: #E6F1FB;
+
+  /* Semantic */
+  --success-text: #27500A;
+  --success-bg: #EAF3DE;
+  --danger-text: #791F1F;
+  --danger-bg: #FCEBEB;
+  --warning-text: #633806;
+  --warning-bg: #FAEEDA;
+  --info-text: #0C447C;
+  --info-bg: #E6F1FB;
+
+  /* Text */
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #94a3b8;
+
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #F8FAFC;
+  --bg-tertiary: #F1F5F9;
+
+  /* Borders */
+  --border: #e2e8f0;
+  --border-dark: #cbd5e1;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --bottom-nav-height: 64px;
+  --breakpoint: 768px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================================================
+   Dark theme — refined, eye-comfortable, daylight-readable.
+   High-contrast text + vivid (not washed-out) blue accent.
+   =================================================================== */
+[data-theme="dark"] {
+  /* Brand */
+  --primary: #4a9eff;
+  --primary-dark: #6fb3ff;   /* hover → lighter on dark */
+  --primary-light: rgba(74, 158, 255, 0.16);
+
+  /* Semantic — bright text on translucent tints so badges read in daylight */
+  --success-text: #5fd39a;
+  --success-bg: rgba(47, 208, 111, 0.16);
+  --danger-text: #ff8a6b;
+  --danger-bg: rgba(255, 106, 69, 0.16);
+  --warning-text: #ffc266;
+  --warning-bg: rgba(255, 179, 64, 0.16);
+  --info-text: #6db2ff;
+  --info-bg: rgba(74, 158, 255, 0.16);
+
+  /* Text */
+  --text-primary: #eaf1fb;
+  --text-secondary: #a7b6cc;
+  --text-muted: #7286a1;
+
+  /* Backgrounds — slate-navy, layered for depth */
+  --bg-primary: #161f30;   /* cards, sidebar, inputs, modals */
+  --bg-secondary: #0e1626; /* page background (darkest) */
+  --bg-tertiary: #1f2c42;  /* hover states, calc display */
+
+  /* Borders */
+  --border: #283750;
+  --border-dark: #3a4d6e;
+
+  /* Shadow — deeper for dark surfaces */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
