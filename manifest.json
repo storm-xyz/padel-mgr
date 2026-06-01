@@ -1,15 +1,15 @@
 {
   "name": "Padel MGR",
-  "short_name": "Padel MGR",
-  "description": "إدارة ملاعب البادل - Padel Court Management",
-  "start_url": "./",
-  "scope": "./",
+  "short_name": "PadelMGR",
+  "description": "إدارة ملاعب البادل — حجوزات، تقفيل، أكاديمية وإحصائيات",
+  "theme_color": "#185FA5",
+  "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#111111",
-  "theme_color": "#1A73E8",
   "dir": "rtl",
   "lang": "ar",
+  "start_url": "./",
+  "scope": "./",
   "icons": [
     {
       "src": "icon-192.png",
