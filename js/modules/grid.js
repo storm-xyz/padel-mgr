@@ -7,8 +7,9 @@
 
   var gridDate = null;
   var SLOT_START = 360;   // 06:00
-  var SLOT_END = 1560;    // 02:00 next day
+  var SLOT_END = 1800;    // 06:00 next day
   var STEP = 30;
+  var gridState = null;   // { occ, courts, slotsLen, slots } — shared with selection wiring
 
   function normStart(t) { var m = window.fmt.t2min(t); if (m < SLOT_START) m += 1440; return m; }
 
@@ -16,6 +17,13 @@
     if (!gridDate) gridDate = window.fmt.ymd(new Date());
     var s = window.db.getSettings();
     var courts = s.courts || 2;
+
+    // Preserve scroll position so saving a booking doesn't jump back to the start.
+    var prevGC = container.querySelector('.grid-container');
+    var savedLeft = prevGC ? prevGC.scrollLeft : 0;
+    var savedTop = prevGC ? prevGC.scrollTop : 0;
+    var main = document.querySelector('.main-content');
+    var savedMainTop = main ? main.scrollTop : 0;
 
     var bookings = window.db.bookings.filter(function (b) { return b.date === gridDate && b.status !== 'cancelled'; });
 
@@ -36,6 +44,8 @@
       for (var k = 1; k < span; k++) occ[b.courtNumber][idx + k] = { type: 'covered' };
     });
 
+    gridState = { occ: occ, courts: courts, slotsLen: slots.length, slots: slots };
+
     var head = '<tr class="grid-header-row"><th class="grid-time-col grid-corner">الوقت</th>';
     for (var cc = 1; cc <= courts; cc++) head += '<th>ملعب ' + cc + '</th>';
     head += '</tr>';
@@ -54,7 +64,7 @@
             '<div class="grid-booking-name">' + ui.esc(b.clientName || 'عميل') + '</div>' +
             '<div class="grid-booking-duration">' + (b.duration / 60) + ' س</div></td>';
         } else {
-          body += '<td class="grid-cell-empty" data-court="' + court + '" data-time="' + t + '"></td>';
+          body += '<td class="grid-cell-empty" data-court="' + court + '" data-time="' + t + '" data-idx="' + si + '"></td>';
         }
       }
       body += '</tr>';
@@ -69,9 +79,15 @@
         '<button class="nav-arrow" data-nav="next">←</button>' +
       '</div>' +
       '<div class="grid-legend"><span>🟢 متاح</span><span>🔵 محجوز</span><span>🟡 معلق</span></div>' +
+      '<div class="grid-hint muted">💡 اسحب أو اضغط على الخانات لاختيار فترة الحجز</div>' +
       '<div class="grid-container"><table class="grid-table"><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>';
 
     wire(container);
+
+    // Restore scroll position captured before the re-render.
+    var gc = container.querySelector('.grid-container');
+    if (gc) { gc.scrollLeft = savedLeft; gc.scrollTop = savedTop; }
+    if (main) main.scrollTop = savedMainTop;
   }
 
   function wire(container) {
@@ -84,17 +100,86 @@
         render(container);
       });
     });
-    container.querySelectorAll('.grid-cell-empty').forEach(function (td) {
-      td.addEventListener('click', function () {
-        window.PMGR.openBookingModal({
-          date: gridDate,
-          startTime: td.getAttribute('data-time'),
-          courtNumber: parseInt(td.getAttribute('data-court'), 10)
-        });
-      });
-    });
+    setupSelection(container);
     container.querySelectorAll('[data-booking]').forEach(function (td) {
       td.addEventListener('click', function (e) { showPopover(e, td.getAttribute('data-booking')); });
+    });
+  }
+
+  /* ---------------- Drag / tap selection on empty cells ----------------
+     Press (or click) an empty cell and drag across adjacent empty cells in
+     the same court to select a time range, then the booking modal opens
+     pre-filled with the start time and duration. A single tap selects one
+     30-minute slot. The range is clamped to contiguous empty slots. */
+  function setupSelection(container) {
+    var sel = null; // { court, anchor, focus }
+
+    function cellAt(court, idx) {
+      return container.querySelector('.grid-cell-empty[data-court="' + court + '"][data-idx="' + idx + '"]');
+    }
+    function isEmpty(court, idx) {
+      return idx >= 0 && gridState && idx < gridState.slotsLen &&
+        gridState.occ[court] && !gridState.occ[court][idx];
+    }
+    function clampRange(court, anchor, focus) {
+      var lo = Math.min(anchor, focus), hi = Math.max(anchor, focus);
+      var start = anchor, end = anchor;
+      for (var i = anchor - 1; i >= lo; i--) { if (isEmpty(court, i)) start = i; else break; }
+      for (var j = anchor + 1; j <= hi; j++) { if (isEmpty(court, j)) end = j; else break; }
+      return { start: start, end: end };
+    }
+    function clearPaint() {
+      container.querySelectorAll('.grid-cell-selecting').forEach(function (c) { c.classList.remove('grid-cell-selecting'); });
+    }
+    function paint(court, start, end) {
+      clearPaint();
+      for (var i = start; i <= end; i++) { var c = cellAt(court, i); if (c) c.classList.add('grid-cell-selecting'); }
+    }
+
+    function onMove(ev) {
+      if (!sel) return;
+      var el = document.elementFromPoint(ev.clientX, ev.clientY);
+      var td = el && el.closest ? el.closest('.grid-cell-empty') : null;
+      if (td && parseInt(td.getAttribute('data-court'), 10) === sel.court) {
+        sel.focus = parseInt(td.getAttribute('data-idx'), 10);
+        var r = clampRange(sel.court, sel.anchor, sel.focus);
+        paint(sel.court, r.start, r.end);
+      }
+      if (ev.cancelable) ev.preventDefault();
+    }
+    function onUp() {
+      if (!sel) return;
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onUp);
+      var r = clampRange(sel.court, sel.anchor, sel.focus);
+      var court = sel.court;
+      sel = null;
+      clearPaint();
+      var count = r.end - r.start + 1;
+      var startMin = gridState.slots[r.start];
+      window.PMGR.openBookingModal({
+        date: gridDate,
+        startTime: window.fmt.min2t(startMin % 1440),
+        courtNumber: court,
+        duration: count * STEP
+      });
+    }
+
+    container.querySelectorAll('.grid-cell-empty').forEach(function (td) {
+      td.addEventListener('pointerdown', function (ev) {
+        if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+        sel = {
+          court: parseInt(td.getAttribute('data-court'), 10),
+          anchor: parseInt(td.getAttribute('data-idx'), 10),
+          focus: parseInt(td.getAttribute('data-idx'), 10)
+        };
+        paint(sel.court, sel.anchor, sel.anchor);
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onUp);
+        if (ev.cancelable) ev.preventDefault();
+      });
     });
   }
 
