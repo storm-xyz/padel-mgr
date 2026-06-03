@@ -121,7 +121,8 @@
       : '<div class="form-group"><label>باسورد جديد</label><input id="pwd1" type="password"></div>' +
         '<div class="form-group"><label>تأكيد الباسورد</label><input id="pwd2" type="password"></div>' +
         '<button class="btn btn-primary btn-block" id="setPwd">تعيين الباسورد</button>';
-    return card('🔒 حماية التطبيق', inner);
+    return card('🔒 حماية التطبيق', inner +
+      '<small class="muted">الباسورد بيتخزّن مشفّر (SHA-256) على جهازك بس، وبيتطلب كل ما تفتح التطبيق على نفس الجهاز.</small>');
   }
 
   /* 8. Data management */
@@ -228,12 +229,16 @@
       var p1 = $('pwd1').value, p2 = $('pwd2').value;
       if (p1.length < 4) { ui.toast('الباسورد 4 أحرف على الأقل', '#e03131'); return; }
       if (p1 !== p2) { ui.toast('الباسورد غير متطابق', '#e03131'); return; }
-      localStorage.setItem(window.PMGR.pwdKey, window.PMGR.hashPwd(p1)); ui.toast('تم تعيين الباسورد ✓'); render(container);
+      window.PMGR.hashPwd(p1).then(function (h) {
+        localStorage.setItem(window.PMGR.pwdKey, h); ui.toast('تم تعيين الباسورد ✓'); render(container);
+      });
     });
     if ($('changePwd')) $('changePwd').addEventListener('click', function () {
       var np = prompt('الباسورد الجديد (4 أحرف على الأقل):'); if (np == null) return;
       if (np.length < 4) { ui.toast('قصير جداً', '#e03131'); return; }
-      localStorage.setItem(window.PMGR.pwdKey, window.PMGR.hashPwd(np)); ui.toast('تم التغيير ✓');
+      window.PMGR.hashPwd(np).then(function (h) {
+        localStorage.setItem(window.PMGR.pwdKey, h); ui.toast('تم التغيير ✓');
+      });
     });
     if ($('removePwd')) $('removePwd').addEventListener('click', function () {
       if (confirm('إلغاء حماية الباسورد؟')) { localStorage.removeItem(window.PMGR.pwdKey); ui.toast('تم الإلغاء ✓'); render(container); }

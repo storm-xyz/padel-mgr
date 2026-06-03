@@ -126,7 +126,20 @@
 
   /* ---------------- Password gate ---------------- */
   var PWD_KEY = 'pmgr_password';
-  function hashPwd(p) { return btoa(unescape(encodeURIComponent(p + 'pmgr_salt'))); }
+  var PWD_SALT = 'pmgr_salt_v2';
+  // Legacy reversible hash (base64) — kept only to migrate old stored passwords.
+  function legacyHash(p) { return btoa(unescape(encodeURIComponent(p + 'pmgr_salt'))); }
+  // Strong one-way hash: SHA-256 via Web Crypto, hex-encoded. Returns a Promise.
+  function hashPwd(p) {
+    var canSubtle = window.crypto && window.crypto.subtle && window.crypto.subtle.digest && window.TextEncoder;
+    if (!canSubtle) return Promise.resolve(legacyHash(p));
+    var data = new TextEncoder().encode(String(p) + PWD_SALT);
+    return window.crypto.subtle.digest('SHA-256', data).then(function (buf) {
+      var bytes = new Uint8Array(buf), hex = '';
+      for (var i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0');
+      return 'sha256$' + hex;
+    });
+  }
   window.PMGR.hashPwd = hashPwd;
   window.PMGR.pwdKey = PWD_KEY;
 
@@ -146,8 +159,15 @@
     document.body.appendChild(screen);
     function attempt() {
       var val = document.getElementById('loginPwd').value;
-      if (hashPwd(val) === stored) { document.body.removeChild(screen); onSuccess(); }
-      else { document.getElementById('loginErr').style.display = 'block'; }
+      hashPwd(val).then(function (h) {
+        if (h === stored) { document.body.removeChild(screen); onSuccess(); return; }
+        // Transparently upgrade a password still stored with the old base64 hash.
+        if (legacyHash(val) === stored) {
+          try { localStorage.setItem(PWD_KEY, h); } catch (e) {}
+          document.body.removeChild(screen); onSuccess(); return;
+        }
+        document.getElementById('loginErr').style.display = 'block';
+      });
     }
     document.getElementById('loginBtn').addEventListener('click', attempt);
     document.getElementById('loginPwd').addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(); });
