@@ -215,7 +215,7 @@
 
   function timeOptions(selected) {
     var opts = '';
-    for (var m = 360; m <= 1560; m += 15) { // 06:00 → 02:00 next day
+    for (var m = 360; m <= 1800; m += 15) { // 06:00 → 06:00 next day
       var t = window.fmt.min2t(m % 1440);
       opts += '<option value="' + t + '"' + (t === selected ? ' selected' : '') + '>' + window.fmt.time12(t) + '</option>';
     }
@@ -229,7 +229,7 @@
 
     draft = {
       editId: opts.editId || null,
-      duration: existing ? existing.duration : 60,
+      duration: existing ? existing.duration : (parseInt(opts.duration, 10) || 60),
       court: existing ? existing.courtNumber : (opts.courtNumber || 1),
       pay: existing ? existing.paymentMethod : 'cash',
       expenses: existing && Array.isArray(existing.expenses) ? existing.expenses.slice() : []
@@ -241,9 +241,10 @@
     for (var i = 1; i <= (s.courts || 2); i++) {
       courtsHtml += '<button type="button" class="opt-btn' + (draft.court === i ? ' active' : '') + '" data-court="' + i + '">ملعب ' + i + '</button>';
     }
+    var durIsManual = DURATIONS.every(function (d) { return d.v !== draft.duration; });
     var durHtml = DURATIONS.map(function (d) {
       return '<button type="button" class="opt-btn' + (draft.duration === d.v ? ' active' : '') + '" data-dur="' + d.v + '">' + d.l + '</button>';
-    }).join('') + '<button type="button" class="opt-btn" data-dur="manual">يدوي</button>';
+    }).join('') + '<button type="button" class="opt-btn' + (durIsManual ? ' active' : '') + '" data-dur="manual">يدوي</button>';
 
     var payHtml = [['pending', '⏳ معلق'], ['cash', '💵 كاش'], ['visa', '💳 فيزا'], ['mixed', '🔗 مختلط']].map(function (p) {
       return '<button type="button" class="opt-btn' + (draft.pay === p[0] ? ' active' : '') + '" data-pay="' + p[0] + '">' + p[1] + '</button>';
@@ -252,14 +253,14 @@
     var html =
       '<div class="modal-header"><div class="modal-title">' + (existing ? 'تعديل حجز' : 'حجز جديد') + '</div>' +
         '<button class="modal-close" data-close>✕</button></div>' +
-      '<div class="form-group"><label>اسم العميل *</label><input id="bName" autofocus value="' + ui.esc(existing ? existing.clientName : '') + '"></div>' +
+      '<div class="form-group"><label>اسم العميل (اختياري)</label><input id="bName" autofocus value="' + ui.esc(existing ? existing.clientName : '') + '"></div>' +
       '<div class="form-group"><label>رقم الهاتف</label><input id="bPhone" type="tel" value="' + ui.esc(existing ? existing.phone : '') + '"></div>' +
       '<div class="form-row">' +
         '<div class="form-group"><label>التاريخ</label><input id="bDate" type="date" value="' + date + '"></div>' +
         '<div class="form-group"><label>وقت البداية</label><select id="bStart">' + timeOptions(startTime) + '</select></div>' +
       '</div>' +
       '<div class="form-group"><label>المدة</label><div class="duration-grid" id="durGrid">' + durHtml + '</div>' +
-        '<input id="bDurManual" type="number" placeholder="دقائق" style="margin-top:8px;display:none" value="' + (existing ? existing.duration : '') + '"></div>' +
+        '<input id="bDurManual" type="number" placeholder="دقائق" style="margin-top:8px;display:' + (durIsManual ? 'block' : 'none') + '" value="' + (durIsManual ? draft.duration : '') + '"></div>' +
       '<div class="form-group"><label>الملعب</label><div class="court-grid" id="courtGrid">' + courtsHtml + '</div></div>' +
       '<div class="form-group"><label>طريقة الدفع</label><div class="pay-grid" id="payGrid">' + payHtml + '</div></div>' +
       '<div id="payAmounts"></div>' +
@@ -370,7 +371,6 @@
 
   function saveBooking(overlay, $, existing) {
     var name = $('bName').value.trim();
-    if (!name) { ui.toast('أدخل اسم العميل ⚠️', '#e03131'); return; }
     if (!draft.duration || draft.duration <= 0) { ui.toast('أدخل مدة الحجز ⚠️', '#e03131'); return; }
 
     var date = $('bDate').value, startTime = $('bStart').value;
